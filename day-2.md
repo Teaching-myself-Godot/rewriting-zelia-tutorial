@@ -116,8 +116,81 @@ All this work should allow you to draw these shapes into the viewport in no time
 
 ![draw terrains in viewport](screenshots/draw_terrains_in_viewport.png)
 
+### Don't forget to save!
+
+I almost forgot myself. Press `Ctrl-S` to save the `World`-scene into `rest://world.tscn`
+
 ### Technical debt 3
 
 After reading up about `TileMap` - including developers' opinions about it, I concluded that at this point I can safe create one `TileMap`-scene, call it `World`, and assume we will be making all the level content in it.
 
 This violates some of the [SOLID](https://en.wikipedia.org/wiki/SOLID) principles, i.e. it does not separate the concern of tiles from the concern of a map/level/world, but we will accept this potential technical debt.
+
+## Add the `Player` to the `World` scene
+
+Let's add the `Player`-node as an instance into this `World`-scene.
+
+Just drag her scene file from the `FileSystem` tab into the `tree view`: `res://player/player.tscn`, like in the first tutorials.
+
+Test the current scene.
+
+Actually make the `World`-scene the main scene by right clicking on `world.tscn` in the `FileSystem` tab and picking `Set as Main Scene`.
+
+Use `F5` or your OS's shortcut to run the entire project.
+
+There is a lot missing, we can't leave Zelia just _hanging_ there! (ha ha ha).
+
+![zelia just hanging there](screenshots/zelia-just-hanging-there.png)
+
+### Make her subject to the laws of physics.
+
+Like we speculated during day 1, we need to change her `Node Type` if we do not want to write all the physics ourselves. 
+
+And I don't. I did it last time and it took me weeks and weeks of tweaking; and there are sure to still be bugs hanging around.
+
+1. Go to the `Player` scene view (the one where she is the root node).
+2. Right click on `Player` 
+3. Pick `Change type`
+4. Choose `RigidBody2D`
+5. Replace her attached script `res://player/player.gd` with this one line of code:
+
+```gdscript
+extends RigidBody2D # this first line changed!
+```
+
+Test by running the project.
+
+### Tweaking her physics properties
+
+If you let her fall from a really high place she could fall flat on her face.
+
+![Zelia flat on her face](screenshots/zelia-flat-on-her-face.png)
+
+This looks funny and all, but if you let her run in this state, you might understand the problem.
+
+1. Make sure you're in the `Player` scene
+2. Check `Lock Rotation` to `On` in the `Inspector`
+
+If you check it on in the world scene this rule will _only_ apply to her instance in _that_ scene. 
+
+We want these defaults to apply to her _class_ not her _instance_.
+
+![locking rotation](screenshots/locking-rotations.png)
+
+## Rewriting her code
+
+Well, we have to start all over again!
+
+In writing we call this "Kill your Darlings". 
+
+With the beginner's mindset, we simply call this learning. It's fun!
+
+The [`RigidBody2D` documentation](https://docs.godotengine.org/en/stable/classes/class_rigidbody2d.html) refers to [this example project](https://godotengine.org/asset-library/asset/119). 
+
+We will base our rewrite on the code in [this gdscript file](https://github.com/godotengine/godot-demo-projects/blob/3.5-9e68af3/2d/physics_platformer/player/player.gd) as it roughly does what we need as well...
+
+...So bye beautiful `enums`!
+
+```gdscript
+
+```
