@@ -390,6 +390,19 @@ Run the player scene to test out the jump.
 
 Personally I think one second of air time is a little to long, so let's change it to  `0.7s` - not too long as to seem unnatural, yet long enough for her to change direction in the air.
 
+## Jump sound
+
+Before we round up let's also add in the jump sound. Create a new child node for `Player` of type `AudioStreamPlayer` and call it `JumpSound`.
+
+Open up the `Inspector` and next to `Stream` use `Quick load` and pick `jump-sound.wav` from our resources dir.
+
+Then add this new line of code in `_process`:
+
+```gdscript
+	if Input.is_action_just_pressed("Jump") and movement_state != MovementState.AIRBORNE:
+		$JumpSound.play() # the new line
+```
+
 ## Technical debt 2
 
 The code is starting to look a little messy already, so we might want refactor at this point.
