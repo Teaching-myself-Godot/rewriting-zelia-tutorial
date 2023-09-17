@@ -29,5 +29,11 @@ Because Zelia has become a pretty big project we should pay attention to directo
 
 Let's make a subdir in the root folder named `player` with another subdir named `images`.
 
-You can download her png files from [assets/zelia-player.zip](assets/zelia-player.zip)
+You can download her png files from [assets/zelia-player.zip](https://github.com/Teaching-myself-Godot/rewriting-zelia-tutorial/raw/main/assets/zelia-player.zip)
+
+Your FileSystem tab should now look like this:
+![import-player](screenshots/import-player.png)
+
+Zelia also has a jump sound. Let's create a sounds dir for it.
+Here is her [jump-sound.wav](https://github.com/Teaching-myself-Godot/rewriting-zelia-tutorial/raw/main/assets/jump-sound.wav)
 
