@@ -25,6 +25,9 @@ Because Zelia once started out as an HTML5 webgame it might work well in the web
 
 ## Importing the player assets
 
-Because Zelia has become a pretty big project we can at least keep her asset's directory structure. Let's make a subdir in the root folder named `player` to match the way I named stuff in the original game.
+Because Zelia has become a pretty big project we should pay attention to directory structure early.
 
+Let's make a subdir in the root folder named `player` with another subdir named `images`.
+
+You can download her png files from [assets/zelia-player.zip](assets/zelia-player.zip)
 
