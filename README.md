@@ -24,3 +24,14 @@ I will be documenting my work in numbered days, some days we'll get a lot done. 
 
 [Day 1 - Controlling the Player](day-1.md)
 
+
+## Things I read up on
+
+This section contains links I read up on but haven't used (yet) / might not use at all for this project.
+
+### Things we will need
+- [Using TileMaps](https://docs.godotengine.org/en/stable/tutorials/2d/using_tilemaps.html)
+- [Terrain Autotiling and Alternative Tiles ~ Godot 4 Tutorial for Beginners](https://www.youtube.com/watch?v=vV8uKN1VnN4)
+
+### Things we probably won't need, but would like to
+- [How to use Godot's AStar2D for path finding](https://escada-games.itch.io/randungeon/devlog/261991/how-to-use-godots-astar2d-for-path-finding)
