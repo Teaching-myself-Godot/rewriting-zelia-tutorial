@@ -21,11 +21,12 @@ Apparently, it's a [known issue](https://github.com/godotengine/godot/issues/447
 Let's start a new project. 
 
 Because Zelia once started out as an HTML5 webgame it might work well in the web again. Also I want to be able to compile to as many platforms as possible this time, so let's pick the `Compatibility` renderer:
+
 ![Compatibility Renderer](screenshots/renderer-choice.png)
 
 ## Importing the player assets
 
-Because Zelia has become a pretty big project we should pay attention to directory structure early.
+Because Zelia has become a pretty big project we should pay attention to directory structure early on.
 
 Let's make a subdir in the root folder named `player` with another subdir named `images`.
 
@@ -228,17 +229,19 @@ enum MovementState { IDLE, RUNNING, AIRBORNE }
 
 # We will want to debug these states, let's export them as well
 @export var movement_state : int
-@export var orientation   : int
+@export var orientation    : int
 
 
 func _ready():
 	movement_state = MovementState.IDLE
-	orientation   = Orientation.RIGHT
+	orientation    = Orientation.RIGHT
 
 func _process(delta):
 	pass
 
 ```
+
+### Test run
 
 Run the current scene to test our property assignments. 
 
@@ -247,13 +250,14 @@ To debug exported properties while running, go to the node tree window and pick 
 ![toggle remote](screenshots/toggle-remote.png)
 
 Then click the `root`-node first and then the `Player`-node. 
+
 The `Inspector` tab for `Player` should now show:
 
 ![movement state props](screenshots/movement-state-props.png)
 
 You can even change the property values through this interface!
 
-### Processing the inputs and assigning states for running
+## Implement running animations
 
 So let's now write some body for the `_process()` func.
 
@@ -262,10 +266,10 @@ Let's first write tests for the `Run right` and `Run left` actions to set the mo
 ```gdscript
 func _process(delta):
 	if Input.is_action_pressed("Run right"):
-		orientation = Orientation.RIGHT
+		orientation    = Orientation.RIGHT
 		movement_state = MovementState.RUNNING
 	elif Input.is_action_pressed("Run left"):
-		orientation = Orientation.LEFT
+		orientation    = Orientation.LEFT
 		movement_state = MovementState.RUNNING
 	else:
 		movement_state = MovementState.IDLE
@@ -295,7 +299,7 @@ Add the following code at the bottom of the `_process` func:
 
 And make sure our `AnimatedSprite2D` node starts playing in func `_ready`.
 
-```
+```gdscript
 func _ready():
 	movement_state = MovementState.IDLE
 	orientation    = Orientation.RIGHT
@@ -333,7 +337,7 @@ Let the `Wait Time` property remain at `1s` and mark it as `One Shot`.
 
 ### Starting the MockAirTimer when the jump button was pressed
 
-Change the `_process` func like to match this snippet; changes and additions are under the comments.
+Change the `_process` func to match this snippet; changes and additions are under the comments.
 
 ```gdscript
 func _process(delta):
@@ -343,11 +347,11 @@ func _process(delta):
 		movement_state = MovementState.AIRBORNE
 
 	if Input.is_action_pressed("Run right"):
-		orientation = Orientation.RIGHT
+		orientation    = Orientation.RIGHT
 		# Only change movement state to running if not airborne
 		movement_state = MovementState.RUNNING if movement_state != MovementState.AIRBORNE else MovementState.AIRBORNE
 	elif Input.is_action_pressed("Run left"):
-		orientation = Orientation.LEFT
+		orientation    = Orientation.LEFT
 		# Only change movement state to running if not airborne
 		movement_state = MovementState.RUNNING if movement_state != MovementState.AIRBORNE else MovementState.AIRBORNE
 	else:
@@ -373,11 +377,15 @@ func _process(delta):
 
 If we let her jump now she will remain airborne forever. Let's not forget to add a listener to the `MockAirTimer`.
 
-Select the `MockAirTimer`-node in the node tree view and open the `Node` tab next to the `Inspector` tab. Double-click `timeout()` to open the `Connect a Signal` dialog:
+Select the `MockAirTimer`-node in the node tree view and open the `Node` tab next to the `Inspector` tab.
+
+Double-click `timeout()` to open the `Connect a Signal` dialog:
 
 ![connect a signal](screenshots/connect-a-signal-dialog.png)
 
 Leave all the defaults in place and click `Connect`
+
+### Handle the timeout
 
 We now end up with the listener func `_on_mock_air_timer_timeout` to implement like this:
 
@@ -387,6 +395,8 @@ func _on_mock_air_timer_timeout():
 ```
 
 Run the player scene to test out the jump. 
+
+### Tweaking the timings
 
 Personally I think one second of air time is a little to long, so let's change it to  `0.7s` - not too long as to seem unnatural, yet long enough for her to change direction in the air.
 
@@ -415,5 +425,7 @@ Well that wraps up our day.
 
 I hope you enjoyed it as much as I did!
 
-Our next day will introduce some tiles and some movement. Maybe we can even try out the [`RigidBody2D`](https://docs.godotengine.org/en/stable/classes/class_rigidbody2d.html) at some stage!
+Our next day will introduce some tiles and some movement. 
+
+Maybe we can even try out the [`RigidBody2D`](https://docs.godotengine.org/en/stable/classes/class_rigidbody2d.html) at some stage!
 
