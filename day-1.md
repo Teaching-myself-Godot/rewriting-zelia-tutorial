@@ -415,7 +415,7 @@ Then add this new line of code in `_process`:
 
 ## Technical debt 2
 
-The code is starting to look a little messy already, so we might want refactor at this point.
+The [code is starting to look a little messy](https://github.com/Teaching-myself-Godot/godot-zelia/blob/6d300048f64f709ae48f67c5de0fc57542551f6e/player/player.gd) already, so we might want refactor at this point.
 
 No worries, we'll revisit this code often.
 
