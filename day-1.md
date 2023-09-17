@@ -179,7 +179,7 @@ And assign these keys to `Jump`:
 2. Keyboard Up arrow - `Up (Physical)`
 3. Joypad Button 0 - (`Buttom Action`, `Sony Cross`, `Xbox A`, `Ninendo B`)
 
-### Player script
+## Player script
 
 Finally, let's code some stuff, taking guidance  from [the official guide](https://docs.godotengine.org/en/stable/getting_started/first_2d_game/03.coding_the_player.html).
 
