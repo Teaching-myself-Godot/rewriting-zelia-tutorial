@@ -1,6 +1,9 @@
 # Learning Godot by rewriting Zelia
 
-Skip the elaborate intro and start: [Day 1 - Controlling the Player](day-1.md)
+Skip the elaborate intro and start:
+
+- [Day 1 - Controlling the Player](day-1.md)
+- [Day 2 - Adding some tiles](day-2.md)
 
 # Elaborate intro
 
@@ -26,8 +29,8 @@ We'll discover how that goes together as well.
 
 I will be documenting my work in numbered days, some days we'll get a lot done. On others, well you know how that goes.
 
-[Day 1 - Controlling the Player](day-1.md)
-
+- [Day 1 - Controlling the Player](day-1.md)
+- [Day 2 - Adding some tiles](day-2.md)
 
 ## Things I read up on
 

@@ -425,7 +425,9 @@ Well that wraps up our day.
 
 I hope you enjoyed it as much as I did!
 
-Our next day will introduce some tiles and some movement. 
+Our next day will introduce some tiles and some movement:
 
-Maybe we can even try out the [`RigidBody2D`](https://docs.godotengine.org/en/stable/classes/class_rigidbody2d.html) at some stage!
+[Day 2 - Adding some tiles](day-2.md)
+
+Maybe we can even try out that [`RigidBody2D`](https://docs.godotengine.org/en/stable/classes/class_rigidbody2d.html) at some stage!
 
