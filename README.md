@@ -1,5 +1,7 @@
 # Learning Godot by rewriting Zelia
 
+Skip the elaborate intro and start: [Day 1 - Controlling the Player](day-1.md)
+
 Last year I collaborated with my son on creating a game from scratch. 
 
 We soon discovered that a game needs a lot of content and ended up one year later with a _lot_ of level editor and very little game.
