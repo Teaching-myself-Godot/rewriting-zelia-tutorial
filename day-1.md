@@ -119,6 +119,7 @@ What I managed to achieve in godot for now looks like this.
 ![zelia in godot 1](screenshots/zelia-in-godot-renderer.png)
 
 However, dropping the full screen requirement and in stead opting for a resizable window achieved a way better scaling effect, ending up with this:
+
 ![zelia in godot 2](screenshots/zelia-in-godot-renderer-2.png)
 
 
