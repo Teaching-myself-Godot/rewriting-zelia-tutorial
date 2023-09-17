@@ -279,4 +279,128 @@ I noticed a slight delay in the inspector, but I'm guessing that's due to it bei
 
 Let's reread [the guide](https://docs.godotengine.org/en/stable/getting_started/first_2d_game/03.coding_the_player.html#choosing-animations) on changing the animations.
 
+Add the following code at the bottom of the `_process` func:
+```gdscript
+	match (movement_state):
+		MovementState.RUNNING:
+			$AnimatedSprite2D.animation = "running"
+		_: # MovementState.IDLE
+			$AnimatedSprite2D.animation = "idle"
+
+	if orientation == Orientation.LEFT:
+		$AnimatedSprite2D.flip_h = true
+	else:
+		$AnimatedSprite2D.flip_h = false
+```
+
+And make sure our `AnimatedSprite2D` node starts playing in func `_ready`.
+
+```
+func _ready():
+	movement_state = MovementState.IDLE
+	orientation    = Orientation.RIGHT
+	$AnimatedSprite2D.play()
+```
+
+Test the current scene and if all is well our little Zelia is up and running! (pun intended)
+
+## Implementing the jump
+
+Ok so now we want her to jump!
+
+This is harder than it seems. It's not just a matter of `if jump-is-pressed then draw jump`: we are missing some environmental factors.
+
+Let's first define what we know about how jumping works.
+
+1. Test if the jump button was just pressed  `Input.is_action_just_pressed("Jump")`
+2. `Player` receives some negative y-acceleration
+3. `Player` spends some time in the air (i.e. is not touching a floor)
+4. Gravity (some positive y-acceleration) pulls the player back down.
+
+Seems like it would be a smart move to change the `Player`-node into a [`RigidBody2D`](https://docs.godotengine.org/en/stable/classes/class_rigidbody2d.html) at some stage.
+
+However, for now we just want to have some direct feedback from our inputs so let's mock some air time:
+
+### Mock airtime node
+
+Create a new `Timer` node as a child node for `Player` and call it `MockAirTimer` ... or if you're deadset on it `MockAirborneTimeTimer`. :-)
+
+![mock air time timer](screenshots/mock-airtimer-node.png)
+
+Let the `Wait Time` property remain at `1s` and mark it as `One Shot`.
+
+![mock air time timer props](screenshots/mock-airtimer-props.png)
+
+### Starting the MockAirTimer when the jump button was pressed
+
+Change the `_process` func like to match this snippet; changes and additions are under the comments.
+
+```gdscript
+func _process(delta):
+	# If user wants to jump, start the MockAirTimer and change the movement state to airborne
+	if Input.is_action_just_pressed("Jump") and movement_state != MovementState.AIRBORNE:
+		$MockAirTimer.start()
+		movement_state = MovementState.AIRBORNE
+
+	if Input.is_action_pressed("Run right"):
+		orientation = Orientation.RIGHT
+		# Only change movement state to running if not airborne
+		movement_state = MovementState.RUNNING if movement_state != MovementState.AIRBORNE else MovementState.AIRBORNE
+	elif Input.is_action_pressed("Run left"):
+		orientation = Orientation.LEFT
+		# Only change movement state to running if not airborne
+		movement_state = MovementState.RUNNING if movement_state != MovementState.AIRBORNE else MovementState.AIRBORNE
+	else:
+		# Only change movement state to idle if not airborne
+		movement_state = MovementState.IDLE    if movement_state != MovementState.AIRBORNE else MovementState.AIRBORNE
+
+	match (movement_state):
+		MovementState.RUNNING:
+			$AnimatedSprite2D.animation = "running"
+		# This was added
+		MovementState.AIRBORNE:
+			$AnimatedSprite2D.animation = "jumping"
+		_: # MovementState.IDLE
+			$AnimatedSprite2D.animation = "idle"
+
+	if orientation == Orientation.LEFT:
+		$AnimatedSprite2D.flip_h = true
+	else:
+		$AnimatedSprite2D.flip_h = false
+```
+
+### Listening to the MockAirTimer timeout
+
+If we let her jump now she will remain airborne forever. Let's not forget to add a listener to the `MockAirTimer`.
+
+Select the `MockAirTimer`-node in the node tree view and open the `Node` tab next to the `Inspector` tab. Double-click `timeout()` to open the `Connect a Signal` dialog:
+
+![connect a signal](screenshots/connect-a-signal-dialog.png)
+
+Leave all the defaults in place and click `Connect`
+
+We now end up with the listener func `_on_mock_air_timer_timeout` to implement like this:
+
+```gdscript
+func _on_mock_air_timer_timeout():
+	movement_state = MovementState.IDLE
+```
+
+Run the player scene to test out the jump. 
+
+Personally I think one second of air time is a little to long, so let's change it to  `0.7s` - not too long as to seem unnatural, yet long enough for her to change direction in the air.
+
+## Technical debt 2
+
+The code is starting to look a little messy already, so we might want refactor at this point.
+
+No worries, we'll revisit this code often.
+
+## Wrap up
+
+Well that wraps up our day. 
+
+I hope you enjoyed it as much as I did!
+
+Our next day will introduce some tiles and some movement. Maybe we can even try out the [`RigidBody2D`](https://docs.godotengine.org/en/stable/classes/class_rigidbody2d.html) at some stage!
 
