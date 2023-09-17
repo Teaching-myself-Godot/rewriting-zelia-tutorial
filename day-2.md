@@ -181,7 +181,7 @@ We want these defaults to apply to her _class_ not her _instance_.
 
 Well, we have to start all over again!
 
-In writing we call this "Kill your Darlings". 
+In writing we call this "Kill your Darlings" ...So bye beautiful `enums`!
 
 With the beginner's mindset, we simply call this learning. It's fun!
 
@@ -189,7 +189,11 @@ The [`RigidBody2D` documentation](https://docs.godotengine.org/en/stable/classes
 
 We will base our rewrite on the code in [this gdscript file](https://github.com/godotengine/godot-demo-projects/blob/3.5-9e68af3/2d/physics_platformer/player/player.gd) as it roughly does what we need as well...
 
-...So bye beautiful `enums`!
+In this first iteration you'll see a lot of copy/paste. 
+
+I added my own observation comments starting with `->`.
+
+These are to help me understand what is happening, not criticism on the original code.
 
 ```gdscript
 
