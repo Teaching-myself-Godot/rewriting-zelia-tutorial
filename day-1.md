@@ -114,11 +114,11 @@ Although I would have preferred the outcome to look like this:
 
 ![zelia in pygame](screenshots/zelia-in-sdl-renderer.png)
 
-What I managed to achieve in godot for now looks like this.
+What I managed to achieve in godot by myself was blurry.
 
 ![zelia in godot 1](screenshots/zelia-in-godot-renderer.png)
 
-However, dropping the full screen requirement and in stead opting for a resizable window achieved a way better scaling effect, ending up with this:
+However, this [reddit thread](https://www.reddit.com/r/godot/comments/v5blkk/blurry_sprite_godot_40/) came to the rescue to help me end up with this:
 
 ![zelia in godot 2](screenshots/zelia-in-godot-renderer-2.png)
 
@@ -133,5 +133,150 @@ However, dropping the full screen requirement and in stead opting for a resizabl
 6. And that `Resizable` is checked to `On`
 7. Set the `Stretch` mode to `canvas_items`
 8. And the `Aspect` to `keep`
+9. Then open `Render > Textures > Canvas Textures`
+10. And change `Filter` to `Nearest`
+
+
+## Adding controls
+
+The original game was written for a gamepad and tested with this (tr|d)usty controller:
+
+![my gamepad](screenshots/my-gamepad.png)
+
+Keyboard and mouse were added later and work quite differently.
+
+So let's first create some dedicated inputs for running and jumping and see if we can fix the casting+aiming mechanic later.
+
+### Input Map
+
+Open `Project > Project Settings > Input Map`.
+
+Add these new `Actions`:
+
+1. Run right 
+2. Run left
+3. Jump
+
+Assign these keys to `Run right`:
+
+1. Keyboard 'D' - `D (Physical)`
+2. Keyboard Right arrow - `Right (Physical)`
+3. Joypad Axis 0 (`Left Stick Right`, `Joystick 0 Right - All Devices`)
+4. Joypad Button 14 (`D-pad Right - All Devices`)
+
+
+Assign these keys to `Run left`:
+
+1. Keyboard 'A' - `A (Physical)`
+2. Keyboard Left arrow - `Left (Physical)`
+3. Joypad Axis 0 (`Left Stick Left`, `Joystick 0 Left - All Devices`)
+4. Joypad Button 13 (`D-pad Left - All Devices`)
+
+And assign these keys to `Jump`:
+
+1. Keyboard 'W' - `W (Physical)`
+2. Keyboard Up arrow - `Up (Physical)`
+3. Joypad Button 0 - (`Buttom Action`, `Sony Cross`, `Xbox A`, `Ninendo B`)
+
+### Player script
+
+Finally, let's code some stuff, taking guidance  from [the official guide](https://docs.godotengine.org/en/stable/getting_started/first_2d_game/03.coding_the_player.html).
+
+Attach a script to the `Player`-node and save it in `res://player/player.gd`
+
+So in the original game there were some movement states I would like to keep using to make our rewrite easier:
+
+```python
+from enum import Enum
+
+class Orientation(Enum):
+    LEFT = 1
+    RIGHT = 2
+    NONE = 3
+    UP = 4
+    DOWN = 5
+
+class MovementState(Enum):
+    IDLE = 1
+    RUNNING = 2
+    AIRBORNE = 3
+    JUMPING = 4
+    DYING = 5
+    CASTING = 6
+    FACING_FORWARD = 7
+    HOLDING_ITEM = 8
+
+class CastDirection(Enum):
+    DIAG_DOWN = 1
+    FORWARD = 2
+    DIAG_UP = 3
+    UP = 4
+    DOWN = 5
+```
+
+Let's [read up on](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_basics.html) how to port these python style `enums` to gdscript.
+
+That looks nice and clean, let's define some inside our `player.gd` script for now.
+
+Let's assign them to some properties in the `_ready()` func.
+
+```gdscript
+extends Area2D
+
+enum Orientation   { LEFT, RIGHT }
+enum MovementState { IDLE, RUNNING, AIRBORNE }
+
+# We will want to debug these states, let's export them as well
+@export var movement_state : int
+@export var orientation   : int
+
+
+func _ready():
+	movement_state = MovementState.IDLE
+	orientation   = Orientation.RIGHT
+
+func _process(delta):
+	pass
+
+```
+
+Run the current scene to test our property assignments. 
+
+To debug exported properties while running, go to the node tree window and pick `Remote` in stead of `Local`:
+
+![toggle remote](screenshots/toggle-remote.png)
+
+Then click the `root`-node first and then the `Player`-node. 
+The `Inspector` tab for `Player` should now show:
+
+![movement state props](screenshots/movement-state-props.png)
+
+You can even change the property values through this interface!
+
+### Processing the inputs and assigning states for running
+
+So let's now write some body for the `_process()` func.
+
+Let's first write tests for the `Run right` and `Run left` actions to set the movement
+
+```gdscript
+func _process(delta):
+	if Input.is_action_pressed("Run right"):
+		orientation = Orientation.RIGHT
+		movement_state = MovementState.RUNNING
+	elif Input.is_action_pressed("Run left"):
+		orientation = Orientation.LEFT
+		movement_state = MovementState.RUNNING
+	else:
+		movement_state = MovementState.IDLE
+```
+
+To test out whether our state changes work we run the current scene and open the `Remote` inspector for player. (Remember: click the `root`-node first and then the `Player`-node).
+
+I noticed a slight delay in the inspector, but I'm guessing that's due to it being on a lower priority thread.
+
+### Picking the right animations based on states
+
+Let's reread [the guide](https://docs.godotengine.org/en/stable/getting_started/first_2d_game/03.coding_the_player.html#choosing-animations) on changing the animations.
 
 
