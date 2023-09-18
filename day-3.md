@@ -12,3 +12,8 @@ Today we want to achieve these goals:
 However, _will_ we achieve these goals?
 
 Let's find out.
+
+## Prerequisites
+
+Code tag for when you lost your project: [after-day-2](https://github.com/Teaching-myself-Godot/godot-zelia/tree/after-day-2)
+
