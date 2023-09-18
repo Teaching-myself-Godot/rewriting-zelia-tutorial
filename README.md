@@ -3,7 +3,8 @@
 Skip the elaborate intro and start:
 
 - [Day 1 - Controlling the Player](day-1.md)
-- [Day 2 - Adding some tiles](day-2.md)
+- [Day 2 - Adding some tiles and some physics](day-2.md)
+- [Day 3 - Importing more Tiles the lazy way](day-3.md)
 
 # Elaborate intro
 
@@ -30,7 +31,8 @@ We'll discover how that goes together as well.
 I will be documenting my work in numbered days, some days we'll get a lot done. On others, well you know how that goes.
 
 - [Day 1 - Controlling the Player](day-1.md)
-- [Day 2 - Adding some tiles](day-2.md)
+- [Day 2 - Adding some tiles and some physics](day-2.md)
+- [Day 3 - Importing more Tiles the lazy way](day-3.md)
 
 ## Things I read up on
 

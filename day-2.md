@@ -1,4 +1,4 @@
-# Day 2 - Adding some tiles
+# Day 2 - Adding some tiles and some physics
 
 So today we're going to achieve these goals:
 
@@ -264,11 +264,56 @@ func _physics_process(delta):
 	move_and_slide()
 ```
 
-And it just works! Frankly: it's better than the original.
+And it just works! Frankly: it's much better than the original.
 
 If you are as new to Godot and 2D physics as I am, make sure you read the tutorial and the docs carefully and then reread the script I came up with:
 
-### Tyding up
+- [CharacterBody2D platformer movement](https://docs.godotengine.org/en/stable/tutorials/physics/using_character_body_2d.html#platformer-movement)
+- [CharacterBody2D class reference](https://docs.godotengine.org/en/stable/classes/class_characterbody2d.html)
 
-- remove the mock timer
-- change the gravity setting
+### Change the gravity setting
+
+As I my mentioned in the code comments, I changed the Project's default gravity setting from 980 to 1300:
+
+1. Go to `Project > Project Settings `
+2. Click on `Filter Settings`
+3. Type in `gravity`
+4. Pick `Physics > 2D`
+5. Set `Default Gravity` to `1300`
+
+## Dead code Code cleanup 
+
+We left some dead code and chose some poor names. Let's fix that before wrapping up our day.
+
+In our new script we to away the need for our `MockAirTimer`. So let's remove it.
+
+### Removing the `_on_mock_air_timer_timeout` signal
+
+Just to be sure, let's disconnect the `signal` we made first:
+
+1. Select the `MockerAirTimer` node in the treeview of the `Player` scene
+2. Click the `Node` tab next to `Inspector`
+3. Right click `.. ::_on_mock_air_timer_timeout()`
+4. Choose `Disconnect`
+
+![remove the signal](screenshots/remove_mock_signal.png)
+
+### Remove `MockAirTimer` itself
+
+Right click on the `MockAirTimer`-node in the tree view and delete it.
+
+Make sure all references to it in `player.gd` are gone as well, or you'll get a reference error.
+
+## Technical debt 4
+
+We have some poorly chosen names. 
+
+I am we can do better than "Run Right" and "Run Left" knowing that they are already doubling for changing direction while airborne.
+
+But also, I want to import more tiles and I want them to connect the way the original Zelia editor did.
+
+I suspect this is possible by making them all part of one and the same terrain and if that is so, the terrain name `Grass and Dirt` would be a poor fit.
+
+But let's do that tomorrow:
+
+[Day 3 - Importing more Tiles the lazy way](day-3.md)
