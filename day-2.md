@@ -334,10 +334,6 @@ We have some poorly chosen names.
 
 I am we can do better than `"Run Right"` and `"Run Left"` knowing that they are already doubling for changing direction while airborne.
 
-But also, I want to import more tiles and I want them to connect the way the original Zelia editor did.
+But let's set some goals for tomorrow:
 
-I suspect this is possible by making them all part of one and the same terrain and if that is so, the terrain name `Grass and Dirt` would be a poor fit.
-
-But let's do that tomorrow:
-
-[Day 3 - Importing more Tiles the lazy way](day-3.md)
+[Day 3 - To Be Determined](day-3.md)
