@@ -86,23 +86,6 @@ When testing the animation for running I noticed that it did not look as smooth 
 
 In the original game `casting` was not - strictly speaking - an animation, but a set of casting orientations based on an angle. We will probably have to fix that later.
 
-
-### Add a hitbox
-
-So the original Zelia had pixel perfect collisions. I wrote everything myself, so it was quite a battery hog in modern machines and a performance killer in older machines. However, I mainly did that to avoid having to draw hitboxes and doing polygon based collision math myself.
-
-_If_ we want pixel perfect collision again, we'd probably follow this recipe on [stackoverflow](https://stackoverflow.com/questions/68063306/how-do-you-do-pixel-perfect-collisions-in-godot-engine#answer-74856202). For now, let's make do with a nice pill shape just like in the [guide](https://docs.godotengine.org/en/stable/getting_started/first_2d_game/02.player_scene.html).
-
-1. Create another child node for `Player` of the type `CollisionShape2D`.
-2. Choose `CapsuleShape2D` in the inspector tab next to Shape
-3. 'Ungroup' the children of `Player` to make the `CollisionShape2D` selectable
-4. Align the box like in the screenshot below 
-5. And 'group' them again.
-
-![collision shape alignment](screenshots/pillbox.png)
-
-Save everything and test the current scene with F6 (make sure Zelia's in the viewport).
-
 ## Setting up the screen
 
 Zelia looks so small!
@@ -123,7 +106,6 @@ However, this [reddit thread](https://www.reddit.com/r/godot/comments/v5blkk/blu
 
 ![zelia in godot 2](screenshots/zelia-in-godot-renderer-2.png)
 
-
 ### The final resizable window setup I'm happy with
 
 1. Open `Project > Project Settings`
@@ -136,6 +118,23 @@ However, this [reddit thread](https://www.reddit.com/r/godot/comments/v5blkk/blu
 8. And the `Aspect` to `keep`
 9. Then open `Render > Textures > Canvas Textures`
 10. And change `Filter` to `Nearest`
+
+
+## Add a hitbox
+
+So the original Zelia had pixel perfect collisions. I wrote everything myself, so it was quite a battery hog in modern machines and a performance killer in older machines. However, I mainly did that to avoid having to draw hitboxes and doing polygon based collision math myself.
+
+_If_ we want pixel perfect collision again, we'd probably follow this recipe on [stackoverflow](https://stackoverflow.com/questions/68063306/how-do-you-do-pixel-perfect-collisions-in-godot-engine#answer-74856202). For now, let's make do with a nice pill shape just like in the [guide](https://docs.godotengine.org/en/stable/getting_started/first_2d_game/02.player_scene.html).
+
+1. Create another child node for `Player` of the type `CollisionShape2D`.
+2. Choose `CapsuleShape2D` in the inspector tab next to Shape
+3. 'Ungroup' the children of `Player` to make the `CollisionShape2D` selectable
+4. Align the box like in the screenshot below 
+5. And 'group' them again.
+
+![collision shape alignment](screenshots/pillbox.png)
+
+Save everything and test the current scene with F6 (make sure Zelia's in the viewport).
 
 
 ## Adding controls
