@@ -148,49 +148,127 @@ Like we speculated during day 1, we need to change her `Node Type` if we do not 
 
 And I don't. I did it last time and it took me weeks and weeks of tweaking; and there are sure to still be bugs hanging around.
 
+### First attempt with `RigidBody2D`
+
+In my first attempt I actually tried to make `Player` extend from `RigidBody2D` and failed to get a good enough grip on what was happening. 
+
+You can check out the result on [the day-2-epic-fail tag of the github project](https://github.com/Teaching-myself-Godot/godot-zelia/blob/day-2-epic-fail/player/player.gd) of the code.
+
+### Second attempt with `CharacterBody2D`
+
+For my second attempt I read up on [CharacterBody2D platformer movement](https://docs.godotengine.org/en/stable/tutorials/physics/using_character_body_2d.html#platformer-movement). Let's try that out now.
+
+
 1. Go to the `Player` scene view (the one where she is the root node).
 2. Right click on `Player` 
 3. Pick `Change type`
-4. Choose `RigidBody2D`
-5. Replace her attached script `res://player/player.gd` with this one line of code:
+4. Choose `CharacterBody2D`
+5. Edit `res://player/player.gd` and change the extends line:
 
 ```gdscript
-extends RigidBody2D # this first line changed!
+extends CharacterBody2D # this first line changed!
 ```
 
-Test by running the project.
+Test by running the project. That changed nothing (for now).
 
-### Tweaking her physics properties
+## Adapting her script to `CharacterBody2D`
 
-If you let her fall from a really high place she could fall flat on her face.
+So let's try this out: [CharacterBody2D platformer movement](https://docs.godotengine.org/en/stable/tutorials/physics/using_character_body_2d.html#platformer-movement).
 
-![Zelia flat on her face](screenshots/zelia-flat-on-her-face.png)
 
-This looks funny and all, but if you let her run in this state, you might understand the problem.
-
-1. Make sure you're in the `Player` scene
-2. Check `Lock Rotation` to `On` in the `Inspector`
-
-If you check it on in the world scene this rule will _only_ apply to her instance in _that_ scene. 
-
-We want these defaults to apply to her _class_ not her _instance_.
-
-![locking rotation](screenshots/locking-rotations.png)
-
-## Rewriting her code
-
-Well, we have to start all over again!
-
-In writing we call this "Kill your Darlings". 
-
-With the beginner's mindset, we simply call this learning. It's fun!
-
-The [`RigidBody2D` documentation](https://docs.godotengine.org/en/stable/classes/class_rigidbody2d.html) refers to [this example project](https://godotengine.org/asset-library/asset/119). 
-
-We will base our rewrite on the code in [this gdscript file](https://github.com/godotengine/godot-demo-projects/blob/3.5-9e68af3/2d/physics_platformer/player/player.gd) as it roughly does what we need as well...
-
-...So bye beautiful `enums`!
 
 ```gdscript
+extends CharacterBody2D
 
+enum Orientation   { LEFT, RIGHT }
+enum MovementState { IDLE, RUNNING, AIRBORNE }
+
+# I removed the exports for now, no debugging needed at the moment
+var movement_state : int
+var orientation    : int
+
+# Get the gravity from the project settings so you can sync with rigid body nodes.
+# NOTE: I changed the default from 980 to 1300, Zelia jumps high yet falls fast.
+var gravity    = ProjectSettings.get_setting("physics/2d/default_gravity")
+# The most realistic speed for Zelia's feet
+var speed      = 120.0
+# Funnily the original game had jump_speed set to -4.0 and gravity to 13.0
+var jump_speed = -400.0
+
+# No changes here
+func _ready():
+	movement_state = MovementState.IDLE
+	orientation    = Orientation.RIGHT
+	$AnimatedSprite2D.play()
+
+# Changed _process to _physics_process
+func _physics_process(delta):
+	# Apply the gravity.
+	velocity.y += gravity * delta
+
+	# Update the MovementState based on the collisions observed
+	if movement_state == MovementState.AIRBORNE:
+		# If she's airborne right now
+		if is_on_floor():
+			# .. and hits the floor, she's idle
+			movement_state = MovementState.IDLE
+		elif Input.is_action_pressed("Run right"):
+			# Else you can still move her right
+			orientation = Orientation.RIGHT
+			velocity.x = speed
+		elif Input.is_action_pressed("Run left"):
+			# ... and left
+			orientation = Orientation.LEFT
+			velocity.x = -speed
+		# But you cannot let her remove x momentum
+	else:
+		# Else we are not airborne right now
+		if Input.is_action_pressed("Run right"):
+			# so we run right when run right is pressed
+			orientation = Orientation.RIGHT
+			movement_state = MovementState.RUNNING
+			velocity.x = speed
+		elif Input.is_action_pressed("Run left"):
+			# .. and left ...
+			orientation = Orientation.LEFT
+			movement_state = MovementState.RUNNING
+			velocity.x = -speed
+		else:
+			# and stand idle if no x-movement button is pressed
+			velocity.x = 0
+			movement_state = MovementState.IDLE  
+
+	# Handle Jump, only when on the floor
+	if Input.is_action_just_pressed("Jump") and is_on_floor():
+		$JumpSound.play()
+		movement_state = MovementState.AIRBORNE
+		velocity.y = jump_speed
+	
+	# This code has not changed
+	match (movement_state):
+		MovementState.RUNNING:
+			$AnimatedSprite2D.animation = "running"
+		# This was added
+		MovementState.AIRBORNE:
+			$AnimatedSprite2D.animation = "jumping"
+		_: # MovementState.IDLE
+			$AnimatedSprite2D.animation = "idle"
+
+	# Neither had this
+	if orientation == Orientation.LEFT:
+		$AnimatedSprite2D.flip_h = true
+	else:
+		$AnimatedSprite2D.flip_h = false
+
+	# Yet this is new
+	move_and_slide()
 ```
+
+And it just works! Frankly: it's better than the original.
+
+If you are as new to Godot and 2D physics as I am, make sure you read the tutorial and the docs carefully and then reread the script I came up with:
+
+### Tyding up
+
+- remove the mock timer
+- change the gravity setting
