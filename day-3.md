@@ -11,7 +11,7 @@ Today we want to achieve these goals:
 
 However, _will_ we achieve these goals?
 
-Let's find out. Spoiler: [skip to step 3]()
+Let's find out. Spoiler: [skip to step 3](#step-3---detecting-an-automatable-pattern-when-importing-a-new-atlas)
 
 ## Prerequisites
 
@@ -39,4 +39,4 @@ Never mind.
 
 # Step 3 - Detecting an automatable pattern when importing a new `Atlas`
 
-Let's import 
+Let's add a new `Terrain`, import a new `png`-file as `Atlas` and link up the two together.
