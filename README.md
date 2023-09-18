@@ -4,7 +4,7 @@ Skip the elaborate intro and start:
 
 - [Day 1 - Controlling the Player](day-1.md)
 - [Day 2 - Adding some tiles and some physics](day-2.md)
-- [Day 3 - To Be Determined](day-3.md)
+- [Day 3 - Casting Fireballs](day-3.md)
 
 # Elaborate intro
 
@@ -32,7 +32,7 @@ I will be documenting my work in numbered days, some days we'll get a lot done. 
 
 - [Day 1 - Controlling the Player](day-1.md)
 - [Day 2 - Adding some tiles and some physics](day-2.md)
-- [Day 3 - To Be Determined](day-3.md)
+- [Day 3 - Casting Fireballs](day-3.md)
 
 ## Things I read up on
 

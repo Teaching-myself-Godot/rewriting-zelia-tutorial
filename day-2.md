@@ -129,6 +129,15 @@ After reading up about `TileMap` - including developers' opinions about it, I co
 
 This violates some of the [SOLID](https://en.wikipedia.org/wiki/SOLID) principles, i.e. it does not separate the concern of tiles from the concern of a map/level/world, but we will accept this potential technical debt.
 
+## Import some more `Atlases`
+
+If you carefully follow the same recipe you can of course create more `Terrains` for `Terrain Set 0` this way.
+
+Just one screenshot hint for the one I added `res://surface_maps/tree-trunk/1.png`. It's about adjusting the collision area by manipulating the initial rectangle after pressing `F`:
+
+![peak](screenshots/peak.png)
+
+
 ## Add the `Player` to the `World` scene
 
 Let's add the `Player`-node as an instance into this `World`-scene.
@@ -336,4 +345,4 @@ I am we can do better than `"Run Right"` and `"Run Left"` knowing that they are 
 
 But let's set some goals for tomorrow:
 
-[Day 3 - To Be Determined](day-3.md)
+[Day 3 - Casting Fireballs](day-3.md)
