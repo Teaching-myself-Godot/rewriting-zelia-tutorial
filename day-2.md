@@ -260,7 +260,7 @@ func _physics_process(delta):
 		_: # MovementState.IDLE
 			$AnimatedSprite2D.animation = "idle"
 
-	# Neither had this
+	# Neither has this
 	if orientation == Orientation.LEFT:
 		$AnimatedSprite2D.flip_h = true
 	else:
