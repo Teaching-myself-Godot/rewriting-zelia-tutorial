@@ -15,7 +15,8 @@ Before I could make this day's tutorial I had to read up on and watch:
 
 1. [Using TileMaps](https://docs.godotengine.org/en/stable/tutorials/2d/using_tilemaps.html)
 2. [Terrain Autotiling and Alternative Tiles ~ Godot 4 Tutorial for Beginners](https://www.youtube.com/watch?v=vV8uKN1VnN4)
-3. [`RigidBody2D`](https://docs.godotengine.org/en/stable/classes/class_rigidbody2d.html) 
+3. ~~[`RigidBody2D`](https://docs.godotengine.org/en/stable/classes/class_rigidbody2d.html)~~
+4. [CharacterBody2D platformer movement](https://docs.godotengine.org/en/stable/tutorials/physics/using_character_body_2d.html#platformer-movement)
 
 If you lost your project or want to start from here, I tagged the project after day one so you could clone or download it from [github](https://github.com/Teaching-myself-Godot/godot-zelia/tree/after-day-1)
 
@@ -29,7 +30,9 @@ First make sure you have some surface assets ready. Create a new resource dir ca
 
 Go `Scene > New Scene` and create new scene of type `TileMap`. Then rename it to `World` by double clicking on its node.
 
-Let's follow the steps in [Using TileMaps](https://docs.godotengine.org/en/stable/tutorials/2d/using_tilemaps.html) and the [video](https://www.youtube.com/watch?v=vV8uKN1VnN4):
+Let's follow the steps in [Using TileMaps](https://docs.godotengine.org/en/stable/tutorials/2d/using_tilemaps.html) and the [video](https://www.youtube.com/watch?v=vV8uKN1VnN4).
+
+From the `Inpector` do:
 
 1. Set the `Cell Quadrant` property to `15`
 2. Create a new `TileSet` 
@@ -152,7 +155,9 @@ And I don't. I did it last time and it took me weeks and weeks of tweaking; and 
 
 In my first attempt I actually tried to make `Player` extend from `RigidBody2D` and failed to get a good enough grip on what was happening. 
 
-You can check out the result on [the day-2-epic-fail tag of the github project](https://github.com/Teaching-myself-Godot/godot-zelia/blob/day-2-epic-fail/player/player.gd) of the code.
+You can check out the result on [the day-2-epic-fail tag of the github project](https://github.com/Teaching-myself-Godot/godot-zelia/blob/day-2-epic-fail/player/player.gd) of the code...
+
+![Zelia flat on her face](screenshots/zelia-flat-on-her-face.png)
 
 ### Second attempt with `CharacterBody2D`
 
@@ -175,7 +180,7 @@ Test by running the project. That changed nothing (for now).
 
 So let's try this out: [CharacterBody2D platformer movement](https://docs.godotengine.org/en/stable/tutorials/physics/using_character_body_2d.html#platformer-movement).
 
-
+Much has change, feel free to copy/paste this first and see if it works, but you probably know the most imporant law of cheating with `Stackoverflow`: type it out yourself to learn better.
 
 ```gdscript
 extends CharacterBody2D
@@ -220,7 +225,8 @@ func _physics_process(delta):
 			# ... and left
 			orientation = Orientation.LEFT
 			velocity.x = -speed
-		# But you cannot let her remove x momentum
+		else:
+			velocity.x = 0
 	else:
 		# Else we are not airborne right now
 		if Input.is_action_pressed("Run right"):
@@ -266,14 +272,14 @@ func _physics_process(delta):
 
 And it just works! Frankly: it's much better than the original.
 
-If you are as new to Godot and 2D physics as I am, make sure you read the tutorial and the docs carefully and then reread the script I came up with:
+If you are as new to Godot and perfab 2D physics engines as I am, make sure you read the tutorial and the docs carefully and try to write the script yourself:
 
 - [CharacterBody2D platformer movement](https://docs.godotengine.org/en/stable/tutorials/physics/using_character_body_2d.html#platformer-movement)
 - [CharacterBody2D class reference](https://docs.godotengine.org/en/stable/classes/class_characterbody2d.html)
 
 ### Change the gravity setting
 
-As I my mentioned in the code comments, I changed the Project's default gravity setting from 980 to 1300:
+As I my mentioned in the code comments, I changed the Project's default gravity setting from `980` to `1300`:
 
 1. Go to `Project > Project Settings `
 2. Click on `Filter Settings`
@@ -281,11 +287,29 @@ As I my mentioned in the code comments, I changed the Project's default gravity 
 4. Pick `Physics > 2D`
 5. Set `Default Gravity` to `1300`
 
+
+### Make it scroll with `Camera2D`
+
+The original Zelia never ever left the center of the screen; everything _else_ just moved. 
+
+I read _somewhere_ that it would be easy: just add a `Camera2D` child node to the `Player`-node.
+
+This evening my son asked me for a demo, so I proposed to him we check it out.. He was amazed: "De dingen waarvan je verwacht dat ze kort duren om te maken duren gewoon kort om te maken!" (That is Dutch for: "The things you'd expect a short time to make actually take a short time to make!").
+
+1. Right click the `Player`-node
+2. Click `Add Child Node`
+3. Pick `Camera2D`
+4. Start the game
+
+Voilá.
+
 ## Dead code Code cleanup 
 
-We left some dead code and chose some poor names. Let's fix that before wrapping up our day.
+We left some dead code. Let's fix that before wrapping up our day.
 
-In our new script we to away the need for our `MockAirTimer`. So let's remove it.
+In our new script we to away the need for our `MockAirTimer`. 
+
+So let's remove it.
 
 ### Removing the `_on_mock_air_timer_timeout` signal
 
@@ -308,7 +332,7 @@ Make sure all references to it in `player.gd` are gone as well, or you'll get a 
 
 We have some poorly chosen names. 
 
-I am we can do better than "Run Right" and "Run Left" knowing that they are already doubling for changing direction while airborne.
+I am we can do better than `"Run Right"` and `"Run Left"` knowing that they are already doubling for changing direction while airborne.
 
 But also, I want to import more tiles and I want them to connect the way the original Zelia editor did.
 
