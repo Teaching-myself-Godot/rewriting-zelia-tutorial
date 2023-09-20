@@ -41,7 +41,7 @@ var cast_angle     : float
 
 4. determine orientation and cast sprite by cast angle
 
-```
+```gdscript
 # Determine the casting sprite name based on the cast_angle
 func get_casting_sprite(deg) -> String:
 	var casting_left  = (deg > 120 and deg < 180) or (deg > -180 and deg < -120)
