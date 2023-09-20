@@ -6,10 +6,12 @@ How about these goals..? For fire magic?
 - Determine cast direction via mouse
 - Via left axis
 - Draw the correct cast sprite (see to Technical debt 1)
+- Handle technical debt 2: messy code
 - Spawn fireballs
 
 # notes
 
+## TODO: write about..
 1. add Fireball button (mouse left, gamepad B)
 2. determine cast angle by mouse
 ```gdscript
@@ -103,6 +105,8 @@ func get_casting_sprite(deg) -> String:
 
 6. toggle full screen with world script
 7. Techdebt 2 messy code -> self-documenting funcs
+
+## TODO code
 8. Add fireball interval timer
 9. Add fireball node + script
 10. Techdebt 2 messy code -> link to guide on code documentation comments and apply those practices
