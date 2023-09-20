@@ -103,5 +103,7 @@ func get_casting_sprite(deg) -> String:
 
 6. toggle full screen with world script
 7. Techdebt 2 messy code -> self-documenting funcs
-8. Techdebt 2 messy code -> link to guide on code documentation comments and apply those practices
+8. Add fireball interval timer
+9. Add fireball node + script
+10. Techdebt 2 messy code -> link to guide on code documentation comments and apply those practices
 
