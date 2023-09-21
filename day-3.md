@@ -1,13 +1,124 @@
 # Day 3 - Casting Fireballs
 
-How about these goals..? For fire magic?
+Today we're going to let Zelia cast her fireballs again.
 
-- Assign casting button(s)
-- Determine cast direction via mouse
-- Via left axis
-- Draw the correct cast sprite (see to Technical debt 1)
-- Handle technical debt 2: messy code
-- Spawn fireballs
+## The steps for today
+
+1. [Assign casting buttons](#assign-casting-buttons)
+2. [Fix the casting sprites for Zelia](#fix-the-casting-sprites-for-zelia) (Technical debt 1)
+3. [Add the `MovementState` for casting and `CastDirection`](#add-the-movementstate-for-casting-and-castdirection)
+4. [Determine cast direction via mouse cursor position and L-stick axis](#determine-cast-direction-via-mouse-cursor-position-and-l-stick-axis)
+5. [Draw the correct casting sprites based on cast direction](#draw-the-correct-casting-sprites-based-on-cast-direction)
+5. [Extract some functions for less messy code](#extract-some-functions-for-less-messy-code) (Technical debt 2)
+6. [Add a `Fireball` scene and test its flying](#add-a-fireball-scene-and-test-its-flying)
+7. [Spawn fireballs when she casts](#spawn-fireballs-when-she-casts)
+8. [Make fireballs collide with the `TileMap`, not with the `Player`](#make-fireballs-collide-with-the-tilemap-not-with-the-player)
+
+
+# Assign casting buttons
+
+Zelia can cast fireballs in all directions:
+- when holding gamepad button `B`, you can aim with the `L-stick`
+- when holding the left mouse button, you can aim with the mouse cursor.
+
+1. Go to `Project > Project Settings`
+2. Go to `Input Maps`
+3. Choose `Add New Action`
+4. Set the name to `Fireball button`
+5. Assign `Left Mouse Button` to `Fireball button` 
+6. Assign `Joypad Button 1` to `Fireball button`
+
+Now to determine which of either is pressed we need to assign one to another name.
+
+7. Choose `Add New Action`
+8. Set the name to `Left mouse button`
+9. Assign `Left Mouse Button` to `Left mouse button` 
+
+![Fireball buttons](screenshots/fireball-buttons-added.png)
+
+# Fix the casting sprites for Zelia
+
+On day one we added one `SpriteFrames` entry for all casting images. 
+
+We should have made an entry per image to cover all her angles of casting:
+
+1. Go to `FileSystem > player.tscn`
+2. Go to `Scene > Player > AnimatedSprite2D`
+3. On the bottom pane choose `casting`
+4. Rename it to `casting_down` (click on it a second time)
+5. Select the image casting forward 
+6. Press `Ctrl-C` to copy it
+7. Add a new `Animation` named `casting_forward`
+8. Select it and press `Ctrl-V` to paste
+9. Repeat this process until you have 4 entries:
+
+![techdebt 1 new sprites](screenshots/cast_direction_separate_sprites.png)
+
+**Note**: that the image called `casting_down` will also be used for casting down diagonally. 
+
+(Her arms look really silly when pointing directly down)
+
+# Determine cast direction via mouse cursor position and L-stick axis
+
+Zelia can cast in all directions when holding a casting button.
+
+Based on her angle of casting we'll pick the correct sprite.
+
+Go to `FileSystem > player > player.gd` to edit the script.
+
+1. Add a movement state for casting:
+
+```gdscript
+enum MovementState { IDLE, RUNNING, AIRBORNE, CASTING }
+```
+
+2. Add a property for the direction of casting
+
+```gdscript
+@export var cast_angle : float
+```
+
+3. In the `_physics_process`  set `cast_angle` and `movement_state`
+
+Note that the other two cases (on the floor and not on the floor) are now handled only if the `Fireball button` is _not_ pressed.
+
+```gdscript
+	if Input.is_action_pressed("Fireball button"):
+		movement_state = MovementState.CASTING
+		# base the angle of casting on the position of the mouse
+		# relative to Zelia
+		if Input.is_action_pressed("Left mouse button"):
+			cast_angle = (get_global_mouse_position() - position).normalized().angle()
+		else:
+			cast_angle = Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)).normalized().angle()
+	elif is_on_floor():
+		movement_state = MovementState.IDLE
+	else:
+		movement_state = MovementState.AIRBORNE
+```
+
+4. Test via remote debugging
+
+This time we will monitor the exported var `cast_angle`. 
+
+If you forgot how, I documented it on day 1:
+
+Remote debug [see](day-1.md#test-run)
+
+
+# Draw the correct casting sprites based on cast direction
+
+
+
+# Add the `MovementState` for casting and `CastDirection`
+
+# Extract some functions for less messy code
+
+# Add a `Fireball` scene and test its flying
+
+# Spawn fireballs when she casts
+
+# Make fireballs collide with the `TileMap`, not with the `Player`
 
 # notes
 
