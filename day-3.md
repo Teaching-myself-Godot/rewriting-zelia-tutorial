@@ -90,7 +90,7 @@ enum MovementState { IDLE, RUNNING, AIRBORNE, CASTING }
 	if Input.is_action_pressed("Fireball button"):
 		movement_state = MovementState.CASTING
 		# base the angle of casting on the position of the mouse
-		# relative to Zelia
+		# relative to Zelia or on the L-stick
 		if Input.is_action_pressed("Left mouse button"):
 			cast_angle = (get_global_mouse_position() - position).normalized().angle()
 		else:
@@ -130,14 +130,13 @@ We will change all code this _again_ soon! For the better, I promise.
 
 ```gdscript
 func _physics_process(delta):
-	# Apply the gravity.
 	velocity.y += gravity * delta
 
-	# Handle casting
+	# Set initial movement state
 	if Input.is_action_pressed("Fireball button"):
 		movement_state = MovementState.CASTING
 		# base the angle of casting on the position of the mouse
-		# relative to Zelia
+		# relative to Zelia or on the L-stick
 		if Input.is_action_pressed("Left mouse button"):
 			cast_angle = (get_global_mouse_position() - position).normalized().angle()
 		else:
@@ -229,12 +228,12 @@ This code snippet now flips her based on her casting angle:
 			orientation = Orientation.LEFT
 ```
 
-And this rearrangement further prevents her from moving while casting:
+And this rearrangement further prevents her from entering other movement states while casting:
 ```gdscript
 	if Input.is_action_pressed("Fireball button"):
 		movement_state = MovementState.CASTING
 		# base the angle of casting on the position of the mouse
-		# relative to Zelia
+		# relative to Zelia or on the L-stick
 		if Input.is_action_pressed("Left mouse button"):
 			cast_angle = (get_global_mouse_position() - position).normalized().angle()
 		else:
@@ -252,8 +251,159 @@ We will make _all this_ a **LOT** more maintainable soon!
 
 # Draw the correct casting sprites based on cast direction
 
+To make a good head start let's make a well-named function this time to choose the correct sprite name to draw:
+
+## `func get_casting_sprite`
+```gdscript
+# Determine the casting sprite name based on decimal degrees
+func get_casting_sprite(deg) -> String:
+	var casting_left  = (deg > 120 and deg < 180) or (deg > -180 and deg < -120)
+	var casting_right = deg > -60  and deg < 60
+	var casting_up    = deg > -140 and deg < -20
+	var casting_down  = deg > 30   and deg < 150
+
+	if casting_up and (casting_right or casting_left):
+		return "casting_diag_up"
+	elif casting_down and (casting_right or casting_left):
+		return "casting_down"
+	elif casting_up:
+		return "casting_up"
+	elif casting_down:
+		return "casting_down"
+	else:
+		return "casting_forward"
+```
+
+Now let's also add the case for `MovementState.CASTING` to our `match`-statement:
+
+```gdscript
+	# Determine sprite based on movement state
+	match (movement_state):
+		MovementState.RUNNING:
+			$AnimatedSprite2D.animation = "running"
+		# This was added
+		MovementState.AIRBORNE:
+			$AnimatedSprite2D.animation = "jumping"
+		MovementState.CASTING:
+			# when casting invoke get_casting_sprite to set the correct 
+			# animation name
+			$AnimatedSprite2D.animation = get_casting_sprite(rad_to_deg(cast_angle))
+		_: # MovementState.IDLE
+			$AnimatedSprite2D.animation = "idle"
+```
+
 
 # Extract some functions for less messy code
+
+Now it's really time to fix [Technical debt 2](day-1.md#technical-debt-2), because the debt became deeper.
+
+Here is a link to the commit of the refactor we're going to do: 
+
+[techdebt, write functions. ](https://github.com/Teaching-myself-Godot/godot-zelia/commit/dc64f5f6009fa2eaf961b3352cfbfc864c4cb028)
+
+
+## The process of tyding up code
+
+Now there must be a pattern or best practice name for this, but here's how it goes.
+
+Spot a function with a lot of code in the function body and do:
+1. For each bit of code needs comments to explain what it does, create a function named after the comments.
+2. For each block of code handling a case in an if-block write a function that says what it handles
+3. For each line of code longer than your coding viewport, functions to shorten that line
+4. For each complex boolean evaluation write a function with a name that says what it does
+5. For each code repetition write a function to be reused
+... etcetera.
+
+This refactor only applied step `1`, `2` and `3`
+
+Let's try and apply step `1` ourselves by looking at the above [rewrite](#rearrange-the-code-in-_physics_process-a-little) again.
+
+### Spot a big function and apply the steps!
+
+We spot that `_physics_process` is now almost 100 lines long.
+
+Step `1` - code that needs comments:
+
+```gdscript
+	# Handle casting
+	if Input.is_action_pressed("Fireball button"):
+		movement_state = MovementState.CASTING
+		# base the angle of casting on the position of the mouse
+		# relative to Zelia or on the L-stick
+		if Input.is_action_pressed("Left mouse button"):
+			cast_angle = (get_global_mouse_position() - position).normalized().angle()
+		else:
+			cast_angle = Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)).normalized().angle()
+	elif is_on_floor():
+		movement_state = MovementState.IDLE
+	else:
+		movement_state = MovementState.AIRBORNE
+```
+
+Is moved to a separate function named `set_movement_state`.
+
+```gdscript
+# Set initial movement state
+func set_movement_state():
+	if Input.is_action_pressed("Fireball button"):
+		movement_state = MovementState.CASTING
+		# base the angle of casting on the position of the mouse
+		# relative to Zelia or on the L-stick
+		if Input.is_action_pressed("Left mouse button"):
+			cast_angle = (get_global_mouse_position() - position).normalized().angle()
+		else:
+			cast_angle = Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)).normalized().angle()
+	elif is_on_floor():
+		movement_state = MovementState.IDLE
+	else:
+		movement_state = MovementState.AIRBORNE
+```
+
+Step `1` can be applied again to this new function:
+
+```gdscript
+# base the angle of casting on the position of the mouse relative to Zelia
+func set_cast_angle():
+	if Input.is_action_pressed("Left mouse button"):
+		cast_angle = (get_global_mouse_position() - position).normalized().angle()
+	else:
+		cast_angle = Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)).normalized().angle()
+
+# Set initial movement state
+func set_movement_state():
+	if Input.is_action_pressed("Fireball button"):
+		movement_state = MovementState.CASTING
+		set_cast_angle()
+	elif is_on_floor():
+		movement_state = MovementState.IDLE
+	else:
+		movement_state = MovementState.AIRBORNE
+```
+
+Now both step `2` and `3` still apply to this new function:
+
+```
+# Vector of L-stick
+func get_l_stick_axis_vec() -> Vector2:
+	return Vector2(
+		Input.get_joy_axis(0, JOY_AXIS_LEFT_X), 
+		Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)
+	)
+
+# Vector from player to mouse position
+func get_mouse_vec_to_player() -> Vector2:
+	return get_global_mouse_position() - position
+
+# base the angle of casting on the position of the mouse relative to Zelia
+func set_cast_angle():
+	if Input.is_action_pressed("Left mouse button"):
+		cast_angle = get_mouse_vec_to_player().normalized().angle()
+	else:
+		cast_angle = get_l_stick_axis_vec().normalized().angle()
+```
+
+### Rinse and repeat!
+
 
 # Add a `Fireball` scene and test its flying
 
@@ -280,7 +430,7 @@ var cast_angle     : float
 	if Input.is_action_pressed("Fireball button mouse"):
 		movement_state = MovementState.CASTING
 		# base the angle of casting on the position of the mouse
-		# relative to Zelia
+		# relative to Zelia or on the L-stick
 		cast_angle = (get_global_mouse_position() - position).normalized().angle()
 	elif is_on_floor():
 		movement_state = MovementState.IDLE
@@ -348,7 +498,7 @@ func get_casting_sprite(deg) -> String:
 	if Input.is_action_pressed("Fireball button"):
 		movement_state = MovementState.CASTING
 		# base the angle of casting on the position of the mouse
-		# relative to Zelia
+		# relative to Zelia or on the L-stick
 		if Input.is_action_pressed("Left mouse button"):
 			cast_angle = (get_global_mouse_position() - position).normalized().angle()
 		else:
