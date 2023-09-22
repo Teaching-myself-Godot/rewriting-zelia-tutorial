@@ -4,7 +4,8 @@ Skip the elaborate intro and start:
 
 - [Day 1 - Controlling the Player](day-1.md)
 - [Day 2 - Adding some tiles and some physics](day-2.md)
-- [Day 3 - Casting Fireballs](day-3.md)
+- [Day 3 - Casting Sprites](day-3.md)
+- [Day 4 - Casting Fireballs](day-4.md)
 
 # Elaborate intro
 
