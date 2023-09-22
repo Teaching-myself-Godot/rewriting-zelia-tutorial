@@ -122,6 +122,11 @@ We need to rearrange our code in the `_physics_process` a little in order to ach
 1. Let Zelia flip orientation based on her casting angle
 2. Let Zelia stop moving on the x-axis while casting
 
+If you're already familiar with code refactors, here's a link to the end-result of these rewrites, and a skip link for this bit of the tutorial:
+- [player.gd](https://github.com/Teaching-myself-Godot/godot-zelia/blob/164027e6ed74a70c1222778ebcd8dffba24ec416/player/player.gd)
+- [Adding a fireball node](#add-a-fireball-scene-and-test-its-flying)
+
+
 Please do copy and paste the next rewrite of the entire `_physics_process`, remembering to:
 - read the code carefully
 - look at what changed
@@ -298,7 +303,7 @@ Now let's also add the case for `MovementState.CASTING` to our `match`-statement
 
 Now it's really time to fix [Technical debt 2](day-1.md#technical-debt-2), because the debt became deeper.
 
-If you're already familiar with code refactors, here's a link to the end-result and a skip link for this bit of the tutorial:
+**Again**: if you're already familiar with code refactors, here's a link to the end-result and a skip link for this bit of the tutorial:
 - [player.gd](https://github.com/Teaching-myself-Godot/godot-zelia/blob/164027e6ed74a70c1222778ebcd8dffba24ec416/player/player.gd)
 - [Adding a fireball node](#add-a-fireball-scene-and-test-its-flying)
 
