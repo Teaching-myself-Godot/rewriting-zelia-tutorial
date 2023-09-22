@@ -1,10 +1,6 @@
-# Day 3 - Casting Fireballs
+# Day 3 - Casting Sprites
 
-Today we're going to let Zelia cast her fireballs again.
-
-Just some small notes:
-- I changed the `Player`'s `var speed` property in `player.gd` from `120.0` to `170.0`
-- I removed `@export` from the `movement_state` and `orientation` property
+Today we're going to add Zelia's casting sprites to her script.
 
 ## The steps for today
 
@@ -14,10 +10,6 @@ Just some small notes:
 4. [Rearrange the code in `_physics_process` a little](#rearrange-the-code-in-_physics_process-a-little)
 5. [Draw the correct casting sprites based on cast direction](#draw-the-correct-casting-sprites-based-on-cast-direction)
 6. [Extract some functions for less messy code](#extract-some-functions-for-less-messy-code) (Technical debt 2)
-7. [Add a `Fireball` scene and test its flying](#add-a-fireball-scene-and-test-its-flying)
-8. [Spawn fireballs when she casts](#spawn-fireballs-when-she-casts)
-9. [Make fireballs collide with the `TileMap`, not with the `Player`](#make-fireballs-collide-with-the-tilemap-not-with-the-player)
-
 
 # Assign casting buttons
 
@@ -55,14 +47,13 @@ We should have made an entry per image to cover all her angles of casting:
 7. Add a new `Animation` named `casting_forward`
 8. Select it and press `Ctrl-V` to paste
 9. Repeat this process until you have 4 entries: `casting_up`, `casting_diag_up`, `casting_forward` and `casting_down`
+10. Remove the images _not_ casting down from the `casting_down` animation
 
 ![techdebt 1 new sprites](screenshots/cast_direction_separate_sprites.png)
 
-**Note**: that the image called `casting_down` will also be used for casting down diagonally. 
+**Note**: the image called `casting_down` will also be used for casting down diagonally. 
 
 (Her arms look really silly when pointing directly down)
-
-10. Remove the images _not_ casting down from the `casting_down` animation
 
 # Determine cast direction via mouse cursor position and L-stick axis
 
@@ -116,22 +107,26 @@ Check and see if the `cast_angle` changes when you:
 
 ![remote debug cast angle](screenshots/remote_debug_cast_angle.png)
 
+
+# Some refactor steps come next
+
+**Note**: If you're already familiar with code refactors, here's a link to the end-result of these rewrites, and a skip link for this bit of the tutorial:
+
+- [player.gd](https://github.com/Teaching-myself-Godot/godot-zelia/blob/164027e6ed74a70c1222778ebcd8dffba24ec416/player/player.gd)
+- [Draw the correct casting sprites based on cast direction](#draw-the-correct-casting-sprites-based-on-cast-direction)
+
+
 # Rearrange the code in `_physics_process` a little
 
 We need to rearrange our code in the `_physics_process` a little in order to achieve 2 things:
 1. Let Zelia flip orientation based on her casting angle
 2. Let Zelia stop moving on the x-axis while casting
 
-If you're already familiar with code refactors, here's a link to the end-result of these rewrites, and a skip link for this bit of the tutorial:
-- [player.gd](https://github.com/Teaching-myself-Godot/godot-zelia/blob/164027e6ed74a70c1222778ebcd8dffba24ec416/player/player.gd)
-- [Draw the correct casting sprites based on cast direction](#draw-the-correct-casting-sprites-based-on-cast-direction)
-
-
 Please do copy and paste the next rewrite of the entire `_physics_process`, remembering to:
 - read the code carefully
 - look at what changed
 
-We will change all code this _again_ soon! For the better, I promise.
+We will change all code this _again_ soon! For the better, I promise:
 
 ```gdscript
 func _physics_process(delta):
@@ -303,9 +298,9 @@ Now let's also add the case for `MovementState.CASTING` to our `match`-statement
 
 Now it's really time to fix [Technical debt 2](day-1.md#technical-debt-2), because the debt became deeper.
 
-**Again**: if you're already familiar with code refactors, here's a link to the end-result and a skip link for this bit of the tutorial:
+**Again**: if you're already familiar with code refactors, here's a link to the end-result and a skip link to day 4:
 - [player.gd](https://github.com/Teaching-myself-Godot/godot-zelia/blob/164027e6ed74a70c1222778ebcd8dffba24ec416/player/player.gd)
-- [Adding a fireball node](#add-a-fireball-scene-and-test-its-flying)
+- [Day 4 - Casting fireballs](day-4.md)
 
 ## The process of tyding up code
 
@@ -481,120 +476,14 @@ Your entire `player.gd` script should look like this:
 
 [`player.gd`](https://github.com/Teaching-myself-Godot/godot-zelia/blob/164027e6ed74a70c1222778ebcd8dffba24ec416/player/player.gd) - on github commit: _"use my own tutorial for day-3 part 1."_
 
-# Add a `Fireball` scene and test its flying
-
-TODO write about fireball node stuff:
-
-[assets/fireballs.zip](https://github.com/Teaching-myself-Godot/rewriting-zelia-tutorial/raw/main/assets/fireballs.zip)
-
-
-[Enemy script from tutorial](https://docs.godotengine.org/en/stable/getting_started/first_2d_game/04.creating_the_enemy.html#enemy-script):
-
-- `CollisionShape2D`
-- `AnimatedSprite2D`
-- [`VisibleOnScreenNotifier2D`](https://docs.godotengine.org/en/stable/classes/class_visibleonscreennotifier2d.html#class-visibleonscreennotifier2d)
-
-
-![animations setup](screenshots/fireball-animations.png)
-
-```gdscript
-extends Area2D
-
-var velocity = Vector2.ZERO
-
-func _physics_process(delta):
-	position += velocity * delta
-
-func _on_visible_on_screen_notifier_2d_screen_exited():
-	queue_free()
-
-```
-
-Remote debug:
-
-![remote debug](screenshots/remote_debug_fireball.png)
-
-
-# Spawn fireballs when she casts
-
-TODO write about fireball spawning!
-
-[Instancing with signals](https://docs.godotengine.org/en/stable/tutorials/scripting/instancing_with_signals.html)
-
-```gdscript
-# Cast fireball signal declaration
-signal cast_fire_magic(fireball, direction, location)
-
-# Fireball class
-var Fireball = preload("res://projectiles/fireball/Fireball.tscn")
-
-func _on_fireball_interval_timer_timeout():
-	if movement_state == MovementState.CASTING:
-		# elegant, yet no fit:
-		var origin = position + Vector2(10, 0).rotated(cast_angle) + Vector2(0, 2)
-		cast_fire_magic.emit(Fireball, cast_angle, origin)
-```
-
-
-[Instancing](https://docs.godotengine.org/en/stable/getting_started/step_by_step/instancing.html#doc-instancing)
-
-![link for instancing](https://docs.godotengine.org/en/stable/_images/instancing_scene_link_button.png)
-
-**Connect the signal from World scene!**
-
-```gdscript
-# world.gd
-func _on_player_cast_fire_magic(Fireball, direction, location):
-	var fireball = Fireball.instantiate()
-	add_child(fireball)
-	fireball.rotation = direction
-	fireball.position = location
-	fireball.velocity = Vector2.from_angle(direction) * 150
-```
-
-
-# Make fireballs collide with the `TileMap`, not with the `Player`
-
-TODO write about:
-
-- player:   mask and layer 1 (for now)
-- world:    mask and layer 1 and 2 (for now)
-- fireball: mask and layer 2 (for now)
-
-Handle fireball collision, final script
-
-`DissipateTimer` added.
-
-```gdscript
-extends Area2D
-
-@export var velocity = Vector2.ZERO
-
-
-func _ready():
-	$AnimatedSprite2D.play("default")
-
-func _physics_process(delta):
-	position += velocity * delta
-
-func _on_visible_on_screen_notifier_2d_screen_exited():
-	queue_free()
-
-# collision with something in collision layer/mask 2
-func _on_body_entered(body):
-	$AnimatedSprite2D.play("dissipate")
-	$DissipateTimer.start()
-	velocity *= 0.1
-
-func _on_dissipate_timer_timeout():
-	queue_free()
-```
-
-
-- Fireball z-index changed: Show behind parent is ON!
-
 
 # Technical debt 5
 
-- Comments probably do not conform to documentation guide.
-- Look at some coding conventions.
+Two observation on remaining technical debt:
+
+- Our comments probably do not conform to documentation guidelines
+- Some coding conventions might not comply either
+
+Let's park that and go right on ahead to:
+
+[Day 4 - Casting Fireballs](day-4.md)
