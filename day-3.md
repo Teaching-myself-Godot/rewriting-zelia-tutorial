@@ -124,7 +124,7 @@ We need to rearrange our code in the `_physics_process` a little in order to ach
 
 If you're already familiar with code refactors, here's a link to the end-result of these rewrites, and a skip link for this bit of the tutorial:
 - [player.gd](https://github.com/Teaching-myself-Godot/godot-zelia/blob/164027e6ed74a70c1222778ebcd8dffba24ec416/player/player.gd)
-- [Adding a fireball node](#add-a-fireball-scene-and-test-its-flying)
+- [Draw the correct casting sprites based on cast direction](#draw-the-correct-casting-sprites-based-on-cast-direction)
 
 
 Please do copy and paste the next rewrite of the entire `_physics_process`, remembering to:
