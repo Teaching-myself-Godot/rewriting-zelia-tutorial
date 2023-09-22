@@ -404,6 +404,76 @@ func set_cast_angle():
 
 ### Rinse and repeat!
 
+Now we spot this elaborate comment: 
+
+_"Update movement state, velocity and orientation based on the combo of her current movement state and environmental factors"_
+
+Applying the refactor steps listed previously do:
+1. Create a function `handle_movement_state`
+2. Cut+paste all the code under the long comment up to above the `match` call into `handle_movement_state`
+3. Call `handle_movement_state()` after `set_movement_state()`
+4. Create a func `handle_casting`
+5. Cut+paste all the code within the block `if movement_state == MovementState.CASTING:` into it
+6. Call `handle_casting()` in this if block
+7. Do the same for `handle_airborne()` under `elif movement_state == MovementState.AIRBORNE:`
+8. And make 2 functions to be called under `else:` - `handle_running()` and `handle_jumping()`
+
+Your final func `handle_movement_state()` should now look like this.
+
+```gdscript
+# Main movement state handler entry point
+func handle_movement_state():
+	if movement_state == MovementState.CASTING:
+		handle_casting()
+	elif movement_state == MovementState.AIRBORNE:
+		handle_airborne()
+	else:
+		handle_running()
+		handle_jumping()
+```
+
+### Just 2 more funcs!
+
+1. Create the function `set_current_sprite`
+2. Put the entire block of `match (movement_state):` in it
+3. Invoke it under `handle_movement_state()`
+
+And :
+
+1. Create the function `flip_current_sprite`
+2. Put the entire if-else block of `if orientation == Orientation.LEFT:` in it
+3. Invoke it under `set_current_sprite()`
+
+
+## All tidied up 
+
+Your `_physics_process` should now look like this:
+
+```gdscript
+# Changed _process to _physics_process
+func _physics_process(delta):
+	# Apply the gravity.
+	velocity.y += gravity * delta
+
+	# Set, and handle movement state 
+	set_movement_state()
+	handle_movement_state()
+
+	# Set the correct sprite based on movement state
+	set_current_sprite()
+
+	# Determine sprite-flip based on orientation
+	flip_current_sprite()
+
+	# Apply 2d physics engine's movement 
+	move_and_slide()
+```
+
+And everything should still work.
+
+Your entire `player.gd` script should look like this:
+
+[`player.gd`](https://github.com/Teaching-myself-Godot/godot-zelia/blob/164027e6ed74a70c1222778ebcd8dffba24ec416/player/player.gd) - on github commit: _"use my own tutorial for day-3 part 1."_
 
 # Add a `Fireball` scene and test its flying
 
