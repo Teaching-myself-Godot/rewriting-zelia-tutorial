@@ -10,6 +10,7 @@ Skip the elaborate intro and start:
 # Sneak preview
 
 You can see a sneak preview of my progress on the itch.io draft via a (not so) secret url:
+
 [Sneak Preview](https://renevanderark.itch.io/zelia-from-teaching-myself-godot?secret=WDhw0zXEKFRo9QzGPMZmSG1vs)
 
 
