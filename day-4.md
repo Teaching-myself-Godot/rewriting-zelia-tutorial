@@ -119,8 +119,3 @@ func _on_dissipate_timer_timeout():
 
 - Fireball z-index changed: Show behind parent is ON!
 
-
-# Technical debt 5
-
-- Comments probably do not conform to documentation guide.
-- Look at some coding conventions.
