@@ -230,6 +230,7 @@ This code snippet now flips her based on her casting angle:
 
 And this rearrangement further prevents her from entering other movement states while casting:
 ```gdscript
+	# Set initial movement state
 	if Input.is_action_pressed("Fireball button"):
 		movement_state = MovementState.CASTING
 		# base the angle of casting on the position of the mouse
@@ -297,10 +298,9 @@ Now let's also add the case for `MovementState.CASTING` to our `match`-statement
 
 Now it's really time to fix [Technical debt 2](day-1.md#technical-debt-2), because the debt became deeper.
 
-Here is a link to the commit of the refactor we're going to do: 
-
-[techdebt, write functions. ](https://github.com/Teaching-myself-Godot/godot-zelia/commit/dc64f5f6009fa2eaf961b3352cfbfc864c4cb028)
-
+If you're already familiar with code refactors, here's a link to the end-result and a skip link for this bit of the tutorial:
+- [player.gd](https://github.com/Teaching-myself-Godot/godot-zelia/blob/164027e6ed74a70c1222778ebcd8dffba24ec416/player/player.gd)
+- [Adding a fireball node](#add-a-fireball-scene-and-test-its-flying)
 
 ## The process of tyding up code
 
@@ -309,18 +309,19 @@ Now there must be a pattern or best practice name for this, but here's how it go
 Spot a function with a lot of code in the function body and do:
 1. For each bit of code needs comments to explain what it does, create a function named after the comments.
 2. For each block of code handling a case in an if-block write a function that says what it handles
-3. For each line of code longer than your coding viewport, functions to shorten that line
+3. For each line of code longer than your coding viewport, write functions to shorten that line
 4. For each complex boolean evaluation write a function with a name that says what it does
 5. For each code repetition write a function to be reused
+
 ... etcetera.
 
 This refactor only applied step `1`, `2` and `3`
 
-Let's try and apply step `1` ourselves by looking at the above [rewrite](#rearrange-the-code-in-_physics_process-a-little) again.
-
 ### Spot a big function and apply the steps!
 
-We spot that `_physics_process` is now almost 100 lines long.
+Let's rewrite the above [code](#rearrange-the-code-in-_physics_process-a-little) again.
+
+We spot that `_physics_process` is now almost 100 lines long!
 
 Step `1` - code that needs comments:
 
@@ -382,7 +383,7 @@ func set_movement_state():
 
 Now both step `2` and `3` still apply to this new function:
 
-```
+```gdscript
 # Vector of L-stick
 func get_l_stick_axis_vec() -> Vector2:
 	return Vector2(
