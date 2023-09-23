@@ -47,9 +47,12 @@ We should have made an entry per image to cover all her angles of casting:
 7. Add a new `Animation` named `casting_forward`
 8. Select it and press `Ctrl-V` to paste
 9. Repeat this process until you have 4 entries: `casting_up`, `casting_diag_up`, `casting_forward` and `casting_down`
-10. Remove the images _not_ casting down from the `casting_down` animation
+10. Remove the images _not_ casting down from the `casting_down` animation:
 
-![techdebt 1 new sprites](screenshots/cast_direction_separate_sprites.png)
+![casting_diag_up](screenshots/casting_diag_up.png)
+![casting_down](screenshots/casting_down.png)
+![casting_forward](screenshots/casting_forward.png)
+![casting_up](screenshots/casting_up.png)
 
 **Note**: the image called `casting_down` will also be used for casting down diagonally. 
 

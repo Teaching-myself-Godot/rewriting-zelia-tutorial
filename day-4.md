@@ -6,6 +6,7 @@
 1. [Add a `Fireball` scene and test its flying](#add-a-fireball-scene-and-test-its-flying)
 2. [Spawn fireballs when she casts](#spawn-fireballs-when-she-casts)
 3. [Make fireballs collide with the `TileMap`, not with the `Player`](#make-fireballs-collide-with-the-tilemap-not-with-the-player)
+4. [Generate renditions to make the fireball dissipate](#generate-renditions-to-make-the-fireball-dissipate)
 
 # Add a `Fireball` scene and test its flying
 
@@ -119,3 +120,9 @@ func _on_dissipate_timer_timeout():
 
 - Fireball z-index changed: Show behind parent is ON!
 
+
+# Generate renditions to make the fireball dissipate
+
+- [Singletons (Autoload)¶](https://docs.godotengine.org/en/stable/tutorials/scripting/singletons_autoload.html)
+- [Image](https://docs.godotengine.org/en/stable/classes/class_image.html#class-image)
+- [ImageTexture](https://docs.godotengine.org/en/stable/classes/class_imagetexture.html)

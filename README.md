@@ -52,6 +52,7 @@ This section contains links I read up on but haven't used (yet) / might not use 
 - [Terrain Autotiling and Alternative Tiles ~ Godot 4 Tutorial for Beginners](https://www.youtube.com/watch?v=vV8uKN1VnN4)
 - [`CharacterBody2D`](https://docs.godotengine.org/en/stable/classes/class_characterbody2d.html)
 - [`RigidBody2D`](https://docs.godotengine.org/en/stable/classes/class_rigidbody2d.html)
+- [Singletons (Autoload)¶](https://docs.godotengine.org/en/stable/tutorials/scripting/singletons_autoload.html)
 
 ### Things we probably won't need, but would like to
 - [How to use Godot's AStar2D for path finding](https://escada-games.itch.io/randungeon/devlog/261991/how-to-use-godots-astar2d-for-path-finding)
