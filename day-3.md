@@ -2,6 +2,17 @@
 
 Today we're going to add Zelia's casting sprites to her script.
 
+Want to start from here? 
+
+Clone or download the result of day 2 from [github](https://github.com/Teaching-myself-Godot/godot-zelia/tree/after-day-2)
+
+## Learning goals
+
+- Determine the angle between the Zelia sprite and the mouse cursor
+- Determine the angle of the `L-stick`
+- Using `rad_to_deg` to determing the correct casting sprite for aiming
+- Code refactor to tidy up code and make it more maintainable
+
 ## The steps for today
 
 1. [Assign casting buttons](#assign-casting-buttons)
@@ -13,7 +24,7 @@ Today we're going to add Zelia's casting sprites to her script.
 
 # Assign casting buttons
 
-Zelia can cast fireballs in all directions:
+After day 3 Zelia will cast fireballs in all directions:
 - when holding gamepad button `B`, you can aim with the `L-stick`
 - when holding the left mouse button, you can aim with the mouse cursor.
 
@@ -28,13 +39,13 @@ Now to determine which of either is pressed we need to assign one to another nam
 
 7. Choose `Add New Action`
 8. Set the name to `Left mouse button`
-9. Assign `Left Mouse Button` to `Left mouse button` 
+9. Assign `Left Mouse Button` to your new action named `Left mouse button` 
 
 ![Fireball buttons](screenshots/fireball-buttons-added.png)
 
 # Fix the casting sprites for Zelia
 
-On day one we added one `SpriteFrames` entry for all casting images. 
+On day 1 we added one `SpriteFrames` entry for all casting images. 
 
 We should have made an entry per image to cover all her angles of casting:
 
@@ -45,9 +56,10 @@ We should have made an entry per image to cover all her angles of casting:
 5. Select the image casting forward 
 6. Press `Ctrl-C` to copy it
 7. Add a new `Animation` named `casting_forward`
-8. Select it and press `Ctrl-V` to paste
-9. Repeat this process until you have 4 entries: `casting_up`, `casting_diag_up`, `casting_forward` and `casting_down`
-10. Remove the images _not_ casting down from the `casting_down` animation:
+8. Click on the preview window
+9. Select it and press `Ctrl-V` to paste the image of Zelia casting forward
+10. Repeat this process until you have 4 entries: `casting_up`, `casting_diag_up`, `casting_forward` and `casting_down`
+11. Remove the images _not_ casting down from the `casting_down` animation:
 
 ![casting_diag_up](screenshots/casting_diag_up.png)
 ![casting_down](screenshots/casting_down.png)
@@ -60,9 +72,9 @@ We should have made an entry per image to cover all her angles of casting:
 
 # Determine cast direction via mouse cursor position and L-stick axis
 
-Zelia can cast in all directions when holding a casting button.
+First let's write some code to see if we can set the angle of casting when one of the `Fireball button`s is pressed.
 
-Based on her angle of casting we'll pick the correct sprite.
+Later on we'll pick the correct sprite, based on her angle of casting
 
 Go to `FileSystem > player > player.gd` to edit the script.
 
@@ -104,38 +116,57 @@ If you forgot how, I documented it on day 1. Remote debug [see](day-1.md#test-ru
 3. Go to `root > World > Player`
 4. Look at the inspector
 
-Check and see if the `cast_angle` changes when you:
-- left-clicking the mouse somewhere on the screen
-- pressing `B` and moving the `L-stick` (the player wil slide around in IDLE mode right now)
+Check and see if the `Cast Angle` value changes when you:
+- left-click the mouse somewhere in the game window
+- press `B` and move the `L-stick` (the player wil slide around in looking `idle` right now)
 
 ![remote debug cast angle](screenshots/remote_debug_cast_angle.png)
 
-
-# Some refactor steps come next
-
-**Note**: If you're already familiar with code refactors, here's a link to the end-result of these rewrites, and a skip link for this bit of the tutorial:
-
-- [player.gd](https://github.com/Teaching-myself-Godot/godot-zelia/blob/164027e6ed74a70c1222778ebcd8dffba24ec416/player/player.gd)
-- [Draw the correct casting sprites based on cast direction](#draw-the-correct-casting-sprites-based-on-cast-direction)
-
-
 # Rearrange the code in `_physics_process` a little
 
+**NOTE** This section will rearrange code to look like this, in case you get stuck: 
+
+[player.gd](https://github.com/Teaching-myself-Godot/godot-zelia/blob/letting-zelia-stop-x-on-cast/player/player.gd)
+
+You could also download it and [skip to the next section](#draw-the-correct-casting-sprites-based-on-cast-direction).
+
+## Let's get started
+
 We need to rearrange our code in the `_physics_process` a little in order to achieve 2 things:
+
 1. Let Zelia flip orientation based on her casting angle
-2. Let Zelia stop moving on the x-axis while casting
+2. Let Zelia stop jumping and moving on the x-axis while casting
 
-Please do copy and paste the next rewrite of the entire `_physics_process`, remembering to:
-- read the code carefully
-- look at what changed
+## Flipping the player left and right by aiming 
 
-We will change all code this _again_ soon! For the better, I promise:
+Extend the code in the `if`-block we just created for setting the `cast_angle` to include setting the `orientation`-property correctly.
 
 ```gdscript
-func _physics_process(delta):
-	velocity.y += gravity * delta
+	if Input.is_action_pressed("Fireball button"):
 
-	# Set initial movement state
+		## ... movement_state and cas_angle are still set here
+
+		# base her orientation on the angle of casting as well
+		if cast_angle > -(PI * 0.5) and cast_angle < PI * 0.5:
+			orientation = Orientation.RIGHT
+		else:
+			orientation = Orientation.LEFT
+```
+
+Test using `F5`: when clicking with the mouse left of her she should now flip to look left.
+
+## Letting Zelia stop jumping and moving on the x-axis while casting
+
+When she's casting she should not slide sideways.
+
+We don't want her to be able to move horizontally while casting in the air (which would make her way too powerful).
+
+### Step 1, move casting code up, stop her from sliding
+
+1. First move your entire `if Input.is_action_pressed("Fireball button")`-block all the way up to below `velocity.y += gravity * delta`.
+2. Change `if movement_state == MovementState.AIRBORNE` into `elif movement_state == MovementState.AIRBORNE`
+
+```gdscript
 	if Input.is_action_pressed("Fireball button"):
 		movement_state = MovementState.CASTING
 		# base the angle of casting on the position of the mouse
@@ -144,38 +175,26 @@ func _physics_process(delta):
 			cast_angle = (get_global_mouse_position() - position).normalized().angle()
 		else:
 			cast_angle = Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)).normalized().angle()
-	elif is_on_floor():
-		movement_state = MovementState.IDLE
-	else:
-		movement_state = MovementState.AIRBORNE
-
-	# Update movement state, velocity and orientation based on the combo of
-	# her current movement state and environmental factors
-	if movement_state == MovementState.CASTING:
-		# She cannot run or move on x-axis in the air while casting
-		velocity.x = 0
 		# base her orientation on the angle of casting as well
 		if cast_angle > -(PI * 0.5) and cast_angle < PI * 0.5:
 			orientation = Orientation.RIGHT
 		else:
 			orientation = Orientation.LEFT
 	elif movement_state == MovementState.AIRBORNE:
-		# If she's airborne right now
-		if is_on_floor():
-			# .. and hits the floor, she's idle
-			movement_state = MovementState.IDLE
-		elif Input.is_action_pressed("Run right"):
-			# Else you can still move her right
-			orientation = Orientation.RIGHT
-			velocity.x = speed
-		elif Input.is_action_pressed("Run left"):
-			# ... and left
-			orientation = Orientation.LEFT
-			velocity.x = -speed
-		else:
-			velocity.x = 0
+```
+
+This stops her from sliding or moving around while in the air.
+
+### Step 2, only jump when not casting _and_ not airborne
+
+She can still jump while casting now, let's fix that.
+
+Indent the `if Input.is_action_just_pressed("Jump") and is_on_floor()` to make it part of the `else`-case matching not casting and not being airborne
+
+
+```gdscript
 	else:
-		# Else we are neither casting nor airborne right now
+		# Else we are not airborne right now
 		if Input.is_action_pressed("Run right"):
 			# so we run right when run right is pressed
 			orientation = Orientation.RIGHT
@@ -191,47 +210,22 @@ func _physics_process(delta):
 			velocity.x = 0
 			movement_state = MovementState.IDLE  
 
+## This is new
 		# Handle Jump, only when on the floor
-		if Input.is_action_just_pressed("Jump") and is_on_floor():
+		if Input.is_action_just_pressed("Jump"):
 			$JumpSound.play()
 			movement_state = MovementState.AIRBORNE
 			velocity.y = jump_speed
-	
-	# Determine sprite based on movement state
-	match (movement_state):
-		MovementState.RUNNING:
-			$AnimatedSprite2D.animation = "running"
-		# This was added
-		MovementState.AIRBORNE:
-			$AnimatedSprite2D.animation = "jumping"
-		_: # MovementState.IDLE
-			$AnimatedSprite2D.animation = "idle"
-
-	# Neither had this
-	if orientation == Orientation.LEFT:
-		$AnimatedSprite2D.flip_h = true
-	else:
-		$AnimatedSprite2D.flip_h = false
-
-	# Apply 2d physics engine's movement 
-	move_and_slide()
 ```
 
-Test again with `F5`. Can you notice the changes?
+That stopped her from jumping while casting
 
-This code snippet now flips her based on her casting angle:
-```gdscript
-	if movement_state == MovementState.CASTING:
-		# She cannot run or move on x-axis in the air while casting
-		velocity.x = 0
-		# base her orientation on the angle of casting as well
-		if cast_angle > -(PI * 0.5) and cast_angle < PI * 0.5:
-			orientation = Orientation.RIGHT
-		else:
-			orientation = Orientation.LEFT
-```
+### Step 3, separate code for setting initial movement state from code updating positions.
 
-And this rearrangement further prevents her from entering other movement states while casting:
+This step will have no _functional_ effect, but it will prepare us for our "readable code refactor" that comes next.
+
+**First** create this new `if-block` just under `velocity.y += gravity * delta`:
+
 ```gdscript
 	# Set initial movement state
 	if Input.is_action_pressed("Fireball button"):
@@ -246,12 +240,27 @@ And this rearrangement further prevents her from entering other movement states 
 		movement_state = MovementState.IDLE
 	else:
 		movement_state = MovementState.AIRBORNE
-
-	# Update movement state, velocity and orientation based on the combo of
-	# her current movement state and environmental factors
 ```
 
-We will make _all this_ a **LOT** more maintainable soon!
+**Second** Replace the old `if Input.is_action_pressed("Fireball button")`-block with this code:
+```gdscript
+	# Update movement state, velocity and orientation based on the combo of
+	# her current movement state and environmental factors
+	if movement_state == MovementState.CASTING:
+		# She cannot run or move on x-axis in the air while casting
+		velocity.x = 0
+		# base her orientation on the angle of casting as well
+		if cast_angle > -(PI * 0.5) and cast_angle < PI * 0.5:
+			orientation = Orientation.RIGHT
+		else:
+			orientation = Orientation.LEFT
+	elif movement_state == MovementState.AIRBORNE:
+```
+
+Your script should now look like this:
+
+[player.gd  (tag = letting-zelia-stop-x-on-cast)](https://github.com/Teaching-myself-Godot/godot-zelia/blob/letting-zelia-stop-x-on-cast/player/player.gd)
+
 
 # Draw the correct casting sprites based on cast direction
 

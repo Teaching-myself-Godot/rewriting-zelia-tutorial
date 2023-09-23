@@ -9,7 +9,7 @@ So today we're going to achieve these goals:
 
 But before we can do that, we need some surfaces for her to run around on.
 
-## Prerequisites
+## Learning goals
 
 Before I could make this day's tutorial I had to read up on and watch:
 
