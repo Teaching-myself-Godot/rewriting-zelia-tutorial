@@ -144,7 +144,7 @@ Extend the code in the `if`-block we just created for setting the `cast_angle` t
 ```gdscript
 	if Input.is_action_pressed("Fireball button"):
 
-		## ... movement_state and cas_angle are still set here
+		## ... movement_state and cast_angle are still set here
 
 		# base her orientation on the angle of casting as well
 		if cast_angle > -(PI * 0.5) and cast_angle < PI * 0.5:
@@ -264,7 +264,7 @@ Your script should now look like this:
 
 # Draw the correct casting sprites based on cast direction
 
-To make a good head start let's make a well-named function this time to choose the correct sprite name to draw:
+Let's make a well-named function to choose the correct sprite name to draw:
 
 ## `func get_casting_sprite`
 ```gdscript
@@ -287,6 +287,10 @@ func get_casting_sprite(deg) -> String:
 		return "casting_forward"
 ```
 
+As you can see, this function expects the cast_angle to be passed as `decimal degrees` in stead of `radians`.
+
+This makes the code a little more self-documenting, at the cost of some minimal performance.
+
 Now let's also add the case for `MovementState.CASTING` to our `match`-statement:
 
 ```gdscript
@@ -305,13 +309,16 @@ Now let's also add the case for `MovementState.CASTING` to our `match`-statement
 			$AnimatedSprite2D.animation = "idle"
 ```
 
+Note the `rad_to_deg` there.
 
 # Extract some functions for less messy code
 
 Now it's really time to fix [Technical debt 2](day-1.md#technical-debt-2), because the debt became deeper.
 
-**Again**: if you're already familiar with code refactors, here's a link to the end-result and a skip link to day 4:
+**NOTE**: if you're already familiar with code refactors or want/need a reference, you can download the final code of today here:
 - [player.gd](https://github.com/Teaching-myself-Godot/godot-zelia/blob/164027e6ed74a70c1222778ebcd8dffba24ec416/player/player.gd)
+
+And if you're already quite familiar with these types of refactor, here's a skip link to day 4:
 - [Day 4 - Casting fireballs](day-4.md)
 
 ## The process of tyding up code
