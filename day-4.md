@@ -178,7 +178,7 @@ We can fix that by toggling off visibility here:
 
 ![toggle invisible](screenshots/toggle-invisible.png)
 
-### Declare, invoke and connect a signal to `instantiate` fireballs
+### Declare and invoke a signal to "cast spells"
 
 What we're doing next is explained in detail in [Instancing with signals](https://docs.godotengine.org/en/stable/tutorials/scripting/instancing_with_signals.html).
 
@@ -202,18 +202,42 @@ func _on_fireball_interval_timer_timeout():
 		cast_projectile.emit(Fireball, cast_angle, position)
 ```
 
-**Connect the signal from World scene!**
+### Let the world scene listen to the signal
+
+The main scene of our game (currently `World`) should get a script with a listener to the casting signal.
+
+Upon that signal, it must `instantiate` a new `Fireball`-node and let it fly:
+
+1. Go to `FileSystem > world.tscn`
+2. Right click the `World`-node and choose `Attach Script`
+3. Use the defaults and click `Create`
+4. Clear the script to one line:
+
+```gdscript
+extends TileMap
+```
+
+5. Click on the `Player`-**child-node** _of_ `World`
+6. Pick `Node` next to `Inpector`
+7. Double click `cast_projectile(...)`
+8. Leave defaults to `Connect` to `World`
+9. Implement `_on_player_cast_projectile` like this:
 
 ```gdscript
 # world.gd
-func _on_player_cast_fire_magic(Fireball, direction, location):
-	var fireball = Fireball.instantiate()
-	add_child(fireball)
-	fireball.rotation = direction
-	fireball.position = location
-	fireball.velocity = Vector2.from_angle(direction) * 150
+func _on_player_cast_projectile(spell_class, direction, origin):
+	var spell = spell_class.instantiate()
+	add_child(spell)
+	spell.rotation = direction
+	spell.position = origin
+	spell.velocity = Vector2.from_angle(direction) * 150.0
 ```
 
+Test the main scene using `F5`
+
+**NOTE**: the fireball should come from her belly in the center at this time. If you made the _same mistake I did_ it might spawn out at another place. 
+
+**FIX**: The rootnode `Fireball` of the `fireball.tscn`-scene should be in the center of its sprite; it's a subtle grey-plus on the `2D`-scene until you click on it.
 
 ### Fix the fireballs' origin, tweak casting sprites with angle of fireball
 
@@ -221,15 +245,24 @@ So we don't want Zelia to shoot fire from her belly, but from her hands.
 
 This script calculates a new and better origin.
 ```
+# Spawn a fireball every 100ms if Fireball button is held
+func _on_fireball_interval_timer_timeout():
+	if movement_state == MovementState.CASTING:
+		# Signal that a fireball should be cast at casting angle and 
+		# from Player's hands
 		var origin = position + Vector2(20, 0).rotated(cast_angle) + Vector2(0, 2)
 		cast_projectile.emit(Fireball, cast_angle, origin)
 ```
 So the `var origin` is calculated by applying 3 transformations:
-1. Create a 'point' at position x=10, y=0 and rotate it by the casting angle: `Vector2(10, 0).rotated(cast_angle)`
+1. Create a 'point' at position x=20, y=0 and rotate it by the casting angle: `Vector2(20, 0).rotated(cast_angle)`
 2. Move it relative to Zelia's center (`position + `)
 3. Move it 2 pixels down `+ Vector(0, 2)`
 
-
+Also, her hands do not match up as nicely with the fireballs as they did in the original game. Use these new angles to determine `casting_up` and `casting_down` in `get_casting_sprite` for better effect:
+```gdscript
+	var casting_up    = deg > -160 and deg < 0
+	var casting_down  = deg > 30   and deg < 160
+```
 
 # Make fireballs collide with the `TileMap`, not with the `Player`
 
