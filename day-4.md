@@ -150,10 +150,35 @@ That's better. Let's shoot the fireballs next.
 
 ## Spawning the fireballs
 
-For this section we follow this guide from the godot tutorials:
+For this section we follow these guides from the godot tutorials:
+- [Instancing](https://docs.godotengine.org/en/stable/getting_started/step_by_step/instancing.html#doc-instancing)
+- [Instancing with signals](https://docs.godotengine.org/en/stable/tutorials/scripting/instancing_with_signals.html)
 
-[Instancing with signals](https://docs.godotengine.org/en/stable/tutorials/scripting/instancing_with_signals.html)
+The main take-away here is to make sure the `Fireball`-scene is loosely coupled from the `Player`-scene; it lives a life of its own.
 
+This also keeps it testable in isolation, like we did earlier.
+
+### Add the Fireball scene to the main scene
+We will however need to be able to access it from the main scene of our game: 
+
+1. Open `FileSystem > res://world.tscn`
+2. Connect the `Fireball`-scene to it by either/or
+- Dragging `fireball.tscn` from the `FileSystem` tab into the `World`-tree
+- Clicking the `Instantiate Child Scene` button:
+
+![instantiate](screenshots/instantiate-child-scene-button.png)
+
+That made _one_ `instance` of the `Fireball`-scene as a direct child of the `World`-scene. 
+
+It kinda just sits there, being visible:
+
+![fireball being visible](screenshots/firball-sitting-there-being-visible.png)
+
+We can fix that by toggling off visibility here:
+
+![toggle invisible](screenshots/toggle-invisible.png)
+
+### Declare a signal to `instantiate` fireballs
 
 
 
@@ -171,10 +196,6 @@ func _on_fireball_interval_timer_timeout():
 		cast_fire_magic.emit(Fireball, cast_angle, origin)
 ```
 
-
-[Instancing](https://docs.godotengine.org/en/stable/getting_started/step_by_step/instancing.html#doc-instancing)
-
-![link for instancing](https://docs.godotengine.org/en/stable/_images/instancing_scene_link_button.png)
 
 **Connect the signal from World scene!**
 
