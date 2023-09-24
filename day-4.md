@@ -178,24 +178,29 @@ We can fix that by toggling off visibility here:
 
 ![toggle invisible](screenshots/toggle-invisible.png)
 
-### Declare a signal to `instantiate` fireballs
+### Declare, invoke and connect a signal to `instantiate` fireballs
 
+What we're doing next is explained in detail in [Instancing with signals](https://docs.godotengine.org/en/stable/tutorials/scripting/instancing_with_signals.html).
 
+We're just going to apply here what we learned.
 
 ```gdscript
-# Cast fireball signal declaration
-signal cast_fire_magic(fireball, direction, location)
+## top of script
+# Preload the Fireball class, used to identify it in cast_projectile
+var Fireball = preload("res://projectiles/fireball/fireball.tscn")
 
-# Fireball class
-var Fireball = preload("res://projectiles/fireball/Fireball.tscn")
+# Declare a signal to cast a projectile spell (like Fireball) 
+# in the given direction, from the given origin
+signal cast_projectile(spell_class, direction : Vector2, origin : Vector2)
 
+## bottom of script
+# Spawn a fireball every 100ms if Fireball button is held
 func _on_fireball_interval_timer_timeout():
 	if movement_state == MovementState.CASTING:
-		# elegant, yet no fit:
-		var origin = position + Vector2(10, 0).rotated(cast_angle) + Vector2(0, 2)
-		cast_fire_magic.emit(Fireball, cast_angle, origin)
+		# Signal that a fireball should be cast at casting angle and 
+		# from Player's position
+		cast_projectile.emit(Fireball, cast_angle, position)
 ```
-
 
 **Connect the signal from World scene!**
 
@@ -208,6 +213,22 @@ func _on_player_cast_fire_magic(Fireball, direction, location):
 	fireball.position = location
 	fireball.velocity = Vector2.from_angle(direction) * 150
 ```
+
+
+### Fix the fireballs' origin, tweak casting sprites with angle of fireball
+
+So we don't want Zelia to shoot fire from her belly, but from her hands.
+
+This script calculates a new and better origin.
+```
+		var origin = position + Vector2(20, 0).rotated(cast_angle) + Vector2(0, 2)
+		cast_projectile.emit(Fireball, cast_angle, origin)
+```
+So the `var origin` is calculated by applying 3 transformations:
+1. Create a 'point' at position x=10, y=0 and rotate it by the casting angle: `Vector2(10, 0).rotated(cast_angle)`
+2. Move it relative to Zelia's center (`position + `)
+3. Move it 2 pixels down `+ Vector(0, 2)`
+
 
 
 # Make fireballs collide with the `TileMap`, not with the `Player`
