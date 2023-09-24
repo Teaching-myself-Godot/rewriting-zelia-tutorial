@@ -78,7 +78,7 @@ If we're going to spawn hundreds of thousands of them, it will become a dire mem
 
 To clean up the potential mess, we'll follow some instructions about nodes leaving the viewport from here:
 
-[Enemy script from: My First 2D Game](https://docs.godotengine.org/en/stable/getting_started/first_2d_game/04.creating_the_enemy.html#enemy-script):
+Enemy script from: [_"My First 2D Game"_](https://docs.godotengine.org/en/stable/getting_started/first_2d_game/04.creating_the_enemy.html#enemy-script):
 
 Following these steps, we will now:
 
@@ -107,9 +107,55 @@ Congratulations, we deleted it.
 
 # Spawn fireballs when she casts
 
-TODO write about fireball spawning!
+If you've looked at the [original Zelia game](https://renevanderark.itch.io/zelia-mystery-mage-and-adventure-maker), you know that she does not fire on button-press/click, but on fixed intervals while holding a button:
+
+## Add a `FireballIntervalTimer`
+
+1. Go to `FileSystem > player > player.tscn`
+2. Add a `Timer`-node to the `Player`-node
+3. Name it `FireballIntervalTimer`
+4. Go to the `Inspector`-tab:
+5. Set `Wait Time` to `0.1`
+6. Make sure the `One Shot`-property is checked `Off`
+7. Check `On` the `Autostart`-property
+
+This makes sure that the `FireballIntervalTimer` is activated when the `Player` is instantiated. 
+
+So, in our current case, when the game starts.
+
+8. Go to the `Node`-tab (next to `Inspector`)
+9. Double-click the `timeout()`-signal
+10. Keep the defaults and click `Connect`
+
+So now, let's check if our new listener `_on_fireball_interval_timer_timeout()` is set up properly:
+
+```gdscript
+func _on_fireball_interval_timer_timeout():
+	print("Pow!")
+```
+
+Test by pressing `F5`, and look at the console:
+
+![console prints "pow"](screenshots/console-prints-pow.png)
+
+Ok, so the `FireballIntervalTimer` works, but she should only shoot fireballs when holding the `Fireball button`:
+
+```gdscript
+func _on_fireball_interval_timer_timeout():
+	if movement_state == MovementState.CASTING:
+		rint("Pow!")
+```
+
+That's better. Let's shoot the fireballs next.
+
+## Spawning the fireballs
+
+For this section we follow this guide from the godot tutorials:
 
 [Instancing with signals](https://docs.godotengine.org/en/stable/tutorials/scripting/instancing_with_signals.html)
+
+
+
 
 ```gdscript
 # Cast fireball signal declaration
