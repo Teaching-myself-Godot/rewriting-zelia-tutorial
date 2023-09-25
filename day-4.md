@@ -432,34 +432,133 @@ singleton_test
 
 ## Generate the dissipate animation with `Image` and `ImageTexture`
 
+So now we want to prepare the animation for the fireball in our `Autoload`-node called `TextureRenditions`. Open the `texture_renditions.gd` script again.
 
+1. Use `preload` to open the `fireball.png` texture and get an instance of its `Image`:
+```gdscript
+extends Node
+
+var fireball = preload("res://projectiles/fireball/fireball.png").get_image()
+```
+2. Prepare a global array to hold the preprocess images:
+```
+var fireball_dissipate : Array = []
+```
+3. In the `_ready()` function add this line:
+```gdscript
+func _ready():
+	fireball_dissipate = get_dissipate_renditions(fireball)
+```
+4. And then write the function `get_dissipate_renditions(...)`
+```gdscript
+# Test if we can make one gray fireball first
+func get_dissipate_renditions(src_rendition):
+	# Create a new Image instance with the same properties as the source image
+	var dst_rendition = Image.create(src_rendition.get_width(), src_rendition.get_height(), false, src_rendition.get_format())
+	# Loop through all the pixels
+	for x in range(src_rendition.get_width()):
+		for y in range(src_rendition.get_height()):
+			# Get the original color
+			var src_color = src_rendition.get_pixel(x, y)
+			# Set red, green and blue to the red of the source color
+			# and keep the source alpha transparency
+			dst_rendition.set_pixel(x, y, Color(src_color.r, src_color.r, src_color.r, src_color.a))
+	# return a list of one gray-scaled image rendition
+	# converted to an instace of ImageTexture
+	return [ImageTexture.create_from_image(dst_rendition)]
+```
+5. Now edit `fireball.gd`, edit `_ready()` like this:
 
 ```gdscript
-extends Area2D
-
-@export var velocity = Vector2.ZERO
-
-
 func _ready():
+	# Start playing the "default" animation
 	$AnimatedSprite2D.play("default")
-
-func _physics_process(delta):
-	position += velocity * delta
-
-func _on_visible_on_screen_notifier_2d_screen_exited():
-	queue_free()
-
-# collision with something in collision layer/mask 2
+	# Add a new animation to the SpriteFrames instance of the $AnimatedSprite2D node
+	$AnimatedSprite2D.sprite_frames.add_animation("dissipate")
+	# Loop through all rendition images in the global singleton fireball_dissipate
+	for rendition in TextureRenditions.fireball_dissipate:
+		# Add them as a frame to 
+		$AnimatedSprite2D.sprite_frames.add_frame("dissipate", rendition)
+```
+6. And change the animation on impact in `_on_body_entered`:
+```gdscript
 func _on_body_entered(body):
+	# play the dissipate animation we coded
 	$AnimatedSprite2D.play("dissipate")
+	# start the new timer in stead of calling queue_free here
 	$DissipateTimer.start()
+	# slow it down to 1/10th the speed
 	velocity *= 0.1
-
-func _on_dissipate_timer_timeout():
-	queue_free()
 ```
 
+Test the project with `F5`. You should now see gray fireballs after collision:
 
-- Fireball z-index changed: Show behind parent is ON!
+![gray fireballs](screenshots/gray-fireball.png)
+
+### The actual rendition script
+
+Now that we established a simple list of one gray fireball rendition worked, let's finish up the rendition script in `texture_renditions.gd`:
+```gdscript
+func _ready():
+	fireball_dissipate = get_dissipate_renditions(fireball, 30, 1, 0.25)
+
+# Return a list of dissipating image renditions as an ImageTexture-Array
+# - src_rendition is the original Image
+# - amount is the amount of times to repeat the rendition effect
+# - scatter is the chance of a pixel being rendered again in a given rendeition
+# - fade is the factor by which the alpha channel transparency should be reduced 
+# in each rendition
+func get_dissipate_renditions(src_rendition : Image, amount : int = 14, scatter : int = 1, fade : float = 0.5):
+	var renditions = []
+	for n in range(amount):
+		# Create a new Image instance with the same properties as the source image
+		var dst_rendition = Image.create(src_rendition.get_width(), src_rendition.get_height(), false, src_rendition.get_format())
+		# Loop through all the pixels
+		for x in range(src_rendition.get_width()):
+			for y in range(src_rendition.get_height()):
+				# Get the original color
+				var src_color = src_rendition.get_pixel(x, y)
+				# Copy the source pixel if the random int between 0 and scatter
+				# hits one
+				if randi_range(0, scatter) == 1:
+					# Copy the pixel, reduce opacity by factor fade
+					dst_rendition.set_pixel(x, y, Color(src_color.r, src_color.g, src_color.b, src_color.a * fade))
+		
+		# append this rendition to result array
+		renditions.append(ImageTexture.create_from_image(dst_rendition))
+		# overwrite the src_rendition variable with a new empty image
+		src_rendition = Image.create(src_rendition.get_width(), src_rendition.get_height(), false, src_rendition.get_format())
+		# copy the current rendition into this variable entirely to be
+		# manipulated in the next iteration
+		src_rendition.copy_from(dst_rendition)
+	# return the list of amount renditions
+	return renditions
+```
+
+Upon testing with `F5`, we should now see something like this:
+
+![dissipating fireball](screenshots/dissipating-fireball.png)
+
+
+Tastes may differ, but personally I enjoy the fact that the random scatter in our renditions makes the fireball dissipate a little differently every time we play the game.
+
+### Final touch: show behind parent
+
+The final touch is, it looks nicer if the fireball does not draw _over_ the tiles (nor anything else). Draw it behind tiles (and everything else) makes it look like it really burned the target a little.
+
+There is a checkbox for that as well!
+
+1. Open the `Fireball` scene
+2. Click the `Fireball`-node
+3. Open the `Inspector`
+4. Check the `Visibility > Show Behind Parent`-property to `On`
+
+This works because in our main scene, `World`, the `TileMap` is the parent node of the `Fireball`-instances.
+
+Test again:
+
+![fireball behind parent](screenshots/fireball-behind-parent.png)
+
+
 
 
