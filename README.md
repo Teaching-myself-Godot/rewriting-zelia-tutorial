@@ -7,6 +7,16 @@ Skip the elaborate intro and start:
 - [Day 3 - Casting Sprites](day-3.md)
 - [Day 4 - Casting Fireballs](day-4.md)
 
+
+# Browse topics
+
+- [Generating textures dynamically in code](day-4.md#generate-renditions-to-make-the-fireball-dissipate)
+- [Singleton auto-loaded resources](day-4.md#generate-renditions-to-make-the-fireball-dissipate)
+- [Autotiles in godot 4.1.1](day-2.md#addings-tiles-in-a-tilemap)
+- [Refactoring big functions](day-3.md#extract-some-functions-for-less-messy-code)
+- [Basic platformer 2D physics](day-2.md#adapting-her-script-to-characterbody2d)
+
+
 # Sneak preview
 
 You can see a sneak preview of my progress on the itch.io draft via a (not so) secret url:
