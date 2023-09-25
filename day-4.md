@@ -544,7 +544,7 @@ Tastes may differ, but personally I enjoy the fact that the random scatter in ou
 
 ### Final touch: show behind parent
 
-The final touch is, it looks nicer if the fireball does not draw _over_ the tiles (nor anything else). Draw it behind tiles (and everything else) makes it look like it really burned the target a little.
+The fireball looks nicer if it's not drawn _over_ the tiles (nor anything else). Drawing it behind the tiles (_and_ everything else) makes it look like it really burns the target a little.
 
 There is a checkbox for that as well!
 
