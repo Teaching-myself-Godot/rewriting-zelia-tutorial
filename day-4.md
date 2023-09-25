@@ -244,7 +244,7 @@ Test the main scene using `F5`
 So we don't want Zelia to shoot fire from her belly, but from her hands.
 
 This script calculates a new and better origin.
-```
+```gdscript
 # Spawn a fireball every 100ms if Fireball button is held
 func _on_fireball_interval_timer_timeout():
 	if movement_state == MovementState.CASTING:
