@@ -266,15 +266,173 @@ Also, her hands do not match up as nicely with the fireballs as they did in the 
 
 # Make fireballs collide with the `TileMap`, not with the `Player`
 
-TODO write about:
+At the moment fireballs still fly out the game window. We want then to collide with the terrain tiles, however. 
 
-- player:   mask and layer 1 (for now)
-- world:    mask and layer 1 and 2 (for now)
-- fireball: mask and layer 2 (for now)
+Let's look at the [tutorial](https://docs.godotengine.org/en/stable/getting_started/first_2d_game/03.coding_the_player.html#preparing-for-collisions) once more and apply:
 
-Handle fireball collision, final script
+1. Open the fireball scene `FileSystem > res://projectiles/fireball/fireball.tscn`
+2. Select `Scene > Fireball`
+3. Go to `Node` next to `Inspector`
+4. Double click on the `body_entered(body: Node2D)` signal
+5. Leave defaults on and click `Connect`
+6. To remove them we could use `queue_free()` again:
 
-`DissipateTimer` added.
+```gdscript
+func _on_body_entered(body):
+	queue_free()
+```
+
+That works, the fireball collides when it hits the `Tilemap`. However..
+
+..It will also disappear if it collides with the `Player`. 
+
+## `Collision Layer` and `Collision Mask`
+
+To illustrate, make set its origin the `position`-property of the player again in `player.gd`:
+
+```gdscript
+		# comment out the next line with Ctrl+k
+#		var origin = position + Vector2(20, 0).rotated(cast_angle) + Vector2(0, 2)
+		# replace origin with position in next line
+		cast_projectile.emit(Fireball, cast_angle, position)
+```
+
+Depending on whether the fireballs are drawn over or behind the `Player` you will see either/or:
+- them pop in and out of existence
+- not at all
+
+This is because their `Collision Mask` overlaps the `Collision Layer` of the player. The answers here explain it nicely:
+[What's the difference between Collision layers and Collision masks?](https://ask.godotengine.org/4010/whats-difference-between-collision-layers-collision-masks)
+
+Let's apply what we've learned here like this:
+- `Player`: set both mask and layer to 1 (for now)
+- `World > TileSet`: set both mask and layer to 1 _and_ 2 (for now)
+- `Fireball`: set both mask and layer to 2 (for now)
+
+ `Player` is already set correctly. However, we might want more granularity later.
+
+### Setting `Collision Layer` and `Collision Mask` for `Fireball`
+
+This is a set of properties most easily manipulated in the `Inpector`.
+
+1. Select `res://projectiles/fireball/fireball.tscn`
+2. Click on the `Fireball` node
+3. Go to `Inspector > Collision`
+4. set both mask and layer to 2 (for now)
+
+![collision mask and layer](screenshots/collision-mask-and-layer.png)
+
+
+### Setting it for `World`
+
+But to set it for the `World` scene, be aware you also need to click on `Inspector > Tile Set > TileSet > Physics Layers` as it is a property not of the `TileMap`, but of (one of) its `TileSet`(s)' `Physics Layer`(s) --> if you can still follow.
+
+![Our TileMap's TileSet's Physic Layer's Collision Mask and Collision Layer](screenshots/tilemaps-tilesets-physicslayers-collisionlayerandmask.png)
+
+### Test again 
+
+Press `F5` to test if the fireballs _do_ collide with the `Tilemap` and _do not_ collide with the `Player`. 
+
+Then change back the `player.gd` script:
+```gdscript
+		var origin = position + Vector2(20, 0).rotated(cast_angle) + Vector2(0, 2)
+		cast_projectile.emit(Fireball, cast_angle, origin)
+```
+
+## Add some smoothness to the collided fireballs
+
+Right now the fireballs disappear very abrubtly because `queue_free()` is invoked immediately.
+
+We can smoothe this out a little by introducing a delay and slowing them down on impact:
+
+1. Go to `fireball.tscn`
+2. Give it a `Timer` child node and call it `DissipateTimer`
+3. Check `Inspector > One Shot` to `On`
+4. Set the `Wait Time` to `0.5`
+5. Change+Add this script to `fireball.gd`:
+
+```gdscript
+func _on_body_entered(body):
+	# start the new timer in stead of calling queue_free here
+	$DissipateTimer.start()
+	# slow it down to 1/10th the speed
+	velocity *= 0.1
+```
+
+6. Click `DissipateTimer`-node
+7. Connect the `Node > timeout()`-signal to the `Fireball`
+8. Implement `_on_dissipate_timer_timeout()` like so:
+
+```gdscript
+func _on_dissipate_timer_timeout():
+	queue_free()
+```
+
+That's only a little better. We need an animation to make them fade into non-existence slowly.
+
+# Generate renditions to make the fireball dissipate
+
+We could make this very ease on ourselves by drawing images manually in our [favourite image manipulation program](https://www.gimp.org/), but we'll do it the lazy way.
+
+Well, that is to say, the programmer's way, a.k.a. the reusable way. Remembering the original game we see a lot of stuff disappear in the same, lazy, reused way. We want to know how, right?
+
+## Using `Autoload` for preprocessing
+
+So looking at the documentation it becomes clear that you can easily manipulate texture images using these two classes:
+- [Image](https://docs.godotengine.org/en/stable/classes/class_image.html#class-image)
+- [ImageTexture](https://docs.godotengine.org/en/stable/classes/class_imagetexture.html)
+
+But what is less evident is how to do it only _one_ time, in stead of all the `100.000`+ times a fireball collides. That would _not_ perform _at all_.
+
+Luckily, when you search the docs for "`Singleton`" (my fifth attempt) you find the `Autoload`-class, which is meant for precisely this:
+
+- [Singletons (Autoload)](https://docs.godotengine.org/en/stable/tutorials/scripting/singletons_autoload.html)
+
+So, let us apply the steps and the test if we set it up properly.
+
+1. Go to `Project > Project Settings > Autoload` (4th tab)
+2. Click on the `Node Name` input
+3. Type in `TextureRenditions`, which will be the name of our first `Autoload`
+4. Click `Add`
+5. In the dialog, leave the defaults, creating a new script `res://texture_renditions.gd`
+6. Leave the `Global Variable`-checkbox check on to `Enable`
+7. Close the `Project Settings`-dialog again.
+8. Enter this test script in the file `texture_renditions.gd`:
+
+```gdscript
+extends Node
+
+var singleton_test : String
+
+func _ready():
+	singleton_test = "singleton_test"
+	print("asserting this print is called only once")
+```
+
+Run the project with `F5` and confirm in the console that yes indeed: 
+```
+asserting this print is called only once
+--- Debugging process stopped ---
+```
+
+Also, test if `TextureRenditions.singleton_test` is indeed a globally accessible string in `fireball.gd`:
+```gdscript
+func _ready():
+	print(TextureRenditions.singleton_test)
+```
+
+Run the project again and confirm in the console after shooting some fireballs:
+```
+singleton_test
+singleton_test
+singleton_test
+singleton_test
+--- Debugging process stopped ---
+```
+
+## Generate the dissipate animation with `Image` and `ImageTexture`
+
+
 
 ```gdscript
 extends Area2D
@@ -305,8 +463,3 @@ func _on_dissipate_timer_timeout():
 - Fireball z-index changed: Show behind parent is ON!
 
 
-# Generate renditions to make the fireball dissipate
-
-- [Singletons (Autoload)](https://docs.godotengine.org/en/stable/tutorials/scripting/singletons_autoload.html)
-- [Image](https://docs.godotengine.org/en/stable/classes/class_image.html#class-image)
-- [ImageTexture](https://docs.godotengine.org/en/stable/classes/class_imagetexture.html)
