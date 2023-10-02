@@ -570,7 +570,9 @@ So, I also tried 2D shaders of the `canvas_item` type. But my first attempt fail
 
 You can see my attempt in this branch: [Failed shader attempt on github](https://github.com/Teaching-myself-Godot/godot-zelia/tree/no-per-instance-shaders-for-canvas_items)
 
-So the (common) mistake I made was assuming that a shader script would be active on the _instance_ of a fireball, so I attached it to the material of a `Sprite2D`. What would probably work is to make a hardcoded "dissipate" in our `$AnimatedSprite2D.SpriteSet` and invoke the script i have from there.
+So the (common) mistake I made was assuming that a shader script would be active on the _instance_ of a fireball, so I attached it to the material of a `Sprite2D`. But that [is not supported yet](https://github.com/godotengine/godot/issues/62943)
+
+What would probably work is to make a hardcoded "dissipate" in our `$AnimatedSprite2D.SpriteSet` and invoke the script i have from there.
 
 Another thing is the display setting I chose: it mimics pixels, but just look at the picture just above here: it is perfectly rotated (like Mario Maker 2 seesaws). That makes shaders High Resolution. 
 
