@@ -21,7 +21,7 @@ And the other reason is: my son wanted to write a 2.5D game last weekend: [Untit
 ## What we'll do today
 
 1. [Make a bouncing Slime monster](#make-a-bouncing-slime-monster)
-2. [Add the tree-trun terrain](#add-the-tree-trunk-terrain)
+2. [Add the tree-trunk terrain](#add-the-tree-trunk-terrain)
 2. [Make tiles Zelia can break](#make-tiles-zelia-can-break)
 3. [Allow those breakable tiles to fall down](#allow-those-breakable-tiles-to-fall-down)
 4. [Reuse tiles as background scenery](#reuse-tiles-as-background-scenery)
