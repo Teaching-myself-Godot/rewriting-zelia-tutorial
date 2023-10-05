@@ -1,4 +1,4 @@
-# Slimes, Breaking tiles, Fallings Tiles, Scenery Tiles and Shaders
+# Slimes, Breaking tiles, Falling Tiles, Scenery Tiles and Shaders
 
 So for you it is day five, for me it's now day 14. :D
 
@@ -22,10 +22,10 @@ And the other reason is: my son wanted to write a 2.5D game last weekend: [Untit
 
 1. [Make a bouncing Slime monster](#make-a-bouncing-slime-monster)
 2. [Add the tree-trunk terrain](#add-the-tree-trunk-terrain)
-2. [Make tiles Zelia can break](#make-tiles-zelia-can-break)
-3. [Allow those breakable tiles to fall down](#allow-those-breakable-tiles-to-fall-down)
-4. [Reuse tiles as background scenery](#reuse-tiles-as-background-scenery)
-5. [Review my failed attempt to replace my TextureRenditions singleton with shaders](#review-my-failed-attempt-to-replace-my-texturerenditions-singleton-with-shaders)
+3. [Make tiles Zelia can break](#make-tiles-zelia-can-break)
+4. [Allow those breakable tiles to fall down](#allow-those-breakable-tiles-to-fall-down)
+5. [Reuse tiles as background scenery](#reuse-tiles-as-background-scenery)
+6. [Review my failed attempt to replace my TextureRenditions singleton with shaders](#review-my-failed-attempt-to-replace-my-texturerenditions-singleton-with-shaders)
 
 
 # Make a bouncing Slime monster
@@ -42,6 +42,7 @@ Every game needs one.
 8. Navigate to its `SpriteFrames > Animations`
 9. Change `default` into `airborne`, add `slime/green/5.png` to it
 10. Add `floor_bounce` and add `1.png` - `4.png` to that -> in that order
+11. Set `floor_bounce` to `7 fps` for the nicest effect
 
 
 

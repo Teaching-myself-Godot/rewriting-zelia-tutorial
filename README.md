@@ -6,7 +6,7 @@ Skip the elaborate intro and start:
 - [Day 2 - Adding some tiles and some physics](day-2.md)
 - [Day 3 - Casting Sprites](day-3.md)
 - [Day 4 - Casting Fireballs](day-4.md)
-- [Day 5 - Slimes, Breaking tiles, Fallings Tiles, Scenery Tiles and Shaders](day-5.md)
+- [Day 5 - Slimes, Breaking tiles, Falling Tiles, Scenery Tiles and Shaders](day-5.md)
 
 # Browse topics
 
@@ -54,7 +54,7 @@ I will be documenting my work in numbered days, some days we'll get a lot done. 
 - [Day 2 - Adding some tiles and some physics](day-2.md)
 - [Day 3 - Casting Sprites](day-3.md)
 - [Day 4 - Casting Fireballs](day-4.md)
-- [Day 5 - Slimes, Breaking tiles, Fallings Tiles, Scenery Tiles and Shaders](day-5.md)
+- [Day 5 - Slimes, Breaking tiles, Falling Tiles, Scenery Tiles and Shaders](day-5.md)
 
 ## Things I read up on
 
