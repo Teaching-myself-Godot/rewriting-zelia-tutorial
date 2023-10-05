@@ -16,7 +16,7 @@ Skip the elaborate intro and start:
 - [Refactoring big functions](day-3.md#extract-some-functions-for-less-messy-code)
 - [Basic platformer 2D physics](day-2.md#adapting-her-script-to-characterbody2d)
 - [2D shaders](day-5.md#reuse-tiles-as-background-scenery)
-- [Interactive TileMap Recipes](day-5#make-tiles-zelia-can-break)
+- [Interactive TileMap Recipes](day-5.md#make-tiles-zelia-can-break)
 
 
 # Sneak preview
