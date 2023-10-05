@@ -30,7 +30,20 @@ And the other reason is: my son wanted to write a 2.5D game last weekend: [Untit
 
 # Make a bouncing Slime monster
 
-Every game needs one
+Every game needs one.
+
+1. Download the zip: [assets/green-slime.zip](https://github.com/Teaching-myself-Godot/rewriting-zelia-tutorial/raw/main/assets/green-slime.zip)
+2. Create the resource dirs `res://monsters/slime/green`
+3. Extract the .png files in that `res://monsters/slime/green` dir 
+4. Create a new `CharacterBody2D`-scene
+5. Rename it to `Slime`
+6. And save it into `res://monsters/slime/slime.tscn`
+7. Give slime a child node `AnimatedSprite2D`
+8. Navigate to its `SpriteFrames > Animations`
+9. Change `default` into `airborne`, add `slime/green/5.png` to it
+10. Add `floor_bounce` and add `1.png` - `4.png` to that -> in that order
+
+
 
 # Add the `tree-trunk` terrain
 
