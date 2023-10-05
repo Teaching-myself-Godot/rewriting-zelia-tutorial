@@ -15,7 +15,7 @@ You're going to be spoiled with some 4.1 reïnvented recipes! (I hope)
 
 ## Any other excuses?
 
-And the other reason is: my son wanted to write a 2.5D game last weekend: https://github.com/Teaching-myself-Godot/untitled-shoot-em-up 
+And the other reason is: my son wanted to write a 2.5D game last weekend: [Untitled Shoot 'em Up](https://github.com/Teaching-myself-Godot/untitled-shoot-em-up/tree/master)
 
 
 ## What we'll do today
