@@ -39,11 +39,89 @@ Every game needs one.
 5. Rename it to `Slime`
 6. And save it into `res://monsters/slime/slime.tscn`
 7. Give slime a child node `AnimatedSprite2D`
-8. Navigate to its `SpriteFrames > Animations`
+8. Navigate to its `Inspector Sprite Frames > SpriteFrame > Animations`
 9. Change `default` into `airborne`, add `slime/green/5.png` to it
 10. Add `floor_bounce` and add `1.png` - `4.png` to that -> in that order
-11. Set `floor_bounce` to `7 fps` for the nicest effect
+11. Set `floor_bounce` to `7 fps` for the nicest effect:
 
+![slime](screenshots/slime.png)
+
+## Make the slime collide and bounce 
+
+Because our slime looks a little different depending on what state it's in, let's give it 2 collision shapes:
+
+1. Add a child `CollisionShape2D`-node to `Scene > Slime` 
+2. Name it: `AirborneCollisionShape`
+3. Pick `CircleShape2D` under `Inspector > Shape`
+4. Align it nicely around the `airborne` animation sprite:
+
+![slime airborne coll circle](screenshots/airborne-collision-shape.png)
+
+Next:
+1. Add another child `CollisionShape2D`-node to `Scene > Slime` 
+2. Name it: `FloorBounceCollisionShape`
+3. Pick `CapsuleShape2D` under  `Inspector > Shape`
+4. Align it around the first `floor_bounce` animation sprite:
+
+![slime capsule](screenshots/slime-capsule.png)
+
+### Slimes must bounce
+
+Add the slime to the main scene:
+
+1. Open `res://world.tscn`
+2. Drag at least one slime scene `res://monsters/slimes/slime.tscn` into the `World`-scene
+3. Test the main scene `World` with `F5` and observe that the slime hangs there doing nothing:
+
+![slime hanging there](screenshots/slime-hanging.png)
+
+4. Open the `res://monsters/slimes/slime.tscn` scene
+5. Attach a script to it, picking the default values in the dialog
+6. You might notice a lot of suggested code for a `CharacterBody2D` - although it could be fun to try it out, it's not what we're looking for.
+7. Remove all code and replace the `_physics_process` function body with `pass`:
+
+```gdscript
+extends CharacterBody2D
+
+
+func _physics_process(delta):
+	pass
+```
+
+### Adding the `MovementState`s
+
+We have 2 animations currently, so let's create 2 movement states to match:
+```gdscript
+extends CharacterBody2D
+
+enum MovementState { AIRBORNE, FLOOR_BOUNCE }
+
+var movement_state : int
+
+func _ready():
+    # assume it starts out hanging in the air
+    movement_state = MovementState.AIRBORNE
+
+    # start up the correct animated sprite sprite frames for that state
+	$AnimatedSprite2D.animation = "airborne"
+	$AnimatedSprite2D.play()
+
+```
+
+We also know the slime must bounce around. We can use some familiar stuff for that:
+
+```gdscript
+# We want the level designer to be able to modify stuff like this.
+@export var JUMP_VELOCITY = -400.0
+var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
+```
+
+Now let's at the very least allow some `move_and_slide()` in the `_physics_process`, applying the gravity:
+```gdscript
+func _physics_process(delta):
+	velocity.y += gravity * delta
+    move_and_slide()
+```
 
 
 # Add the `tree-trunk` terrain

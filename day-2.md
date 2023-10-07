@@ -164,8 +164,6 @@ And I don't. I did it last time and it took me weeks and weeks of tweaking; and 
 
 In my first attempt I actually tried to make `Player` extend from `RigidBody2D` and failed to get a good enough grip on what was happening. 
 
-You can check out the result on [the day-2-epic-fail tag of the github project](https://github.com/Teaching-myself-Godot/godot-zelia/blob/day-2-epic-fail/player/player.gd) of the code...
-
 ![Zelia flat on her face](screenshots/zelia-flat-on-her-face.png)
 
 ### Second attempt with `CharacterBody2D`
