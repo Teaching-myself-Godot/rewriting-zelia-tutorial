@@ -464,7 +464,14 @@ In typed languages you need to _declare_ an interface which _tells_ the compiler
 
 Test with `F5`! 
 
-It does ... nothing! 
+All sorts of stuff is not working as expected!
+
+1. [Fireballs just mysteriously start dissipating](#fireballs-collide-into-eachother-now-and-dissipate)
+2. [Slimes are still not collided with by fireballs!](#issue-2-slimes-are-not-in-the-correct-collission-layermask)
+
+So let's tackle both issues in reverse order :)
+
+#### Issue #2: Slimes are not in the correct collission layer/mask
 
 We forgot the collision layer and collision mask:
 
@@ -478,7 +485,25 @@ That should fix it. The fireball should now dissipate upon hitting the slime and
 
 ![slime ouches](screenshots/slime-ouches.png)
 
+#### Fireballs collide into eachother now .. and dissipate
+
+So that mystery was solved quite quickly. Let's make sure that fireballs do _not_ beat eachother anymore by deselecting collision layer `2`:
+
+1. Open `res://projectiles/fireball/fireball.tscn`
+2. Go to `Inspector > Collision`
+3. Deselect `Layer > 2`:
+
+![fireball colli](screenshots/fireball-collision-layer-mask.png)
+
+That should fix it:
+[![slime film 2](screenshots/slime-film-2.png)](screenshots/slime-film3.mp4)
+
+
 ### Allow the slime to die from damage
+
+The next step is not to allow that strange bit of negative `hp`! 
+
+All it takes is doing stuff we already did with the fireball. 
 
 ### Make the slime hurt the player by bouncing into the player
 
