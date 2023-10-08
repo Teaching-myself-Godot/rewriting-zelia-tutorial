@@ -393,7 +393,7 @@ func handle_movement_state():
 So I'm often a lone programmer, which is _bad_. One rule of thumb I learned concerning the DRY (Don't Repeat Yourself) principle I learned - when I _did_ work in a team - is: if you see the same snippet of code duplicated 3 times, refactor.
 
 Well, I'm annoyed seeing it just _2_ times right now, so let's fix it _early_:
-```
+```gdscript
 func follow_player():
 	if PlayerState.position.x < position.x:
 		velocity.x = -X_VELOCITY
