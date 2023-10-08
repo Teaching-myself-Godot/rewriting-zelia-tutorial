@@ -504,7 +504,116 @@ That should fix it:
 
 The next step is not to allow that strange bit of negative `hp`! 
 
-All it takes is doing stuff we already did with the fireball. 
+All it takes is doing stuff we already did with the fireball: [autoloaded texture renditions](day-4.md#generate-renditions-to-make-the-fireball-dissipate)
+
+1. Open `res://texture_renditions.gd`
+2. Add the properties `slime` and `slime_dissipate`
+
+```gdscript
+var slime = preload("res://monsters/slime/green/5.png").get_image()
+var slime_dissipate : Array = []
+```
+
+3. And use `get_dissipate_renditions` to generate renditions for slime-death
+
+```gdscript
+func _ready():
+	slime_dissipate = get_dissipate_renditions(slime, 10, 2, 0.9)
+	fireball_dissipate = get_dissipate_renditions(fireball, 15, 1, 0.5)
+```
+
+#### Add a `MovementState` and animation for slime death
+
+Next open the slime script to add the renditions.
+
+1. Open `res://projectiles/fireball/fireball.gd`
+2. Copy the rendition load code to your paste-buffer (`Ctrl + C`)
+
+```gdscript:
+	# The sprite_frames of $AnimatedSprite2D is a singleton, so after calling 
+	# add_animation one time, it exists for all other instances
+	if "dissipate" not in $AnimatedSprite2D.sprite_frames.get_animation_names():
+		# Add a new animation to the SpriteFrames instance of the $AnimatedSprite2D node
+		$AnimatedSprite2D.sprite_frames.add_animation("dissipate")
+		# Loop through all rendition images in the global singleton fireball_dissipate
+		for rendition in TextureRenditions.fireball_dissipate:
+			# Add them as a frame to 
+			$AnimatedSprite2D.sprite_frames.add_frame("dissipate", rendition)
+```
+
+3. Now open `res://monsters/slime/slime.gd`
+4. And paste the copied code into the `_ready()` function, adjusting one bit: `.fireball_dissipate` becomes `.slime_dissipate`
+```gdscript
+	if "dissipate" not in $AnimatedSprite2D.sprite_frames.get_animation_names():
+		# Add a new animation to the SpriteFrames instance of the $AnimatedSprite2D node
+		$AnimatedSprite2D.sprite_frames.add_animation("dissipate")
+		# Loop through all rendition images in the global singleton 
+		for rendition in TextureRenditions.slime_dissipate:
+			# Add them as a frame to 
+			$AnimatedSprite2D.sprite_frames.add_frame("dissipate", rendition)
+```
+
+5. When the slime's `hp` is `<= 0` then it should _die_
+6. Add the `MovementState.DYING` to the enum:
+```gdscript
+enum MovementState { AIRBORNE, FLOOR_BOUNCE, DYING }
+```
+7. So when the slime takes damage and drops below zero, set it:
+```gdscript
+func take_damage(dmg: int):
+	hp -= dmg
+	if hp <= 0:
+		movement_state = MovementState.DYING
+```
+8. Make sure it is not _reset_ in `set_movement_state()` and disable collisions:
+```gdscript
+func set_movement_state():
+	if movement_state == MovementState.DYING:
+		# FIXME: move to pick_collision_shape_for_movement_state
+		$AirborneCollisionShape.disabled = true
+		$FloorBounceCollisionShape.disabled = true
+	elif is_on_floor():
+		if movement_state == MovementState.AIRBORNE:
+			velocity.x = 0
+			$FloorBounceTimer.start()
+		movement_state = MovementState.FLOOR_BOUNCE
+	else:
+		movement_state = MovementState.AIRBORNE
+```
+8. And _handle_ it in the `movement_state` handler:
+```gdscript
+func handle_movement_state():
+	if movement_state == MovementState.DYING:
+		velocity = Vector2(0, 0)
+	# the rest was there already (behind 'el')
+	elif is_on_wall():
+		follow_player()
+
+	pick_collision_shape_for_movement_state()
+	pick_sprite_for_movement_state()
+```
+9. And make sure the correct animation for dying is picked:
+```gdscript
+func pick_sprite_for_movement_state():
+	match(movement_state):
+		MovementState.FLOOR_BOUNCE:
+			$AnimatedSprite2D.animation = "floor_bounce"
+		MovementState.AIRBORNE:
+			$AnimatedSprite2D.animation = "airborne"
+		MovementState.DYING:
+			$AnimatedSprite2D.animation = "dissipate"
+```
+
+#### The dissipate timer
+
+1. Now let's add a `DissipateTimer` to the `Slime` scene
+2. Open `res://monsters/slime/slime.tscn`
+3. Go to `Scene > Slime` and add a child node `Timer`
+4. And rename it to `DissipateTimer`
+5. Make sure it is set to `One Shot` under `Inspector`, leave `Wait Time` to `1s` 
+6. Connect its `timeout()`-signal to `slime.gd` in the usual way (defaults in dialog and such)
+7. Implement as follows:
+
 
 ### Make the slime hurt the player by bouncing into the player
 
