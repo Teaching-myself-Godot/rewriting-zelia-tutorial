@@ -403,8 +403,80 @@ func follow_player():
 
 Invoke it in `handle_movement_state` and `start_jump.`. Now your code is _`DRY`_ again.
 
-
 ### Make the slime take damage from fireballs
+
+When a fireball hits a slime we can detect it, but which of the two should detect the collision?
+
+Turns out we'll be handling this one, reasoning from the fireball. Which makes sense. The fireball will know how much punch it packs and it will deal it to anything that can `take_damage(...)`.
+
+So the first thing we _will_ do is implement that method for the slime:
+
+```
+@export var hp = 10
+
+func take_damage(dmg: int):
+	hp -= dmg
+	# test if it works
+	print("Ouch! hp = " + str(hp))
+```
+
+Now add the collision detection to the fireball like this:
+1. Open `res://projectiles/fireball/fireball.tscn`
+2. Select `Scene > Fireball`
+3. Go to `Node` next to the `Inspector` tab
+4. Double click `Signals > Area2D > area_entered(...)`
+5. And connect it to the _existing_ Fireball method `_on_body_entered`
+
+**NOTE!** that this is the first time I'm not saying "pick the defaults in the dialog"
+
+So first use `pick`:
+![pick pick](screenshots/connect-trigger-click-pick.png)
+And then choose the `_on_body_entered` method:
+![pick the method](screenshots/pick-existing-listener.png)
+
+
+6. Adapt `func _on_body_entered` like so:
+
+```gdscript
+@export var damage = 1
+
+func _on_body_entered(body):
+	# if the body _can_ take damage, give it _my_damage
+	if body.has_method("take_damage"):
+		body.take_damage(damage)
+
+	# ... leave the rest ...
+```
+
+So the var named `body` can be a slime and a slime will have the method `take_damage`. If it does, we invoke it! If not, it's not _'damageable'_.
+
+
+**Programmer's rant**
+
+We call this duck-typing: 
+_"If it looks like a duck and quacks like a duck..."_: if the target has a `quack()` method, we assume proactively it's a duck.
+
+In typed languages you need to _declare_ an interface which _tells_ the compiler (or interpreter) what methods the class implements. For a loosely typed scripting language like `gdscript` duck-typing makes more sense -- although inevitably you run into the request for type hints, like python did... anyway... whatever... you just want to make cool games, right? 
+
+...and if they crash, just ask a programmer!
+
+**/Programmer's rant**
+
+Test with `F5`! 
+
+It does ... nothing! 
+
+We forgot the collision layer and collision mask:
+
+1. Open `res://monsters/slime/slime.tscn`
+2. Go to `Inspector > Collision`
+3. Add the number 2 to the collision mask and -layer:
+
+![collision mask and layer](screenshots/collision-mask-and-layer-slime.png)
+
+That should fix it. The fireball should now dissipate upon hitting the slime and the slime should report its damage to the log:
+
+![slime ouches](screenshots/slime-ouches.png)
 
 ### Allow the slime to die from damage
 
