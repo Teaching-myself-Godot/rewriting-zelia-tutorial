@@ -496,6 +496,7 @@ So that mystery was solved quite quickly. Let's make sure that fireballs do _not
 ![fireball colli](screenshots/fireball-collision-layer-mask.png)
 
 That should fix it:
+
 [![slime film 3](screenshots/slime-film-2.png)](https://raw.githubusercontent.com/Teaching-myself-Godot/rewriting-zelia-tutorial/main/screenshots/slime-film3.mp4)
 
 
