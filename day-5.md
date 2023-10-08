@@ -371,6 +371,38 @@ Now press `F5` and test:
 
 The first jump looks great, but the second jump already has an issue.
 
+So apparently, when the slime hits a wall, the `velocity.x` is set to zero by `move_and_slide()`... Sounds like it makes perfect sense.
+
+But we want it to fly left to reach te player, so we're going to _fight_ this resistance! :D. We'll pick our battle with physics right here:
+
+```gdscript
+func handle_movement_state():
+	# keep trying to reach the player, even when bumping against the wall
+	if is_on_wall():
+		if PlayerState.position.x < position.x:
+			velocity.x = -X_VELOCITY
+		else:
+			velocity.x = X_VELOCITY
+
+	pick_collision_shape_for_movement_state()
+	pick_sprite_for_movement_state()
+```
+
+#### Refactor early part 2
+
+So I'm often a lone programmer, which is _bad_. One rule of thumb I learned concerning the DRY (Don't Repeat Yourself) principle I learned - when I _did_ work in a team - is: if you see the same snippet of code duplicated 3 times, refactor.
+
+Well, I'm annoyed seeing it just _2_ times right now, so let's fix it _early_:
+```
+func follow_player():
+	if PlayerState.position.x < position.x:
+		velocity.x = -X_VELOCITY
+	else:
+		velocity.x = X_VELOCITY
+```
+
+Invoke it in `handle_movement_state` and `start_jump.`. Now your code is _`DRY`_ again.
+
 
 ### Make the slime take damage from fireballs
 
