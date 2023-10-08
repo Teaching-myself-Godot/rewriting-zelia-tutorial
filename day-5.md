@@ -250,7 +250,7 @@ func set_movement_state():
 
 Test with `F5`: that looks a _lot_ better
 
-![bouncies!](https://raw.githubusercontent.com/Teaching-myself-Godot/rewriting-zelia-tutorial/main/screenshots/bounce-anim.mp4)
+[![bouncies!](screenshots/bounce-anim.png)](https://raw.githubusercontent.com/Teaching-myself-Godot/rewriting-zelia-tutorial/main/screenshots/bounce-anim.mp4)
 
 #### Refactor early.
 
