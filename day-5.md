@@ -466,7 +466,7 @@ Test with `F5`!
 
 All sorts of stuff is not working as expected!
 
-1. [Fireballs just mysteriously start dissipating](#fireballs-collide-into-eachother-now-and-dissipate)
+1. [Fireballs just mysteriously start dissipating](#fireballs-collide-into-eachother-now--and-dissipate)
 2. [Slimes are still not collided with by fireballs!](#issue-2-slimes-are-not-in-the-correct-collission-layermask)
 
 So let's tackle both issues in reverse order :)
