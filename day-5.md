@@ -366,7 +366,7 @@ func set_movement_state():
 
 Now press `F5` and test:
 
-[![slime film 2](screenshots/slime-film-2.png)](screenshots/slime-film2.mp4)
+[![slime film 2](screenshots/slime-film-2.png)](https://raw.githubusercontent.com/Teaching-myself-Godot/rewriting-zelia-tutorial/main/screenshots/slime-film2.mp4)
 
 
 The first jump looks great, but the second jump already has an issue.
@@ -496,7 +496,7 @@ So that mystery was solved quite quickly. Let's make sure that fireballs do _not
 ![fireball colli](screenshots/fireball-collision-layer-mask.png)
 
 That should fix it:
-[![slime film 2](screenshots/slime-film-2.png)](screenshots/slime-film3.mp4)
+[![slime film 3](screenshots/slime-film-2.png)](https://raw.githubusercontent.com/Teaching-myself-Godot/rewriting-zelia-tutorial/main/screenshots/slime-film3.mp4)
 
 
 ### Allow the slime to die from damage
