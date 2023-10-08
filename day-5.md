@@ -411,7 +411,7 @@ Turns out we'll be handling this one, reasoning from the fireball. Which makes s
 
 So the first thing we _will_ do is implement that method for the slime:
 
-```
+```gdscript
 @export var hp = 10
 
 func take_damage(dmg: int):
