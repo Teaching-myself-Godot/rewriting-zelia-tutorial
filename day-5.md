@@ -254,7 +254,7 @@ Test with `F5`: that looks a _lot_ better
 
 #### Refactor early.
 
-The code is cluttering up already. Also, we have not made us of our somewhat artificial separation between `set_movement_state` and `handle_movement_state` yet. 
+The code is cluttering up already. Also, we have not made use of our somewhat artificial separation between `set_movement_state` and `handle_movement_state` yet. 
 
 That separation was supposed to make the code easier to reason about, So now apply the following early '_incisions_' >:)
 
@@ -283,7 +283,9 @@ func set_movement_state():
 		movement_state = MovementState.AIRBORNE
 ```
 
-We still have a `match`-block that needs a comment to explain what it does. Let's fix that by creating a function for it:
+We still have a `match`-block that needs a comment to explain what it does. 
+
+Let's fix that by creating a function for it:
 ```gdscript
 func pick_sprite_for_movement_state():
 	match(movement_state):
@@ -291,6 +293,13 @@ func pick_sprite_for_movement_state():
 			$AnimatedSprite2D.animation = "floor_bounce"
 		MovementState.AIRBORNE:
 			$AnimatedSprite2D.animation = "airborne"
+```
+
+And invoke it from `handle_movement_state` like so:
+```gdscript
+func handle_movement_state():
+	pick_collision_shape_for_movement_state()
+	pick_sprite_for_movement_state()
 ```
 
 Did you notice we applied the lesson we learned on day 3 about [refactoring big functions](day-3.md#extract-some-functions-for-less-messy-code)?
