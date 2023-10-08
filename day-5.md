@@ -306,6 +306,72 @@ Did you notice we applied the lesson we learned on day 3 about [refactoring big 
 
 ### Make the slime bounce in the direction of the player
 
+So, now that the slimes are bouncing up and down nicely, we need to make them aware of where their only enemy is: _you_, the player.
+
+So we already learned a surefire approach through using singletons (or `Autoload`) on [day 4](day-4.md#generate-renditions-to-make-the-fireball-dissipate). Let's apply that again:
+
+1. Go to `Project > Project Settings... > Autoload`
+2. Fill in `PlayerState` under `Node Name` and click `Add`
+3. In the dialog keep the defaults and create the new file
+4. Open `res://player_state.gd`
+5. Add a `var position` of type `Vector2`
+6. When `_ready` initialize it with `Vector2.ZERO`:
+
+```gdscript
+extends Node
+
+var position : Vector2
+
+func _ready():
+	position = Vector2.ZERO
+```
+
+#### Updating `PlayerState.position`
+
+Now this new `PlayerState` singleton must be updated at least every time the player moves. Do this by adding this one line to a suitable function in `player.gd`:
+
+```gdscript
+func _process(_delta)
+	PlayerState.position = position
+```
+
+#### Using `PlayerState.position` in `slime.gd`
+
+Now the slime can't fly, so the only property we need to update in `slime.gd` is the x-position.
+
+The effect we want to achieve is that the slime only moves on the x-axis when airborne. That makes sense because slimes are sticky and do not slide around while stuck to the floor.
+
+So the moment that we want to decide its `velocity.x` is when its jump starts and the moment that we want to stop x movement is when it lands. Go script it:
+```gdscript
+@export var X_VELOCITY = 100
+
+func start_jump():
+	velocity.y = JUMP_VELOCITY
+	if PlayerState.position.x < position.x:
+		velocity.x = -X_VELOCITY
+	else:
+		velocity.x = X_VELOCITY
+
+func set_movement_state():
+	if is_on_floor():
+		if movement_state == MovementState.AIRBORNE:
+			# new line:
+			velocity.x = 0
+			$FloorBounceTimer.start()
+		movement_state = MovementState.FLOOR_BOUNCE
+	else:
+		movement_state = MovementState.AIRBORNE
+
+```
+
+Now press `F5` and test:
+
+[![slime film 2](screenshots/slime-film-2.png)](screenshots/slime-film2.mp4)
+
+
+The first jump looks great, but the second jump already has an issue.
+
+
 ### Make the slime take damage from fireballs
 
 ### Allow the slime to die from damage
