@@ -685,7 +685,7 @@ We want to move on to bigger and better things for now.
 
 Just take a _pass_ on her `take_damage` function for now so we don't clog up the log:
 ```gdscript
-func take_damage(damage : float):
+func take_damage(_damage):
 	# leave Zelia immortal for a while longer
 	pass
 ```
@@ -726,7 +726,7 @@ Now in `damage_player` we can invoke it with a different init_velocity like:  `s
 
 # Add the `tree-trunk` terrain
 
-Because Zelia (in the original game) runs into tiles that are not just squares, our rewrite must have them as well:
+Because Zelia (in the original game) runs into tiles that are not just squares, our rewrite must have them as well. Open `res://world.tscn`.
 
 1. Create a new Terrain in `World > Inspector > Terrain Sets > Terrains`: "Tree Trunk"
 2. Add the `res://surface_maps/tree-trunk/1.png` to our existing `TileSet` - like we learned on [day 2](day-2.md#making-an-atlas-of-an-image).
@@ -736,7 +736,30 @@ Because Zelia (in the original game) runs into tiles that are not just squares, 
 
 ### Create polygons
 
-...TODO screenshot and explicit description here! ...
+So textures in these tiles are not square at all! It would look pretty silly for Zelia to bump into free air. You can easily fix this by manipulating the `physics`-rect to become a polygon. 
+
+Under `Select > Physics > Physics Layer 0` there is an image with that rect drawn over it. Just click on the edges to add a new draggable vertex and manipulate that rect until it looks right:
+
+![treetop](screenshots/treetop.png)
+
+Next finish up the rest of the tree-trunk tiles until it looks like this:
+
+![tree polygons](screenshots/tree-polygons.png)
+
+
+### Don't forget to draw the the `Terrains Peering Bit` for each tile using the `Tree Trunk` terrain from `Terrain Set 0`
+
+So that bit should look like this:
+![tree trunk peering bits](screenshots/treetrunk-peering-bits.png)
+
+
+## Draw and test!
+
+Can Zelia now run up a slope? Why not try it out yourself..
+
+Anyway, the place to test it out is in `res://world.tscn` and drawing this new terrain into the scene like we learned on [day 2](day-2.md#paint-some-terrain):
+
+![slime on tree](screenshots/slime%20on%20tree.png)
 
 ### Solve Technical debt 3
 
