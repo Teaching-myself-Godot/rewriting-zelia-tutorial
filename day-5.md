@@ -618,7 +618,7 @@ func _on_dissipate_timer_timeout():
 	queue_free()
 ```
 8. And of course let's not forget to fire the timer when the slime has no hp left:
-```
+```gdscript
 func take_damage(dmg: int):
 	hp -= dmg
 	if hp <= 0:
@@ -761,7 +761,7 @@ Anyway, the place to test it out is in `res://world.tscn` and drawing this new t
 
 ![slime on tree](screenshots/slime%20on%20tree.png)
 
-### Solve Technical debt 3
+## Solve Technical debt 3
 
 TODO --> Unloosen tight coupling, separate `World` into `Game` and `Terrain`
 
