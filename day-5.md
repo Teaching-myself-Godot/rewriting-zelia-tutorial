@@ -613,9 +613,115 @@ func pick_sprite_for_movement_state():
 5. Make sure it is set to `One Shot` under `Inspector`, leave `Wait Time` to `1s` 
 6. Connect its `timeout()`-signal to `slime.gd` in the usual way (defaults in dialog and such)
 7. Implement as follows:
+```gdscript
+func _on_dissipate_timer_timeout():
+	queue_free()
+```
+8. And of course let's not forget to fire the timer when the slime has no hp left:
+```
+func take_damage(dmg: int):
+	hp -= dmg
+	if hp <= 0:
+		movement_state = MovementState.DYING
+		$DissipateTimer.start()
+```
+
+Test again and make sure the slime does stay dead...
 
 
 ### Make the slime hurt the player by bouncing into the player
+
+Being a `CharacterBody2D`, same as the `Player` is, the `Slime` does not have the `body_entered`, nor does it have `area_entered` out of the box. 
+
+It is probably easier to just code collisions with the player more traditionally: in its movement handler using its `get_slide_collision_*` methods like documented in
+[Detecting collisions](https://docs.godotengine.org/en/stable/tutorials/physics/using_character_body_2d.html#detecting-collisions):
+
+1. Open `slime.gd`
+2. Add a default damage as public property:
+```gdscript
+@export var damage = 1
+```
+3. Write a function `damage_player`:
+```gdscript
+func damage_player():
+	# detect collisions based on collision count
+	for i in get_slide_collision_count():
+		# get current colliding other thing
+		var collider = get_slide_collision(i).get_collider()
+		# test if other thing is the Player
+		if collider.name == "Player":
+			# make the player take damage
+			collider.take_damage(damage)
+```
+
+Testing with `F5` we soon run into an issue: the player does not yet have the `take_damage` method.
+
+4. Open `player.gd`
+5. Write the method `take_damage`:
+```gdscript
+func take_damage(damage : float):
+	print("Ouch! I took: " + str(damage) + " damage!")
+```
+
+Test with `F5` again and notice: she's taking a _lot_ of damage:
+```
+Ouch! I took: 1 damage!
+Ouch! I took: 1 damage!
+Ouch! I took: 1 damage!
+Ouch! I took: 1 damage!
+Ouch! I took: 1 damage!
+Ouch! I took: 1 damage!
+Ouch! I took: 1 damage!
+Ouch! I took: 1 damage!
+Ouch! I took: 1 damage!
+Ouch! I took: 1 damage!
+Ouch! I took: 1 damage!
+Ouch! I took: 1 damage!
+```
+
+So let's leave our player immortal for a while longer, because tweaking how fast she should die is pretty hard. 
+
+We want to move on to bigger and better things for now.
+
+Just take a _pass_ on her `take_damage` function for now so we don't clog up the log:
+```gdscript
+func take_damage(damage : float):
+	# leave Zelia immortal for a while longer
+	pass
+```
+
+#### Just one more tweak: bounce off of the player
+
+One thing we should do now to finish the `Slime` behaviour is to allow it to bounce off of the player a little with the extra benefit that it won't collide into her _that_ often.
+
+We can reuse its `start_jump` method for that:
+```gdscript
+		# test if other thing is the Player
+		if collider.name == "Player":
+			# make the player take damage
+			collider.take_damage(damage)
+			# this is new
+			start_jump()
+```
+
+Testing again shows one more error: the slime double jumps! You can fix it by killing the `FlourBounceTimer` when a jump is started:
+
+```gdscript
+func start_jump():
+	$FloorBounceTimer.stop()
+	velocity.y = JUMP_VELOCITY
+	follow_player()
+```
+
+That's a little much, maybe the slime should bounce off a bit less high:
+```gdscript
+func start_jump(init_velocity = JUMP_VELOCITY):
+	$FloorBounceTimer.stop()
+	velocity.y = init_velocity
+	follow_player()
+```
+
+Now in `damage_player` we can invoke it with a different init_velocity like:  `start_jump(-150)`, still taking `JUMP_VELOCITY` as its default value.
 
 
 # Add the `tree-trunk` terrain
