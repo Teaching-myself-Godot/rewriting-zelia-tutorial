@@ -763,7 +763,66 @@ Anyway, the place to test it out is in `res://world.tscn` and drawing this new t
 
 ## Solve Technical debt 3
 
-TODO --> Unloosen tight coupling, separate `World` into `Game` and `Terrain`
+Now we want to achieve these next steps:
+1. breakable tiles
+2. tiles that fall down
+3. tiles we can use as background scenery
+
+However, currently we only have one scene containing our `TileMap` and that scene _is_ the `TileMap`. Which we renamed to `World`.
+
+That is a _tight coupling_ between a `TileMap` and the entire rest of the game we foresaw  [technical debt on day 2](day-2.md#technical-debt-3).
+
+What we _need_ is that the main scene of our game has _instances_ of our `TileMap`-scene:
+
+1. Create a new scene called `Game` that extends `Node`
+2. Save it into `res://game.tscn`
+3. Rename `res://world.tscn` to `res://terrains.tscn`
+4. Rename the scene name `World` to `Terrains`
+5. Delete all `Terrains`' child nodes (`Player`, `Fireball` - if still present, `Slime`s)
+6. Detach the `world.gd`-script by right clicking on the `Terrains`-node:
+
+![detach script](screenshots/detach-script.png)
+
+7. Rename `res://world.gd` to `res://game.gd`
+8. Now open the `game.tscn` again and attach the `game.gd` script to it
+9. Make sure the script now extends `Node` in stead of `TileMap`:
+
+```gdscript
+extends Node
+
+func _on_player_cast_projectile(spell_class, direction, origin):
+	var spell = spell_class.instantiate()
+	add_child(spell)
+	spell.rotation = direction
+	spell.position = origin
+	spell.velocity = Vector2.from_angle(direction) * 150.0
+```
+
+10. Attach the following scenes as children for `Game` by dragging them from the `FileSystem` tab:
+- `res://terrains.tscn`
+- `res://player/player.tscn`
+- `res://monsters/slime/slime.tscn`
+
+11. Make `res://game.tscn` the main scene by right clicking it in the `FileSystem` tab
+12. Check the scene, which in my case looked like this:
+
+![bad scene](screenshots/bad-scene.png)
+
+There is one thing: Zelia can't shoot anymore
+
+### Fix the fireballs
+
+So we need to connect the `cast_projectile`-signal again to `_on_player_cast_projectile` (moved to `game.gd`), like we did on [day 4](day-4.md#declare-and-invoke-a-signal-to-cast-spells):
+
+1. Select the `Player`-node (the _child_ node of `Game`)
+2. Go to `Node > Signals`
+3. Double click `cast_projectile`
+4. Select `pick`
+5. Double click on `_on_player_cast_projectile(...)`
+6. Click `connect`
+
+Test the game with `F5`
+
 
 # Make tiles Zelia can break
 
