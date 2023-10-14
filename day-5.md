@@ -808,7 +808,7 @@ func _on_player_cast_projectile(spell_class, direction, origin):
 
 ![bad scene](screenshots/bad-scene.png)
 
-There is one thing: Zelia can't shoot anymore
+There is one thing: Zelia can't shoot anymore.
 
 ### Fix the fireballs
 
@@ -826,7 +826,42 @@ Test the game with `F5`
 
 # Make tiles Zelia can break
 
-Still not as cool as in the original, but close enough!
+This next bit took quite some research and avenues attempted yet not taken.
+
+It might seem like the steps are evident and told as if they're easy (or even might have been done much better). They are, however, like many things, the result of effort, trial and error.
+
+That's why you just get the steps without the philosophies. 
+
+## Erase the tiles in the `Terrains`-scene
+
+First let's erase the tiles in the `Terrains`-scene.
+
+1. Open `res://terrains.tscn`.
+2. Click the `Scene > Terrains`-node
+3. Select `TileMap` in the bottom pane
+
+![select tilemap](./screenshots/select-tilemap.png)
+
+4. Select the `Terrains`-tab
+
+![select terrains tab](./screenshots/draw_terrains_in_viewport.png)
+
+5. Pick on of the Terrains
+6. Select the eraser to erase the tiles
+
+![no more tiles](./screenshots/no-more-tiles.png)
+
+7. Open `res://game.tscn`
+
+![no more tiles!](./screenshots/no-more-tiles-2.png)
+
+8. Now click the _child_ node `Terrains`
+9. Navigate to `TileMap > Terrains` in the bottom pane again
+10. And draw some terrain in the `Terrains`-_instance_ of the `Game`-scene
+
+
+## One more tweak
+
 
 
 # Allow those breakable tiles to fall down

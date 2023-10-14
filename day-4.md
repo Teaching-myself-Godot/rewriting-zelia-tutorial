@@ -251,11 +251,11 @@ func _on_fireball_interval_timer_timeout():
 	if movement_state == MovementState.CASTING:
 		# Signal that a fireball should be cast at casting angle and 
 		# from Player's hands
-		var origin = position + Vector2(20, 0).rotated(cast_angle) + Vector2(0, 2)
+		var origin = position + Vector2(14, 0).rotated(cast_angle) + Vector2(0, 2)
 		cast_projectile.emit(Fireball, cast_angle, origin)
 ```
 So the `var origin` is calculated by applying 3 transformations:
-1. Create a 'point' at position x=20, y=0 and rotate it by the casting angle: `Vector2(20, 0).rotated(cast_angle)`
+1. Create a 'point' at position x=14, y=0 and rotate it by the casting angle: `Vector2(14, 0).rotated(cast_angle)`
 2. Move it relative to Zelia's center (`position + `)
 3. Move it 2 pixels down `+ Vector(0, 2)`
 
@@ -293,7 +293,7 @@ To illustrate, make set its origin the `position`-property of the player again i
 
 ```gdscript
 		# comment out the next line with Ctrl+k
-#		var origin = position + Vector2(20, 0).rotated(cast_angle) + Vector2(0, 2)
+#		var origin = position + Vector2(14, 0).rotated(cast_angle) + Vector2(0, 2)
 		# replace origin with position in next line
 		cast_projectile.emit(Fireball, cast_angle, position)
 ```
@@ -336,7 +336,7 @@ Press `F5` to test if the fireballs _do_ collide with the `Tilemap` and _do not_
 
 Then change back the `player.gd` script:
 ```gdscript
-		var origin = position + Vector2(20, 0).rotated(cast_angle) + Vector2(0, 2)
+		var origin = position + Vector2(14, 0).rotated(cast_angle) + Vector2(0, 2)
 		cast_projectile.emit(Fireball, cast_angle, origin)
 ```
 
