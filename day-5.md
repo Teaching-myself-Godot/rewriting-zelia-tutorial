@@ -832,6 +832,18 @@ It might seem like the steps are evident and told as if they're easy (or even mi
 
 That's why you just get the steps without the philosophies. 
 
+The final approach in very simplified terms:
+
+1. Say a `Terrains`-instance is `breakable` using `Metadata`
+2. When the `Terrains`-instance is `_ready()` check if this `breakable`-field is `true`.
+3. If yes, loop through all the tiles in this instance
+4. For each tile, signal an event `add_breakable_tile`
+5. Let the `game.gd` script handle this signal ..
+6.  .. by creating instances of a new scene called `BreakableTile`
+7. After the loop is done, invoke `queue_free()` to clear this `Terrains`-instance
+
+But first: preparations!
+
 ## Erase the tiles in the `Terrains`-scene
 
 First let's erase the tiles in the `Terrains`-scene.
@@ -859,9 +871,44 @@ First let's erase the tiles in the `Terrains`-scene.
 9. Navigate to `TileMap > Terrains` in the bottom pane again
 10. And draw some terrain in the `Terrains`-_instance_ of the `Game`-scene
 
+## Adding a new `Terrain`-instance to `Game`
 
-## One more tweak
+Now, without too many philosophies (as promised), thus further ado:
 
+1. Drag _another_ instance of `res://terrains.tscn` _into_ the `Game` scene
+2. It will be called `Terrains2` if you did that right
+3. Rename it to `BreakableTerrains`
+4. Draw one tile while `BreakableTerrains` is active.
+
+![breakable block visible](./screenshots/breakable-block-visible.png)
+
+5. Test if it is indeed in a the separate node by toggling its visibility:
+
+![breakable block invisible](./screenshots/breakable-block-invisible.png)
+
+## Adding `Metadata` fields and a script
+
+Now that we have a new _instance_ of terrain in the game, we need to transmogrify it into breakable terrain. That means _telling our code_ we intend to do that using _metadata_.
+
+1. Open `res://terrains.tscn`
+2. Navigate to the `Inspector`
+3. Scroll all the way down to find the `+ Add Metadata`-button
+4. Click that button
+5. In the dialog give it the name `breakable`
+6. Keep the type as `bool`
+7. Click `Add`:
+
+![add breakable metadata field](./screenshots/add-breakable-metadata-field.png)
+
+8. Don't forget to save!
+8. Open `res://game.tscn`
+9. Click on `BreakableTerrains`
+10. Pop open the `Inspector > Metadata`
+11. And _here_ check `On` the `Breakable` field:
+
+![check on breakable metadata field](./screenshots/set-breakable-metadata-field.png)
+
+12. Also notice the revert arrow, which implies we overrode default behaviour
 
 
 # Allow those breakable tiles to fall down
