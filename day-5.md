@@ -832,7 +832,7 @@ It might seem like the steps are evident and told as if they're easy (or even mi
 
 That's why you just get the steps without the philosophies. 
 
-The final approach in very simplified terms:
+## The final approach in very simplified terms
 
 1. Say a `Terrains`-instance is `breakable` using `Metadata`
 2. When the `Terrains`-instance is `_ready()` check if this `breakable`-field is `true`.
@@ -886,7 +886,7 @@ Now, without too many philosophies (as promised), thus further ado:
 
 ![breakable block invisible](./screenshots/breakable-block-invisible.png)
 
-## Adding `Metadata` fields and a script
+## Adding `Metadata` fields 
 
 Now that we have a new _instance_ of terrain in the game, we need to transmogrify it into breakable terrain. That means _telling our code_ we intend to do that using _metadata_.
 
@@ -909,6 +909,28 @@ Now that we have a new _instance_ of terrain in the game, we need to transmogrif
 ![check on breakable metadata field](./screenshots/set-breakable-metadata-field.png)
 
 12. Also notice the revert arrow, which implies we overrode default behaviour
+
+## Attach a new `terrains.gd` script
+
+1. Open `res://terrains.tscn`
+2. Click the ![attach script](./screenshots/attach-script.png)-button
+3. Leave defaults active and click `Create`
+4. First let's check if our new `Metadata`-field works:
+```gdscript
+extends TileMap
+
+func _ready():
+	if get_meta("breakable"):
+		print (name + " is breakable")
+```
+5. Test with `F5` and observe:
+```
+BreakableTerrains is breakable
+```
+Now we will loop through the tiles and read _all_ the properties we'll need to signal the game to create that `BreakableTile`-instance [we announced before](#the-final-approach-in-very-simplified-terms).
+
+[link naar de code in experimental](https://github.com/Teaching-myself-Godot/godot-zelia/blob/experimental-feature-branch/terrains/breakable_terrains.gd)
+
 
 
 # Allow those breakable tiles to fall down
