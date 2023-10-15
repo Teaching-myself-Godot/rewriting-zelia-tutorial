@@ -927,9 +927,9 @@ func _ready():
 ```
 BreakableTerrains is breakable
 ```
-Now we will loop through the tiles and read _all_ the properties we'll need to signal the game to create that `BreakableTile`-instance [we announced before](#the-final-approach-in-very-simplified-terms). 
-
 ### A thorough guide to the _poor man's debugger_
+
+Now we will loop through the tiles and read _all_ the properties we'll need to signal the game to create that `BreakableTile`-instance [we announced before](#the-final-approach-in-very-simplified-terms). 
 
 All the godot methods and properties used are linked to their respective class-references:
 
@@ -1052,6 +1052,53 @@ TileSetAtlasSource:            tree-trunk
 tile_atlas_coords:             (75, 0)
 texture:                       res://surface_maps/tree-trunk/1.png
 polygon:                       [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0.5, 4.5), (5.625, 5.75), (7.5, 7.5), (-7.5, 7.5)]
+```
+
+## Declaring and emitting the `add_breakable_tile` signal
+
+Now that we've collected all the information we need for the game to spawn in _one_ `BreakableTile` per tile in our `BreakableTerrains`-instance we're ready to us it.
+
+1. Declare the signal `add_breakable_tile` as follows in `terrains.gd`:
+
+```gdscript
+signal add_breakable_tile(
+	position     : Vector2i, 
+	texture      : Texture2D, 
+	texture_pos  : Vector2i,
+	# collisigon is my personal shorthand for "collision polygon"
+	collisigon   : PackedVector2Array
+)
+```
+2. And `emit` it in the loop (_note we remove all the `print`s_):
+```gdscript
+func _ready():
+	if get_meta("breakable"):
+		# Loop through the tile positions in our current (only) layer
+		for cell in get_used_cells(0):
+			var source_id = get_cell_source_id(0, cell)
+			var tileset_source : TileSetAtlasSource = tile_set.get_source(source_id)
+			var tile_atlas_coords = get_cell_atlas_coords(0, cell)
+			var tile_data = tileset_source.get_tile_data(tile_atlas_coords, 0)
+			emit_signal(
+				"add_breakable_tile",
+				Vector2i(position) + cell * tile_set.tile_size,
+				tileset_source.texture,
+				tile_atlas_coords * tile_set.tile_size,
+				tile_data.get_collision_polygon_points(0, 0)
+			)
+```
+3. Now in `res://game.tscn` select `BreakableTerrains` again
+4. Navigate to `Node > Signals`
+5. Double click `add_breakable_tile`
+6. Leave the defaults (so target is `game.gd`) and click `Connect`
+7. Now print the inputs in this new listener:
+```gdscript
+func _on_breakable_terrains_add_breakable_tile(target_pos, texture, texture_pos, collisigon):
+	print("Target position of BreakableTile:   " + str(target_pos))
+	print("Atlas texture resource dir:         " + str(texture.resource_path))
+	print("Position of this tile in the atlas: " + str(texture_pos))
+	print("Collision polygon of this tile:     " + str(collisigon))
+
 ```
 
 # Allow those breakable tiles to fall down
