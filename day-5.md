@@ -1022,6 +1022,36 @@ tile_atlas_coords:             (60, 15)
 texture:                       res://surface_maps/grass-and-dirt/1.png
 ```
 
+The last bit of information up next was the one that took me the longest: the collision polygons of this tile (_especially because I forgot to draw the polygon for the tile I was testing :D_).
+
+_Also, the obstinate use of **obtain** umpten times is intentional_: it's an _achievement_.
+
+16. Use the `tile_atlas_coords` we obtained with the `tileset_source` we obtained to obtain the [`tile_data`](https://docs.godotengine.org/en/stable/classes/class_tiledata.html#class-tiledata) of this tile with [`get_tile_data`](https://docs.godotengine.org/en/stable/classes/class_tilesetatlassource.html#class-tilesetatlassource-method-get-tile-data)
+17. And then invoke [`get_collision_polygon_points`](https://docs.godotengine.org/en/stable/classes/class_tiledata.html#class-tiledata-method-get-collision-polygon-points) to obtain the ... wait for it ... `PackedVector2Array` representing the collision polygon of this tile:
+
+```gdscript
+			var tile_data = tileset_source.get_tile_data(tile_atlas_coords, 0)
+			print("polygon:                       " + str(tile_data.get_collision_polygon_points(0, 0)))
+```
+18. And that should look like this in your debug log:
+```
+polygon:                       [(-7.5, -7.5), (7.5, -7.5), (7.5, 7.5), (-7.5, 7.5)]
+```
+
+Now, just to make sure we did everything correctly (_did you also notice the 5 magic zeroes `0` we introduced, representing layers and layers and more layers of which we only seem to have one at each turn?_).. Let plant a tree with a divergent polygon as well (in our `BreakableTerrains`-instance of course):
+
+![divergent polygon](./screenshots/tree-polygons.png)
+
+That should log something similar to this:
+```
+Tile grid position:            (9, 3)
+BreakableTile target position: (135, 45)
+TileSetAtlasSource:            tree-trunk
+tile_atlas_coords:             (75, 0)
+texture:                       res://surface_maps/tree-trunk/1.png
+polygon:                       [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0.5, 4.5), (5.625, 5.75), (7.5, 7.5), (-7.5, 7.5)]
+```
+
 # Allow those breakable tiles to fall down
 
 Rigid -> Static -> Rigid -> Character -> Area -> Static -> Rigid -> ooooh...
