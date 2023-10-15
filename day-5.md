@@ -929,6 +929,8 @@ BreakableTerrains is breakable
 ```
 Now we will loop through the tiles and read _all_ the properties we'll need to signal the game to create that `BreakableTile`-instance [we announced before](#the-final-approach-in-very-simplified-terms). 
 
+### A thorough guide to the _poor man's debugger_
+
 All the godot methods and properties used are linked to their respective class-references:
 
 1. Loop through the tiles in our current (only) layer using [get_used_cells](https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-method-get-used-cells)
