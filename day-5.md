@@ -529,7 +529,7 @@ Next open the slime script to add the renditions.
 1. Open `res://projectiles/fireball/fireball.gd`
 2. Copy the rendition load code to your paste-buffer (`Ctrl + C`)
 
-```gdscript:
+```gdscript
 	# The sprite_frames of $AnimatedSprite2D is a singleton, so after calling 
 	# add_animation one time, it exists for all other instances
 	if "dissipate" not in $AnimatedSprite2D.sprite_frames.get_animation_names():
@@ -927,9 +927,58 @@ func _ready():
 ```
 BreakableTerrains is breakable
 ```
-Now we will loop through the tiles and read _all_ the properties we'll need to signal the game to create that `BreakableTile`-instance [we announced before](#the-final-approach-in-very-simplified-terms).
+Now we will loop through the tiles and read _all_ the properties we'll need to signal the game to create that `BreakableTile`-instance [we announced before](#the-final-approach-in-very-simplified-terms). 
 
-[link naar de code in experimental](https://github.com/Teaching-myself-Godot/godot-zelia/blob/experimental-feature-branch/terrains/breakable_terrains.gd)
+All the godot methods and properties used are linked to their respective class-references:
+
+1. Loop through the tiles in our current (only) layer using [get_used_cells](https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-method-get-used-cells)
+```gdscript
+func _ready():
+	if get_meta("breakable"):
+		print (name + " is breakable")
+		# Loop through the tile positions in our current (only) layer
+		for cell in get_used_cells(0):
+			print(cell)
+			print(cell * tile_set.tile_size)
+```
+2. Observe the log:
+```
+BreakableTerrains is breakable
+(7, 2)
+(105, 30)
+```
+The `(7, 2)` is the string serialization of a `Vector2i`, which represents the position of this tile on the `TileMap`'s grid. 
+
+Our [`tile_set`](https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-property-tile-set).[tile_size](https://docs.godotengine.org/en/stable/classes/class_tileset.html#class-tileset-property-tile-size) is `15x15` so the `position` of the `BreakableTile` will become `(105, 30)` _plus_ the `position` of this `TileMap` instance.
+
+3. Let's just print that `TileMap`-instance's `position` just to check:
+```gdscript
+extends TileMap
+
+func _ready():
+	if get_meta("breakable"):
+		print (name + " is breakable")
+		print (name + "'s origin is: " + str(position))
+		# Loop through the tile positions in our current (only) layer
+		for cell in get_used_cells(0):
+			print("Tile grid position:            " + str(cell))
+			print("BreakableTile target position: " + str(Vector2i(position) + cell * tile_set.tile_size))
+```
+4. Run with `F5` and inspect the log:
+```
+BreakableTerrains is breakable
+BreakableTerrains's origin is: (0, 0)
+Tile grid position:            (7, 2)
+BreakableTile target position: (105, 30)
+```
+5. Open `res://game.tscn` and select `BreakableTerrains`
+6. Change its position in `Inspector > Transform > Position` 
+7. Rerun the game and inspect the log again:
+```
+BreakableTile target position: (115, 41)
+```
+8. Changed the `BreakableTerrains`' position by `+(10,11)` as can be observed in the log
+9. Quickly revert the `position` to `(0, 0)`, which makes reasoning easier.
 
 
 
