@@ -979,8 +979,48 @@ BreakableTile target position: (115, 41)
 ```
 8. Changed the `BreakableTerrains`' position by `+(10,11)` as can be observed in the log
 9. Quickly revert the `position` to `(0, 0)`, which makes reasoning easier.
+10. Next use [`get_cell_source_id`](https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-method-get-cell-source-id) and [`tile_set`](https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-property-tile-set).[`get_source`](https://docs.godotengine.org/en/stable/classes/class_tileset.html#class-tileset-method-get-source) to obtain the [`TileSetAtlasSource`](https://docs.godotengine.org/en/stable/classes/class_tilesetatlassource.html) we used for our textures and physics polygons:
+```gdscript
+		for cell in get_used_cells(0):
+			print("Tile grid position:            " + str(cell))
+			print("BreakableTile target position: " + str(Vector2i(position) + cell * tile_set.tile_size))
+			var source_id = get_cell_source_id(0, cell)
+			var tileset_source : TileSetAtlasSource = tile_set.get_source(source_id)
+			print("TileSetAtlasSource:            " + tileset_source.resource_name)
+```
+11. Test with `F5` again:
+```
+BreakableTerrains is breakable
+BreakableTerrains's origin is: (0, 0)
+Tile grid position:            (7, 2)
+BreakableTile target position: (105, 30)
+TileSetAtlasSource:            grass-and-dirt
+```
+12. Next use our `cell` to obtain the position in the _atlas_ texture of the current tile using [`get_cell_atlas_coords`](https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-method-get-cell-atlas-coords)
 
+```gdscript
+			var tile_atlas_coords = get_cell_atlas_coords(0, cell)
+			print("tile_atlas_coords:             " + str(tile_atlas_coords))
+```
 
+13. And of course, this also should be multiplied by our `tile_set`.`tile_size` to get the pixel position on the underlying texture.
+```gdscript
+			print("tile_atlas_coords:             " + str(tile_atlas_coords * tile_set.tile_size))
+```
+14. In order to clip out the correct image we need the  `Texture2D`-resource of the _atlas_ as well
+```gdscript
+			print("texture:                       " + tileset_source.texture.resource_path)
+```
+15. Just to be sure we're still on the same page, check your debug log again:
+```
+BreakableTerrains is breakable
+BreakableTerrains's origin is: (0, 0)
+Tile grid position:            (7, 2)
+BreakableTile target position: (105, 30)
+TileSetAtlasSource:            grass-and-dirt
+tile_atlas_coords:             (60, 15)
+texture:                       res://surface_maps/grass-and-dirt/1.png
+```
 
 # Allow those breakable tiles to fall down
 
