@@ -1098,8 +1098,109 @@ func _on_breakable_terrains_add_breakable_tile(target_pos, texture, texture_pos,
 	print("Atlas texture resource dir:         " + str(texture.resource_path))
 	print("Position of this tile in the atlas: " + str(texture_pos))
 	print("Collision polygon of this tile:     " + str(collisigon))
-
 ```
+8. Go back to `res://terrains.gd`
+9. Earlier [we announced](#the-final-approach-in-very-simplified-terms) in step 7 we would call `queue_free` after all the tiles in the map were _signalled_:
+```gdscript
+func _ready():
+	if get_meta("breakable"):
+		# Loop through the tile positions in our current (only) layer
+		# ... leave the for-loop in tact of course ...
+		# Remove this TileMap from the parent scene
+		queue_free()
+```
+
+If you test again now, all we have left is the print messages in our console, but the (as yet) unbreakable tiles from the `BreakableTerrains`-`TileMap` are gone.
+
+## Creating the `BreakableTile` scene
+
+Now in order the `game.gd` to instantiate breakable tiles and attach then as children we first need to make a `BreakableTile`-scene.
+
+It will be a bit of a weird scene, because we will be giving it empty child-nodes:
+- An empty `Sprite2D` ..
+- .. and an empty [`CollisionPolygon2D`](https://docs.godotengine.org/en/stable/classes/class_collisionpolygon2d.html)
+
+1. Create a new scene of type [`StaticBody2D`](https://docs.godotengine.org/en/stable/classes/class_staticbody2d.html)
+2. In the scene tree rename its root node to `BreakableTile`
+3. Save the scene as `res://tiles/breakable_tile.tscn` 
+4. Give it one child node of type `Sprite2D`
+5. And another child node of type `CollisionPolygon2D`
+
+It doesn't look like much in the ![2d](./screenshots/2d-scene-view.png)- scene view, maybe _temporarily_ we _should_ add a texture for testing purposes:
+
+1. Create `15x15 pixel` sized `.png` of any type you prefer (as long as it is _visible_!)
+2. Save that file into `res://tiles/placeholder.png`
+3. Select the `BreakableTile > Sprite2D` node
+4. Go to `Inspector` and select  `Texture > new ImageTexture`
+5. Drag the `placeholder.png` into the select-box
+
+![placeholder texture](./screenshots/placeholder-texture.png)
+
+Now we can instantiate the scene with at the right position in the `game.gd` script:
+
+1. Open `res://game.gd`
+2. Use [`preload`](https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/static_typing.html#custom-variable-types) to import the `BreakableTile`-scene:
+
+```gdscript
+var BreakableTile = preload("res://tiles/breakable_tile.tscn")
+```
+
+3. Instatiate it in `_on_breakable_terrains_add_breakable_tile`
+4. And then use the `position` argument to set its position property
+```gdscript
+func _on_breakable_terrains_add_breakable_tile(target_pos, texture, texture_pos, collisigon):
+	var new_tile : StaticBody2D = BreakableTile.instantiate()
+	new_tile.position = target_pos
+```
+
+This still does nothing visible. 
+
+We need to add the `BreakableTile`-instance(s) to the game tree, which would make us see our `rest://tiles/placholder.png`-texture.
+
+**HEADS UP!** This next snippet won't work:
+```gdscript
+func _on_breakable_terrains_add_breakable_tile(target_pos, texture, texture_pos, collisigon):
+	var new_tile : StaticBody2D = BreakableTile.instantiate()
+	new_tile.position = target_pos
+	# this is the code we want to execute
+	add_child(new_tile)
+```
+For the sake of learning, press `F5`.
+
+So now we get this error in our console:
+```
+game.gd:16 @ _on_breakable_terrains_add_breakable_tile(): Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
+```
+That sounds super helpful! Let's try it out!
+```gdscript
+func _on_breakable_terrains_add_breakable_tile(target_pos, texture, texture_pos, collisigon):
+	var new_tile : StaticBody2D = BreakableTile.instantiate()
+	new_tile.position = target_pos
+	add_child.call_deferred(new_tile)
+```
+
+Test again with `F5` and voilà, our pretty placeholder is added tot the scene:
+
+![breakable tiles misplaced](./screenshots/breakable-tile-misplaced.png)
+
+
+But wait, what's wrong with this picture? 
+
+Exactly, the placement of our breakable tiles looks wrong, even though we correctly calculated their position. We need to fix the position of our `Sprite2D` and `CollisionPolygon2D` to match where the tile will be placed:
+
+1. Open `res://tiles/breakable_tile.tscn` in ![2d](./screenshots/2d-scene-view.png)-scene view
+2. Select `BreakableTile > Sprite2D`
+3. Then set `Inspector > Transform > Position` to `x=7.5` and `y=7.5`
+4. Select `BreakableTile > CollisionPolygon2D` 
+5. Also set `Inspector > Transform > Position` to `x=7.5` and `y=7.5`
+6. It should now look like this:
+
+![breakable tile corrected positions](./screenshots/breakable-tile-corrected-positions.png)
+
+**Lesson learned**: I'm not liking these `7.5`'s I'm starting to see everywhere... I should have gone for `16x16` last year when I started drawing stuff based on my easy maths.
+
+
+
 
 # Allow those breakable tiles to fall down
 
