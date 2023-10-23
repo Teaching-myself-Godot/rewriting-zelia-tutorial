@@ -1287,6 +1287,35 @@ That is because you need to _enable_ the `region_rect` feature we used. You can 
 
 It's really up to you which you choose, but this tutorial has used the _configuration over code_ approach so far, which implies the 2nd choice... (Usually, as a programmer, I prefer code as configuration, keeping everything nice and together, in stead of in separate places).
 
+### Fix the collision layer and -mask
+
+One last thing you'll have noticed by now is that the collision layer and -mask are not the same for our `BreakableTile` as for our `Terrains` scene. That explains fireballs flying right through them.
+
+Let's make them match.
+
+1. Open `res://tiles/breakable_tile.tscn`
+2. Go to `Inspector > Collision`
+3. For `Layer` check both `1` and `2`
+4. And for `Mask` check both `1` and `2` as well
+
+## Make them break!!
+
+_Finally_!
+
+Up till now we only made a copy of some tiles as a `StaticBody2D`, which made them behave the same as the `TileMap`.
+
+However, now we can use fireball-collisions to reduce some `HP`-property and let the tiles disappear when they're out of `HP`.
+
+Here we will use a 2-step approach:
+1. [Give the breakable tiles an HP property, reduce it on 'take_damage', make them `queue_free`](#remove-tiles-that-are-broken)
+2. [Generate _'cracked'_ renditions of the terrain textures to show the user the damage](#generate-some-pretty-cracks-to-show-the-tile-damage)
+
+## Remove tiles that are broken
+
+asdlkj
+
+
+## Generate some pretty cracks to show the tile damage
 
 
 # Allow those breakable tiles to fall down
