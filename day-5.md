@@ -1093,7 +1093,12 @@ func _ready():
 6. Leave the defaults (so target is `game.gd`) and click `Connect`
 7. Now print the inputs in this new listener:
 ```gdscript
-func _on_breakable_terrains_add_breakable_tile(target_pos, texture, texture_pos, collisigon):
+func _on_breakable_terrains_add_breakable_tile(
+	target_pos  : Vector2,
+	texture     : Texture2D,
+	texture_pos : Vector2i,
+	collisigon  : PackedVector2Array
+):
 	print("Target position of BreakableTile:   " + str(target_pos))
 	print("Atlas texture resource dir:         " + str(texture.resource_path))
 	print("Position of this tile in the atlas: " + str(texture_pos))
@@ -1148,7 +1153,12 @@ var BreakableTile = preload("res://tiles/breakable_tile.tscn")
 3. Instatiate it in `_on_breakable_terrains_add_breakable_tile`
 4. And then use the `position` argument to set its position property
 ```gdscript
-func _on_breakable_terrains_add_breakable_tile(target_pos, texture, texture_pos, collisigon):
+func _on_breakable_terrains_add_breakable_tile(
+	target_pos  : Vector2,
+	texture     : Texture2D,
+	texture_pos : Vector2i,
+	collisigon  : PackedVector2Array
+):
 	var new_tile : StaticBody2D = BreakableTile.instantiate()
 	new_tile.position = target_pos
 ```
@@ -1159,7 +1169,12 @@ We need to add the `BreakableTile`-instance(s) to the game tree, which would mak
 
 **HEADS UP!** This next snippet won't work:
 ```gdscript
-func _on_breakable_terrains_add_breakable_tile(target_pos, texture, texture_pos, collisigon):
+func _on_breakable_terrains_add_breakable_tile(
+	target_pos  : Vector2,
+	texture     : Texture2D,
+	texture_pos : Vector2i,
+	collisigon  : PackedVector2Array
+):
 	var new_tile : StaticBody2D = BreakableTile.instantiate()
 	new_tile.position = target_pos
 	# this is the code we want to execute
@@ -1173,7 +1188,12 @@ game.gd:16 @ _on_breakable_terrains_add_breakable_tile(): Parent node is busy se
 ```
 That sounds super helpful! Let's try it out!
 ```gdscript
-func _on_breakable_terrains_add_breakable_tile(target_pos, texture, texture_pos, collisigon):
+func _on_breakable_terrains_add_breakable_tile(
+	target_pos  : Vector2,
+	texture     : Texture2D,
+	texture_pos : Vector2i,
+	collisigon  : PackedVector2Array
+):
 	var new_tile : StaticBody2D = BreakableTile.instantiate()
 	new_tile.position = target_pos
 	add_child.call_deferred(new_tile)
@@ -1183,8 +1203,7 @@ Test again with `F5` and voilà, our pretty placeholder is added tot the scene:
 
 ![breakable tiles misplaced](./screenshots/breakable-tile-misplaced.png)
 
-
-But wait, what's wrong with this picture? 
+### But wait, what's wrong with this picture? 
 
 Exactly, the placement of our breakable tiles looks wrong, even though we correctly calculated their position. We need to fix the position of our `Sprite2D` and `CollisionPolygon2D` to match where the tile will be placed:
 
@@ -1199,6 +1218,74 @@ Exactly, the placement of our breakable tiles looks wrong, even though we correc
 
 **Lesson learned**: I'm not liking these `7.5`'s I'm starting to see everywhere... I should have gone for `16x16` last year when I started drawing stuff based on my easy maths.
 
+
+### Setting the texture and collision polygon of the `BreakableTile`
+
+The rest of the properties we prepared in `game.gd` we will pass on to properties for the `BreakableTile` itself to handle in its `_ready`-function.
+
+1. Open `res://tiles/breakable_tile.tscn` 
+2. Select the root node `BreakableTile`
+3. Click the ![attach script](./screenshots/attach-script.png)-button 
+4. Leave the defaults and save into `res://tiles/breakable_tile.gd`
+5. Add these public properties:
+```gdscript
+extends StaticBody2D
+
+@export var texture     : Texture2D
+@export var texture_pos : Vector2i
+@export var collisigon  : PackedVector2Array
+
+func _ready():
+	print("BreakableTile.position:    " + str(position))
+	print("BreakableTile.texture:     " + str(texture.resource_path))
+	print("BreakableTile.texture_pos: " + str(texture_pos))
+	print("BreakableTile.collisigon:  " + str(collisigon))
+
+```
+6. Open `res://game.gd`
+7. Set these new public properties in our signal listener:
+```gdscript
+func _on_breakable_terrains_add_breakable_tile(
+	target_pos  : Vector2,
+	texture     : Texture2D,
+	texture_pos : Vector2i,
+	collisigon  : PackedVector2Array
+):
+	var new_tile = BreakableTile.instantiate()
+	new_tile.position    = target_pos
+	new_tile.texture     = texture
+	new_tile.texture_pos = texture_pos
+	new_tile.collisigon  = collisigon
+	add_child.call_deferred(new_tile)
+```
+
+Test this code again with `F5` and confirm we're still seeing the same thing in our consoles:
+```
+BreakableTile.position:    (105, 30)
+BreakableTile.texture:     res://surface_maps/grass-and-dirt/1.png
+BreakableTile.texture_pos: (60, 15)
+BreakableTile.collisigon:  [(-7.5, -7.5), (7.5, -7.5), (7.5, 7.5), (-7.5, 7.5)]
+BreakableTile.position:    (135, 45)
+BreakableTile.texture:     res://surface_maps/tree-trunk/1.png
+BreakableTile.texture_pos: (75, 0)
+BreakableTile.collisigon:  [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0.5, 4.5), (5.625, 5.75), (7.5, 7.5), (-7.5, 7.5)]
+```
+8. Now let's set the correct texture, texture position and polygon in code:
+```gdscript
+func _ready():
+	$Sprite2D.set_texture(texture)
+	$Sprite2D.region_rect = Rect2(texture_pos.x, texture_pos.y, 15, 15)
+	$CollisionPolygon2D.polygon = collisigon
+```
+
+Testing with `F5` you'll probably get this, like me (the entire atlas as a texture):
+![the entire atlas](./screenshots/the-entire-atlas.png)
+
+That is because you need to _enable_ the `region_rect` feature we used. You can either do this in code or in the `BreakableTile`-inspector. 
+1. in code: `$Sprite2D.region_enabled = true`
+2. in the scene select the `Sprite2D`-child node: check `Inspector > Region > Enabled` to `On`
+
+It's really up to you which you choose, but this tutorial has used the _configuration over code_ approach so far, which implies the 2nd choice... (Usually, as a programmer, I prefer code as configuration, keeping everything nice and together, in stead of in separate places).
 
 
 
