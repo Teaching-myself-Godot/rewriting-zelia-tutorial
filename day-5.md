@@ -649,7 +649,8 @@ func damage_player():
 		# get current colliding other thing
 		var collider = get_slide_collision(i).get_collider()
 		# test if other thing is the Player
-		if collider.name == "Player":
+		# (collider could be null, so test existence first)
+		if collider and collider.name == "Player":
 			# make the player take damage
 			collider.take_damage(damage)
 ```
@@ -1312,11 +1313,61 @@ Here we will use a 2-step approach:
 
 ## Remove tiles that are broken
 
-asdlkj
+We made things that can take damage implement the `take_damage`-function. 
 
+That way, things that _give_ damage have a place to _invoke_ that damage. Like our fireballs.
+
+Let's see if we can achieve that effect right now
+1. Open `res://tiles/breakable_tile.gd`
+2. Implement `take_damage()` like this:
+```gdscript
+func take_damage(dmg : float):
+	print("Breakable tile taking " + str(dmg) + " damage")
+```
+
+Then press `F5` and shoot some fireballs at it. Check the console if we're still seeing the same things:
+```
+Breakable tile taking 1 damage
+Breakable tile taking 1 damage
+Breakable tile taking 1 damage
+```
+
+Yup! That works. Now let's add a public property called `hp` which we can set from _metadata_ later.
+
+3. Add the `hp` property on top of `breakable_tile.gd` and set it to `10` as a default.
+```
+extends StaticBody2D
+
+@export var hp          : float = 10.0
+@export var texture     : Texture2D
+@export var texture_pos : Vector2i
+@export var collisigon  : PackedVector2Array
+```
+4. Implement `take_damage` like this now:
+```gdscript
+func take_damage(dmg : float):
+	hp -= dmg
+	if hp <= 0:
+		queue_free()
+```
+
+Then press `F5` and shoot some fireballs at it _again_. 
+
+Watch with satisfaction as these tiles disappear after only `10` hits with a fireball:
+
+[![break a tile](./screenshots/break-a-tile.png)](./screenshots/break-a-tile.mp4)
+
+### HP as metadata
+
+As a level editor you want control over the amount `HP` a breakable tile gets. We can achieve this by adding another metadata field to our `Terrains`-`Tilemap` scene called.. `Hp`.
+
+Let's do that now.
+
+TODO/FIXME: hp as metadata
 
 ## Generate some pretty cracks to show the tile damage
 
+TODO/FIXME: 
 
 # Allow those breakable tiles to fall down
 
