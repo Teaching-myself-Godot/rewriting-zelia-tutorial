@@ -1361,9 +1361,57 @@ Watch with satisfaction as these tiles disappear after only `10` hits with a fir
 
 As a level editor you want control over the amount `HP` a breakable tile gets. We can achieve this by adding another metadata field to our `Terrains`-`Tilemap` scene called.. `Hp`.
 
-Let's do that now.
+Let's do that now:
 
-TODO/FIXME: hp as metadata
+1. Open `res://terrains.tscn` and select the `Terrains` root node
+2. Go to `Inspector > Metadata > + Add Metadata`
+3. Set the `Name` to `hp` and the type to `float` or `int` (your _quacking_ choice)
+4. Click `Add`
+5. Set the value to `10` to serve as the default value
+6. Now open `res://terrains.gd`
+7. Add `hp` as a 5th parameter to `add_breakable_tile`
+
+```gdscript
+signal add_breakable_tile(
+	position     : Vector2i, 
+	texture      : Texture2D, 
+	texture_pos  : Vector2i,
+	collisigon   : PackedVector2Array,
+	hp           : float
+)
+```
+8. Add the `hp`-metadata to the `emit_signal`-call for each tile:
+```gdscript
+			emit_signal(
+				"add_breakable_tile",
+				Vector2i(position) + cell * tile_set.tile_size,
+				tileset_source.texture,
+				tile_atlas_coords * tile_set.tile_size,
+				tile_data.get_collision_polygon_points(0, 0),
+				get_meta("hp")
+			)
+```
+
+9. Open `res://game.gd`
+10. Add the `hp` to `_on_breakable_terrains_add_breakable_tile` and set it on the `BreakableTile` instance there:
+```gdscript
+func _on_breakable_terrains_add_breakable_tile(
+	target_pos  : Vector2,
+	texture     : Texture2D,
+	texture_pos : Vector2i,
+	collisigon  : PackedVector2Array,
+	hp          : float
+):
+	var new_tile = BreakableTile.instantiate()
+	new_tile.position    = target_pos
+	new_tile.texture     = texture
+	new_tile.texture_pos = texture_pos
+	new_tile.collisigon  = collisigon
+	new_tile.hp          = hp
+	add_child.call_deferred(new_tile)
+```
+
+To test, see how it works when you change `hp` metadata in the `BreakableTerrains` tilemap of your game.
 
 ## Generate some pretty cracks to show the tile damage
 
