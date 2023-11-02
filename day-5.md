@@ -1415,7 +1415,11 @@ To test, see how it works when you change `hp` metadata in the `BreakableTerrain
 
 ## Generate some pretty cracks to show the tile damage
 
-TODO/FIXME: 
+What is missing is some visual feedback of tiles breaking. For that effect, we will revisit our approach to [renditions](./day-4.md#generate-renditions-to-make-the-fireball-dissipate), like we did with the [dissipating fireballs](./day-4.md#generate-renditions-to-make-the-fireball-dissipate).
+
+This time we will use a set of `.png` files as an alpha mask. You can download them from here:
+
+[cracked-renditions.zip](https://github.com/Teaching-myself-Godot/rewriting-zelia-tutorial/raw/main/assets/cracked-renditions.zip)
 
 # Allow those breakable tiles to fall down
 
