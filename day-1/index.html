@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Day 1 - Controlling the player - Learning Godot by rewriting Zelia</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Day 1 - Controlling the player";
+        var mkdocs_page_input_path = "day-1.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Learning Godot by rewriting Zelia
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Day 1 - Controlling the player</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#a-new-project">A new project</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#importing-the-player-assets">Importing the player assets</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#player-node-setup">Player Node setup</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#setting-up-the-animations">Setting up the animations</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#higher-framerate">Higher framerate</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#technical-debt-1">Technical debt 1</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#setting-up-the-screen">Setting up the screen</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#the-final-resizable-window-setup-im-happy-with">The final resizable window setup I'm happy with</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#add-a-hitbox">Add a hitbox</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#adding-controls">Adding controls</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#input-map">Input Map</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#player-script">Player script</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#test-run">Test run</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#implement-running-animations">Implement running animations</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#picking-the-right-animations-based-on-states">Picking the right animations based on states</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#implementing-the-jump">Implementing the jump</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#mock-airtime-node">Mock airtime node</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#starting-the-mockairtimer-when-the-jump-button-was-pressed">Starting the MockAirTimer when the jump button was pressed</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#listening-to-the-mockairtimer-timeout">Listening to the MockAirTimer timeout</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#handle-the-timeout">Handle the timeout</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#tweaking-the-timings">Tweaking the timings</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#jump-sound">Jump sound</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#technical-debt-2">Technical debt 2</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#wrap-up">Wrap up</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../day-2/">Day 2 - Adding some tiles and some physics</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../day-3/">Day 3 - Casting Sprites</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../day-4/">Day 4 - Casting Fireballs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../day-5/">Day 5 - Slimes, Breaking tiles, Falling Tiles, Scenery Tiles and Shaders</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Learning Godot by rewriting Zelia</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Tutorials</li>
+      <li class="breadcrumb-item active">Day 1 - Controlling the player</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="day-1-controlling-the-player">Day 1 - Controlling the player</h1>
+<p>So before we start a day: please look at the prerequisites and make sure you are familiar with all the links referred to.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>I started learning godot 4.1.1 yesterday.</p>
+<p>What I did first is make the example 2D game there, after carefully reading up on the key concepts:</p>
+<ul>
+<li><a href="https://docs.godotengine.org/en/stable/getting_started/introduction/key_concepts_overview.html">Key concepts</a></li>
+<li><a href="https://docs.godotengine.org/en/stable/getting_started/step_by_step/index.html">Step by Step</a></li>
+<li><a href="https://docs.godotengine.org/en/stable/getting_started/first_2d_game/index.html">Your first 2D game</a></li>
+</ul>
+<p>In case you, like me, are working in windows and have 2 old monitors connected via laptop docking station: my godot engine crashed while moving it to an external monitor. </p>
+<p>Apparently, it's a <a href="https://github.com/godotengine/godot/issues/44778">known issue</a> also <a href="https://github.com/godotengine/godot/issues/28785">here</a>.</p>
+<h2 id="a-new-project">A new project</h2>
+<p>Let's start a new project. </p>
+<p>Because Zelia once started out as an HTML5 webgame it might work well in the web again. Also I want to be able to compile to as many platforms as possible this time, so let's pick the <code>Compatibility</code> renderer:</p>
+<p><img alt="Compatibility Renderer" src="../screenshots/renderer-choice.png" /></p>
+<h2 id="importing-the-player-assets">Importing the player assets</h2>
+<p>Because Zelia has become a pretty big project we should pay attention to directory structure early on.</p>
+<p>Let's make a subdir in the root folder named <code>player</code> with another subdir named <code>images</code>.</p>
+<p>You can download her png files from <a href="https://github.com/Teaching-myself-Godot/rewriting-zelia-tutorial/raw/main/assets/zelia-player.zip">assets/zelia-player.zip</a></p>
+<p>Your FileSystem tab should now look like this:</p>
+<p><img alt="import-player" src="../screenshots/import-player.png" /></p>
+<p>Zelia also has a jump sound. Let's create a sounds dir for it.
+Here is her <a href="https://github.com/Teaching-myself-Godot/rewriting-zelia-tutorial/raw/main/assets/jump-sound.wav">jump-sound.wav</a>:</p>
+<p><img alt="import-player" src="../screenshots/import-player-sound.png" /></p>
+<h2 id="player-node-setup">Player Node setup</h2>
+<p>For this bit we'll be guided by the instructions in <a href="https://docs.godotengine.org/en/stable/getting_started/first_2d_game/02.player_scene.html">Your first 2D game</a>. </p>
+<p>If you're missing details on how to execute the next steps, please refer to it.</p>
+<ol>
+<li>Add an <code>Area2D</code> node and rename it to <code>Player</code>.</li>
+<li>Save the <code>player.tscn</code> file in <code>res://player/player.tscn</code></li>
+<li>Make <code>Player</code>'s <a href="https://docs.godotengine.org/en/stable/_images/lock_children.webp">child nodes not selectable</a></li>
+<li>Add an <code>AnimatedSprite2D</code> child node with a <code>SpriteFrames</code> resource</li>
+<li>Click <code>SpriteFrames</code> again to open the <code>Animations</code> panel. </li>
+</ol>
+<h3 id="setting-up-the-animations">Setting up the animations</h3>
+<p>We need the following animation names in the list:
+- casting
+- dying
+- forward
+- idle
+- jumping
+- running</p>
+<p>The asset files you downloaded give a good filename hint as to where they belong, but I will list them for you anyway.</p>
+<p>Add the images like so:</p>
+<ul>
+<li>casting: <code>cast-1.png</code> up to <code>cast-4.png</code></li>
+<li>dying: <code>faint-1</code> up to <code>faint-8.png</code></li>
+<li>forward: <code>forward.png</code></li>
+<li>idle:  <code>stand-1.png</code></li>
+<li>jumping: <code>jump.png</code></li>
+<li>running: <code>run-1.png</code> up to <code>run-5.png</code> <em>AND</em> <code>run-4.png</code> down to <code>run-2.png</code></li>
+</ul>
+<h3 id="higher-framerate">Higher framerate</h3>
+<p>When testing the animation for running I noticed that it did not look as smooth as I was used to. Matching the original game let's change the framerate from 5 to 15 for <code>dying</code> and <code>running</code>:</p>
+<p><img alt="animation framerate" src="../screenshots/animation-framerate.png" /></p>
+<h3 id="technical-debt-1">Technical debt 1</h3>
+<p>In the original game <code>casting</code> was not - strictly speaking - an animation, but a set of casting orientations based on an angle. We will probably have to fix that later.</p>
+<h2 id="setting-up-the-screen">Setting up the screen</h2>
+<p>Zelia looks so small!</p>
+<p>That makes perfect sense because she's only about 30 pixels tall. The original game resolution was fullscreen and matched the aspect ratio of your active monitor to make the game <code>320px</code> wide. </p>
+<p>After stumbling my own way through the settings, I looked up this guide on <a href="https://docs.godotengine.org/en/stable/tutorials/rendering/multiple_resolutions.html">resolutions</a>.</p>
+<p>Although I would have preferred the outcome to look like this:</p>
+<p><img alt="zelia in pygame" src="../screenshots/zelia-in-sdl-renderer.png" /></p>
+<p>What I managed to achieve in godot by myself was blurry.</p>
+<p><img alt="zelia in godot 1" src="../screenshots/zelia-in-godot-renderer.png" /></p>
+<p>However, this <a href="https://www.reddit.com/r/godot/comments/v5blkk/blurry_sprite_godot_40/">reddit thread</a> came to the rescue to help me end up with this:</p>
+<p><img alt="zelia in godot 2" src="../screenshots/zelia-in-godot-renderer-2.png" /></p>
+<h3 id="the-final-resizable-window-setup-im-happy-with">The final resizable window setup I'm happy with</h3>
+<ol>
+<li>Open <code>Project &gt; Project Settings</code></li>
+<li>Go to <code>Display &gt; Window</code></li>
+<li>Set <code>Viewport Width</code> to <code>320</code></li>
+<li>And <code>Viewport Height</code> to <code>180</code></li>
+<li>Make sure <code>Mode</code> is set to <code>Windowed</code></li>
+<li>And that <code>Resizable</code> is checked to <code>On</code></li>
+<li>Set the <code>Stretch</code> mode to <code>canvas_items</code></li>
+<li>And the <code>Aspect</code> to <code>keep</code></li>
+<li>Then open <code>Render &gt; Textures &gt; Canvas Textures</code></li>
+<li>And change <code>Filter</code> to <code>Nearest</code></li>
+</ol>
+<h2 id="add-a-hitbox">Add a hitbox</h2>
+<p>So the original Zelia had pixel perfect collisions. I wrote everything myself, so it was quite a battery hog in modern machines and a performance killer in older machines. However, I mainly did that to avoid having to draw hitboxes and doing polygon based collision math myself.</p>
+<p><em>If</em> we want pixel perfect collision again, we'd probably follow this recipe on <a href="https://stackoverflow.com/questions/68063306/how-do-you-do-pixel-perfect-collisions-in-godot-engine#answer-74856202">stackoverflow</a>. For now, let's make do with a nice pill shape just like in the <a href="https://docs.godotengine.org/en/stable/getting_started/first_2d_game/02.player_scene.html">guide</a>.</p>
+<ol>
+<li>Create another child node for <code>Player</code> of the type <code>CollisionShape2D</code>.</li>
+<li>Choose <code>CapsuleShape2D</code> in the inspector tab next to Shape</li>
+<li>'Ungroup' the children of <code>Player</code> to make the <code>CollisionShape2D</code> selectable</li>
+<li>Align the box like in the screenshot below </li>
+<li>And 'group' them again.</li>
+</ol>
+<p><img alt="collision shape alignment" src="../screenshots/pillbox.png" /></p>
+<p>Save everything and test the current scene with F6 (make sure Zelia's in the viewport).</p>
+<h2 id="adding-controls">Adding controls</h2>
+<p>The original game was written for a gamepad and tested with this (tr|d)usty controller:</p>
+<p><img alt="my gamepad" src="../screenshots/my-gamepad.png" /></p>
+<p>Keyboard and mouse were added later and work quite differently.</p>
+<p>So let's first create some dedicated inputs for running and jumping and see if we can fix the casting+aiming mechanic later.</p>
+<h3 id="input-map">Input Map</h3>
+<p>Open <code>Project &gt; Project Settings &gt; Input Map</code>.</p>
+<p>Add these new <code>Actions</code>:</p>
+<ol>
+<li>Run right </li>
+<li>Run left</li>
+<li>Jump</li>
+</ol>
+<p>Assign these keys to <code>Run right</code>:</p>
+<ol>
+<li>Keyboard 'D' - <code>D (Physical)</code></li>
+<li>Keyboard Right arrow - <code>Right (Physical)</code></li>
+<li>Joypad Axis 0 (<code>Left Stick Right</code>, <code>Joystick 0 Right - All Devices</code>)</li>
+<li>Joypad Button 14 (<code>D-pad Right - All Devices</code>)</li>
+</ol>
+<p>Assign these keys to <code>Run left</code>:</p>
+<ol>
+<li>Keyboard 'A' - <code>A (Physical)</code></li>
+<li>Keyboard Left arrow - <code>Left (Physical)</code></li>
+<li>Joypad Axis 0 (<code>Left Stick Left</code>, <code>Joystick 0 Left - All Devices</code>)</li>
+<li>Joypad Button 13 (<code>D-pad Left - All Devices</code>)</li>
+</ol>
+<p>And assign these keys to <code>Jump</code>:</p>
+<ol>
+<li>Keyboard 'W' - <code>W (Physical)</code></li>
+<li>Keyboard Up arrow - <code>Up (Physical)</code></li>
+<li>Joypad Button 0 - (<code>Buttom Action</code>, <code>Sony Cross</code>, <code>Xbox A</code>, <code>Ninendo B</code>)</li>
+</ol>
+<h2 id="player-script">Player script</h2>
+<p>Finally, let's code some stuff, taking guidance  from <a href="https://docs.godotengine.org/en/stable/getting_started/first_2d_game/03.coding_the_player.html">the official guide</a>.</p>
+<p>Attach a script to the <code>Player</code>-node and save it in <code>res://player/player.gd</code></p>
+<p>So in the original game there were some movement states I would like to keep using to make our rewrite easier:</p>
+<pre><code class="language-python">from enum import Enum
+
+class Orientation(Enum):
+    LEFT = 1
+    RIGHT = 2
+    NONE = 3
+    UP = 4
+    DOWN = 5
+
+class MovementState(Enum):
+    IDLE = 1
+    RUNNING = 2
+    AIRBORNE = 3
+    JUMPING = 4
+    DYING = 5
+    CASTING = 6
+    FACING_FORWARD = 7
+    HOLDING_ITEM = 8
+
+class CastDirection(Enum):
+    DIAG_DOWN = 1
+    FORWARD = 2
+    DIAG_UP = 3
+    UP = 4
+    DOWN = 5
+</code></pre>
+<p>Let's <a href="https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_basics.html">read up on</a> how to port these python style <code>enums</code> to gdscript.</p>
+<p>That looks nice and clean, let's define some inside our <code>player.gd</code> script for now.</p>
+<p>Let's assign them to some properties in the <code>_ready()</code> func.</p>
+<pre><code class="language-gdscript">extends Area2D
+
+enum Orientation   { LEFT, RIGHT }
+enum MovementState { IDLE, RUNNING, AIRBORNE }
+
+# We will want to debug these states, let's export them as well
+@export var movement_state : int
+@export var orientation    : int
+
+
+func _ready():
+    movement_state = MovementState.IDLE
+    orientation    = Orientation.RIGHT
+
+func _process(delta):
+    pass
+
+</code></pre>
+<h3 id="test-run">Test run</h3>
+<p>Run the current scene to test our property assignments. </p>
+<p>To debug exported properties while running, go to the node tree window and pick <code>Remote</code> in stead of <code>Local</code>:</p>
+<p><img alt="toggle remote" src="../screenshots/toggle-remote.png" /></p>
+<p>Then click the <code>root</code>-node first and then the <code>Player</code>-node. </p>
+<p>The <code>Inspector</code> tab for <code>Player</code> should now show:</p>
+<p><img alt="movement state props" src="../screenshots/movement-state-props.png" /></p>
+<p>You can even change the property values through this interface!</p>
+<h2 id="implement-running-animations">Implement running animations</h2>
+<p>So let's now write some body for the <code>_process()</code> func.</p>
+<p>Let's first write tests for the <code>Run right</code> and <code>Run left</code> actions to set the movement</p>
+<pre><code class="language-gdscript">func _process(delta):
+    if Input.is_action_pressed(&quot;Run right&quot;):
+        orientation    = Orientation.RIGHT
+        movement_state = MovementState.RUNNING
+    elif Input.is_action_pressed(&quot;Run left&quot;):
+        orientation    = Orientation.LEFT
+        movement_state = MovementState.RUNNING
+    else:
+        movement_state = MovementState.IDLE
+</code></pre>
+<p>To test out whether our state changes work we run the current scene and open the <code>Remote</code> inspector for player. (Remember: click the <code>root</code>-node first and then the <code>Player</code>-node).</p>
+<p>I noticed a slight delay in the inspector, but I'm guessing that's due to it being on a lower priority thread.</p>
+<h3 id="picking-the-right-animations-based-on-states">Picking the right animations based on states</h3>
+<p>Let's reread <a href="https://docs.godotengine.org/en/stable/getting_started/first_2d_game/03.coding_the_player.html#choosing-animations">the guide</a> on changing the animations.</p>
+<p>Add the following code at the bottom of the <code>_process</code> func:</p>
+<pre><code class="language-gdscript">    match (movement_state):
+        MovementState.RUNNING:
+            $AnimatedSprite2D.animation = &quot;running&quot;
+        _: # MovementState.IDLE
+            $AnimatedSprite2D.animation = &quot;idle&quot;
+
+    if orientation == Orientation.LEFT:
+        $AnimatedSprite2D.flip_h = true
+    else:
+        $AnimatedSprite2D.flip_h = false
+</code></pre>
+<p>And make sure our <code>AnimatedSprite2D</code> node starts playing in func <code>_ready</code>.</p>
+<pre><code class="language-gdscript">func _ready():
+    movement_state = MovementState.IDLE
+    orientation    = Orientation.RIGHT
+    $AnimatedSprite2D.play()
+</code></pre>
+<p>Test the current scene and if all is well our little Zelia is up and running! (pun intended)</p>
+<h2 id="implementing-the-jump">Implementing the jump</h2>
+<p>Ok so now we want her to jump!</p>
+<p>This is harder than it seems. It's not just a matter of <code>if jump-is-pressed then draw jump</code>: we are missing some environmental factors.</p>
+<p>Let's first define what we know about how jumping works.</p>
+<ol>
+<li>Test if the jump button was just pressed  <code>Input.is_action_just_pressed("Jump")</code></li>
+<li><code>Player</code> receives some negative y-acceleration</li>
+<li><code>Player</code> spends some time in the air (i.e. is not touching a floor)</li>
+<li>Gravity (some positive y-acceleration) pulls the player back down.</li>
+</ol>
+<p>Seems like it would be a smart move to change the <code>Player</code>-node into a <a href="https://docs.godotengine.org/en/stable/classes/class_rigidbody2d.html"><code>RigidBody2D</code></a> at some stage.</p>
+<p>However, for now we just want to have some direct feedback from our inputs so let's mock some air time:</p>
+<h3 id="mock-airtime-node">Mock airtime node</h3>
+<p>Create a new <code>Timer</code> node as a child node for <code>Player</code> and call it <code>MockAirTimer</code> ... or if you're deadset on it <code>MockAirborneTimeTimer</code>. :-)</p>
+<p><img alt="mock air time timer" src="../screenshots/mock-airtimer-node.png" /></p>
+<p>Let the <code>Wait Time</code> property remain at <code>1s</code> and mark it as <code>One Shot</code>.</p>
+<p><img alt="mock air time timer props" src="../screenshots/mock-airtimer-props.png" /></p>
+<h3 id="starting-the-mockairtimer-when-the-jump-button-was-pressed">Starting the MockAirTimer when the jump button was pressed</h3>
+<p>Change the <code>_process</code> func to match this snippet; changes and additions are under the comments.</p>
+<pre><code class="language-gdscript">func _process(delta):
+    # If user wants to jump, start the MockAirTimer and change the movement state to airborne
+    if Input.is_action_just_pressed(&quot;Jump&quot;) and movement_state != MovementState.AIRBORNE:
+        $MockAirTimer.start()
+        movement_state = MovementState.AIRBORNE
+
+    if Input.is_action_pressed(&quot;Run right&quot;):
+        orientation    = Orientation.RIGHT
+        # Only change movement state to running if not airborne
+        movement_state = MovementState.RUNNING if movement_state != MovementState.AIRBORNE else MovementState.AIRBORNE
+    elif Input.is_action_pressed(&quot;Run left&quot;):
+        orientation    = Orientation.LEFT
+        # Only change movement state to running if not airborne
+        movement_state = MovementState.RUNNING if movement_state != MovementState.AIRBORNE else MovementState.AIRBORNE
+    else:
+        # Only change movement state to idle if not airborne
+        movement_state = MovementState.IDLE    if movement_state != MovementState.AIRBORNE else MovementState.AIRBORNE
+
+    match (movement_state):
+        MovementState.RUNNING:
+            $AnimatedSprite2D.animation = &quot;running&quot;
+        # This was added
+        MovementState.AIRBORNE:
+            $AnimatedSprite2D.animation = &quot;jumping&quot;
+        _: # MovementState.IDLE
+            $AnimatedSprite2D.animation = &quot;idle&quot;
+
+    if orientation == Orientation.LEFT:
+        $AnimatedSprite2D.flip_h = true
+    else:
+        $AnimatedSprite2D.flip_h = false
+</code></pre>
+<h3 id="listening-to-the-mockairtimer-timeout">Listening to the MockAirTimer timeout</h3>
+<p>If we let her jump now she will remain airborne forever. Let's not forget to add a listener to the <code>MockAirTimer</code>.</p>
+<p>Select the <code>MockAirTimer</code>-node in the node tree view and open the <code>Node</code> tab next to the <code>Inspector</code> tab.</p>
+<p>Double-click <code>timeout()</code> to open the <code>Connect a Signal</code> dialog:</p>
+<p><img alt="connect a signal" src="../screenshots/connect-a-signal-dialog.png" /></p>
+<p>Leave all the defaults in place and click <code>Connect</code></p>
+<h3 id="handle-the-timeout">Handle the timeout</h3>
+<p>We now end up with the listener func <code>_on_mock_air_timer_timeout</code> to implement like this:</p>
+<pre><code class="language-gdscript">func _on_mock_air_timer_timeout():
+    movement_state = MovementState.IDLE
+</code></pre>
+<p>Run the player scene to test out the jump. </p>
+<h3 id="tweaking-the-timings">Tweaking the timings</h3>
+<p>Personally I think one second of air time is a little to long, so let's change it to  <code>0.7s</code> - not too long as to seem unnatural, yet long enough for her to change direction in the air.</p>
+<h2 id="jump-sound">Jump sound</h2>
+<p>Before we round up let's also add in the jump sound. Create a new child node for <code>Player</code> of type <code>AudioStreamPlayer</code> and call it <code>JumpSound</code>.</p>
+<p>Open up the <code>Inspector</code> and next to <code>Stream</code> use <code>Quick load</code> and pick <code>jump-sound.wav</code> from our resources dir.</p>
+<p>Then add this new line of code in <code>_process</code>:</p>
+<pre><code class="language-gdscript">    if Input.is_action_just_pressed(&quot;Jump&quot;) and movement_state != MovementState.AIRBORNE:
+        $JumpSound.play() # the new line
+</code></pre>
+<h2 id="technical-debt-2">Technical debt 2</h2>
+<p>The <a href="https://github.com/Teaching-myself-Godot/godot-zelia/blob/6d300048f64f709ae48f67c5de0fc57542551f6e/player/player.gd">code is starting to look a little messy</a> already, so we might want refactor at this point.</p>
+<p>No worries, we'll revisit this code often.</p>
+<h2 id="wrap-up">Wrap up</h2>
+<p>Well that wraps up our day. </p>
+<p>I hope you enjoyed it as much as I did!</p>
+<p>Our next day will introduce some tiles and some movement:</p>
+<p><a href="../day-2/">Day 2 - Adding some tiles and some physics</a></p>
+<p>Maybe we can even try out that <a href="https://docs.godotengine.org/en/stable/classes/class_rigidbody2d.html"><code>RigidBody2D</code></a> at some stage!</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../day-2/" class="btn btn-neutral float-right" title="Day 2 - Adding some tiles and some physics">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../day-2/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

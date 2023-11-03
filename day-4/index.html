@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Day 4 - Casting Fireballs - Learning Godot by rewriting Zelia</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Day 4 - Casting Fireballs";
+        var mkdocs_page_input_path = "day-4.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Learning Godot by rewriting Zelia
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tutorials</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../day-1/">Day 1 - Controlling the player</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../day-2/">Day 2 - Adding some tiles and some physics</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../day-3/">Day 3 - Casting Sprites</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Day 4 - Casting Fireballs</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#the-steps-for-today">The steps for today</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#add-a-fireball-scene-and-test-its-flying">Add a Fireball scene and test its flying</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#adding-the-fireball-image-asset-and-fireball-scene">Adding the fireball image asset and Fireball scene</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#let-it-fly">Let it fly</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#clean-it-up">Clean it up</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#spawn-fireballs-when-she-casts">Spawn fireballs when she casts</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#add-a-fireballintervaltimer">Add a FireballIntervalTimer</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#spawning-the-fireballs">Spawning the fireballs</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#add-the-fireball-scene-to-the-main-scene">Add the Fireball scene to the main scene</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#declare-and-invoke-a-signal-to-cast-spells">Declare and invoke a signal to "cast spells"</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#let-the-world-scene-listen-to-the-signal">Let the world scene listen to the signal</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#fix-the-fireballs-origin-tweak-casting-sprites-with-angle-of-fireball">Fix the fireballs' origin, tweak casting sprites with angle of fireball</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#make-fireballs-collide-with-the-tilemap-not-with-the-player">Make fireballs collide with the TileMap, not with the Player</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#collision-layer-and-collision-mask">Collision Layer and Collision Mask</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#setting-collision-layer-and-collision-mask-for-fireball">Setting Collision Layer and Collision Mask for Fireball</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#setting-it-for-world">Setting it for World</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#test-again">Test again</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#add-some-smoothness-to-the-collided-fireballs">Add some smoothness to the collided fireballs</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#generate-renditions-to-make-the-fireball-dissipate">Generate renditions to make the fireball dissipate</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#using-autoload-for-preprocessing">Using Autoload for preprocessing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#generate-the-dissipate-animation-with-image-and-imagetexture">Generate the dissipate animation with Image and ImageTexture</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#the-actual-rendition-script">The actual rendition script</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#final-touch-show-behind-parent">Final touch: show behind parent</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#why-not-shaders">Why not shaders?</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../day-5/">Day 5 - Slimes, Breaking tiles, Falling Tiles, Scenery Tiles and Shaders</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Learning Godot by rewriting Zelia</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Tutorials</li>
+      <li class="breadcrumb-item active">Day 4 - Casting Fireballs</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="day-4-casting-fireballs">Day 4 - Casting Fireballs</h1>
+<p>Today we're going to let Zelia cast fireballs.</p>
+<p>Want to start from here? </p>
+<p>Clone or download the result of day 3 from <a href="https://github.com/Teaching-myself-Godot/godot-zelia/tree/after-day-3">github</a></p>
+<h2 id="the-steps-for-today">The steps for today</h2>
+<ol>
+<li><a href="#add-a-fireball-scene-and-test-its-flying">Add a <code>Fireball</code> scene and test its flying</a></li>
+<li><a href="#spawn-fireballs-when-she-casts">Spawn fireballs when she casts</a></li>
+<li><a href="#make-fireballs-collide-with-the-tilemap-not-with-the-player">Make fireballs collide with the <code>TileMap</code>, not with the <code>Player</code></a></li>
+<li><a href="#generate-renditions-to-make-the-fireball-dissipate">Generate renditions to make the fireball dissipate</a></li>
+<li><a href="#why-not-shaders">Why not shaders?</a></li>
+</ol>
+<h2 id="add-a-fireball-scene-and-test-its-flying">Add a <code>Fireball</code> scene and test its flying</h2>
+<p>We will use a single <code>.png</code> image as a resource for the fireball. You can download it here:</p>
+<p><a href="https://github.com/Teaching-myself-Godot/rewriting-zelia-tutorial/raw/main/assets/fireball.png">assets/fireball.png</a></p>
+<h3 id="adding-the-fireball-image-asset-and-fireball-scene">Adding the fireball image asset and Fireball scene</h3>
+<ol>
+<li>Create a resource dir <code>res://projectiles/fireball</code></li>
+<li>Place <code>fireball.png</code> inside</li>
+<li>Create a new <code>Area2D</code> scene and call it <code>Fireball</code></li>
+<li>Save it in <code>res://projectiles/fireball/fireball.tscn</code></li>
+<li>Add these child-nodes:</li>
+<li><code>AnimatedSprite2D</code></li>
+<li><code>CollisionShape2D</code></li>
+<li>Add a <code>SpriteFrames</code> to the <code>AnimatedSprite2D</code>-node</li>
+<li>Drag the <code>fireball.png</code> into its <code>default</code> animation</li>
+<li>Use a <code>CircleShape2D</code> for the <code>CollisionShape2D</code> and draw it like this:</li>
+</ol>
+<p><img alt="Fireball collision shape" src="../screenshots/fireball-collision-shape.png" /></p>
+<p>Although we are using only one image, we are using <code>AnimatedSprite2D</code>, not simply <code>Sprite2D</code>.</p>
+<p>This is beacause in <a href="#generate-renditions-to-make-the-fireball-dissipate">step 4</a> we will generate rendition images dynamically for a 'dissipating' animation.</p>
+<h3 id="let-it-fly">Let it fly</h3>
+<p>To make the fireball fly takes a very short script.</p>
+<p>Attach a script to the fireball scene by right-clicking <code>Scene &gt; Fireball</code> and picking <code>Attach Script</code> from the context menu. </p>
+<p>Leave the defaults in place, and write the script:</p>
+<pre><code class="language-gdscript">extends Area2D
+
+# Initialize the fireball with zero speed (x = 0, y = 0)
+@export var velocity = Vector2.ZERO
+
+func _physics_process(delta):
+    # Update position by velocity-vector
+    position += velocity * delta
+</code></pre>
+<p>We exported the <code>velocity</code>-property so we can test this code.</p>
+<p>Run the current scene by pressing <code>F6</code>.</p>
+<p>Wile the scene is running:
+1. Go to <code>Scene &gt; Remote &gt; root &gt; Fireball</code>
+2. Make sure the game window is visible
+3. Find <code>Inspector &gt; Members &gt; Velocity</code>
+4. Set <code>x</code> to <code>50</code>:</p>
+<p><img alt="remote debug fireball" src="../screenshots/remote_debug_fireball.png" /></p>
+<p>This makes the fireball fly out the viewport to the right, never to return.</p>
+<p>If we're going to spawn hundreds of thousands of them, it will become a dire memory leak.</p>
+<h3 id="clean-it-up">Clean it up</h3>
+<p>To clean up the potential mess, we'll follow some instructions about nodes leaving the viewport from here:</p>
+<p>Enemy script from: <a href="https://docs.godotengine.org/en/stable/getting_started/first_2d_game/04.creating_the_enemy.html#enemy-script"><em>"My First 2D Game"</em></a>:</p>
+<p>Following these steps, we will now:</p>
+<ol>
+<li>Add a <a href="https://docs.godotengine.org/en/stable/classes/class_visibleonscreennotifier2d.html#class-visibleonscreennotifier2d"><code>VisibleOnScreenNotifier2D</code></a></li>
+<li>In the <code>2D</code> scene view make sure the <code>Rect</code> surrounds the fireball</li>
+</ol>
+<p><img alt="rect surrounds ball" src="../screenshots/rect-surrounds-ball.png" /></p>
+<ol>
+<li>Click on <code>Node</code> next to <code>Inspector</code></li>
+<li>Double click <code>Signals &gt; screen_exited()</code></li>
+<li>Leave defaults in tact and click <code>Connect</code></li>
+<li>Now add this line to the new function <code>_on_visible_on_screen_notifier_2d_screen_exited</code>:</li>
+</ol>
+<pre><code class="language-gdscript">func _on_visible_on_screen_notifier_2d_screen_exited():
+    queue_free()
+</code></pre>
+<p>Run the current scene again by pressing <code>F6</code> and repeat the remote debugging instructions, setting x to <code>50</code></p>
+<p><img alt="remote debug" src="../screenshots/remote_debug_fireball.png" /></p>
+<p>Now look at the node-tree under <code>Scene</code> until the fireball exits the game viewport.</p>
+<p>Congratulations, we deleted it.</p>
+<h2 id="spawn-fireballs-when-she-casts">Spawn fireballs when she casts</h2>
+<p>If you've looked at the <a href="https://renevanderark.itch.io/zelia-mystery-mage-and-adventure-maker">original Zelia game</a>, you know that she does not fire on button-press/click, but on fixed intervals while holding a button:</p>
+<h3 id="add-a-fireballintervaltimer">Add a <code>FireballIntervalTimer</code></h3>
+<ol>
+<li>Go to <code>FileSystem &gt; player &gt; player.tscn</code></li>
+<li>Add a <code>Timer</code>-node to the <code>Player</code>-node</li>
+<li>Name it <code>FireballIntervalTimer</code></li>
+<li>Go to the <code>Inspector</code>-tab:</li>
+<li>Set <code>Wait Time</code> to <code>0.1</code></li>
+<li>Make sure the <code>One Shot</code>-property is checked <code>Off</code></li>
+<li>Check <code>On</code> the <code>Autostart</code>-property</li>
+</ol>
+<p>This makes sure that the <code>FireballIntervalTimer</code> is activated when the <code>Player</code> is instantiated. </p>
+<p>So, in our current case, when the game starts.</p>
+<ol>
+<li>Go to the <code>Node</code>-tab (next to <code>Inspector</code>)</li>
+<li>Double-click the <code>timeout()</code>-signal</li>
+<li>Keep the defaults and click <code>Connect</code></li>
+</ol>
+<p>So now, let's check if our new listener <code>_on_fireball_interval_timer_timeout()</code> is set up properly:</p>
+<pre><code class="language-gdscript">func _on_fireball_interval_timer_timeout():
+    print(&quot;Pow!&quot;)
+</code></pre>
+<p>Test by pressing <code>F5</code>, and look at the console:</p>
+<p><img alt="console prints &quot;pow&quot;" src="../screenshots/console-prints-pow.png" /></p>
+<p>Ok, so the <code>FireballIntervalTimer</code> works, but she should only shoot fireballs when holding the <code>Fireball button</code>:</p>
+<pre><code class="language-gdscript">func _on_fireball_interval_timer_timeout():
+    if movement_state == MovementState.CASTING:
+        rint(&quot;Pow!&quot;)
+</code></pre>
+<p>That's better. Let's shoot the fireballs next.</p>
+<h3 id="spawning-the-fireballs">Spawning the fireballs</h3>
+<p>For this section we follow these guides from the godot tutorials:
+- <a href="https://docs.godotengine.org/en/stable/getting_started/step_by_step/instancing.html#doc-instancing">Instancing</a>
+- <a href="https://docs.godotengine.org/en/stable/tutorials/scripting/instancing_with_signals.html">Instancing with signals</a></p>
+<p>The main take-away here is to make sure the <code>Fireball</code>-scene is loosely coupled from the <code>Player</code>-scene; it lives a life of its own.</p>
+<p>This also keeps it testable in isolation, like we did earlier.</p>
+<h3 id="add-the-fireball-scene-to-the-main-scene">Add the Fireball scene to the main scene</h3>
+<p>We will however need to be able to access it from the main scene of our game: </p>
+<ol>
+<li>Open <code>FileSystem &gt; res://world.tscn</code></li>
+<li>Connect the <code>Fireball</code>-scene to it by either/or</li>
+<li>Dragging <code>fireball.tscn</code> from the <code>FileSystem</code> tab into the <code>World</code>-tree</li>
+<li>Clicking the <code>Instantiate Child Scene</code> button:</li>
+</ol>
+<p><img alt="instantiate" src="../screenshots/instantiate-child-scene-button.png" /></p>
+<p>That made <em>one</em> <code>instance</code> of the <code>Fireball</code>-scene as a direct child of the <code>World</code>-scene. </p>
+<p>It kinda just sits there, being visible:</p>
+<p><img alt="fireball being visible" src="../screenshots/firball-sitting-there-being-visible.png" /></p>
+<p>We can fix that by toggling off visibility here:</p>
+<p><img alt="toggle invisible" src="../screenshots/toggle-invisible.png" /></p>
+<h3 id="declare-and-invoke-a-signal-to-cast-spells">Declare and invoke a signal to "cast spells"</h3>
+<p>What we're doing next is explained in detail in <a href="https://docs.godotengine.org/en/stable/tutorials/scripting/instancing_with_signals.html">Instancing with signals</a>.</p>
+<p>We're just going to apply here what we learned.</p>
+<pre><code class="language-gdscript">## top of script
+# Preload the Fireball class, used to identify it in cast_projectile
+var Fireball = preload(&quot;res://projectiles/fireball/fireball.tscn&quot;)
+
+# Declare a signal to cast a projectile spell (like Fireball) 
+# in the given direction, from the given origin
+signal cast_projectile(spell_class, direction : Vector2, origin : Vector2)
+
+## bottom of script
+# Spawn a fireball every 100ms if Fireball button is held
+func _on_fireball_interval_timer_timeout():
+    if movement_state == MovementState.CASTING:
+        # Signal that a fireball should be cast at casting angle and 
+        # from Player's position
+        cast_projectile.emit(Fireball, cast_angle, position)
+</code></pre>
+<h3 id="let-the-world-scene-listen-to-the-signal">Let the world scene listen to the signal</h3>
+<p>The main scene of our game (currently <code>World</code>) should get a script with a listener to the casting signal.</p>
+<p>Upon that signal, it must <code>instantiate</code> a new <code>Fireball</code>-node and let it fly:</p>
+<ol>
+<li>Go to <code>FileSystem &gt; world.tscn</code></li>
+<li>Right click the <code>World</code>-node and choose <code>Attach Script</code></li>
+<li>Use the defaults and click <code>Create</code></li>
+<li>Clear the script to one line:</li>
+</ol>
+<pre><code class="language-gdscript">extends TileMap
+</code></pre>
+<ol>
+<li>Click on the <code>Player</code>-<strong>child-node</strong> <em>of</em> <code>World</code></li>
+<li>Pick <code>Node</code> next to <code>Inpector</code></li>
+<li>Double click <code>cast_projectile(...)</code></li>
+<li>Leave defaults to <code>Connect</code> to <code>World</code></li>
+<li>Implement <code>_on_player_cast_projectile</code> like this:</li>
+</ol>
+<pre><code class="language-gdscript"># world.gd
+func _on_player_cast_projectile(spell_class, direction, origin):
+    var spell = spell_class.instantiate()
+    add_child(spell)
+    spell.rotation = direction
+    spell.position = origin
+    spell.velocity = Vector2.from_angle(direction) * 150.0
+</code></pre>
+<p>Test the main scene using <code>F5</code></p>
+<p><strong>NOTE</strong>: the fireball should come from her belly in the center at this time. If you made the <em>same mistake I did</em> it might spawn out at another place. </p>
+<p><strong>FIX</strong>: The rootnode <code>Fireball</code> of the <code>fireball.tscn</code>-scene should be in the center of its sprite; it's a subtle grey-plus on the <code>2D</code>-scene until you click on it.</p>
+<h3 id="fix-the-fireballs-origin-tweak-casting-sprites-with-angle-of-fireball">Fix the fireballs' origin, tweak casting sprites with angle of fireball</h3>
+<p>So we don't want Zelia to shoot fire from her belly, but from her hands.</p>
+<p>This script calculates a new and better origin.</p>
+<pre><code class="language-gdscript"># Spawn a fireball every 100ms if Fireball button is held
+func _on_fireball_interval_timer_timeout():
+    if movement_state == MovementState.CASTING:
+        # Signal that a fireball should be cast at casting angle and 
+        # from Player's hands
+        var origin = position + Vector2(14, 0).rotated(cast_angle) + Vector2(0, 2)
+        cast_projectile.emit(Fireball, cast_angle, origin)
+</code></pre>
+<p>So the <code>var origin</code> is calculated by applying 3 transformations:
+1. Create a 'point' at position x=14, y=0 and rotate it by the casting angle: <code>Vector2(14, 0).rotated(cast_angle)</code>
+2. Move it relative to Zelia's center (<code>position +</code>)
+3. Move it 2 pixels down <code>+ Vector(0, 2)</code></p>
+<p>Also, her hands do not match up as nicely with the fireballs as they did in the original game. Use these new angles to determine <code>casting_up</code> and <code>casting_down</code> in <code>get_casting_sprite</code> for better effect:</p>
+<pre><code class="language-gdscript">    var casting_up    = deg &gt; -160 and deg &lt; 0
+    var casting_down  = deg &gt; 30   and deg &lt; 160
+</code></pre>
+<h2 id="make-fireballs-collide-with-the-tilemap-not-with-the-player">Make fireballs collide with the <code>TileMap</code>, not with the <code>Player</code></h2>
+<p>At the moment fireballs still fly out the game window. We want then to collide with the terrain tiles, however. </p>
+<p>Let's look at the <a href="https://docs.godotengine.org/en/stable/getting_started/first_2d_game/03.coding_the_player.html#preparing-for-collisions">tutorial</a> once more and apply:</p>
+<ol>
+<li>Open the fireball scene <code>FileSystem &gt; res://projectiles/fireball/fireball.tscn</code></li>
+<li>Select <code>Scene &gt; Fireball</code></li>
+<li>Go to <code>Node</code> next to <code>Inspector</code></li>
+<li>Double click on the <code>body_entered(body: Node2D)</code> signal</li>
+<li>Leave defaults on and click <code>Connect</code></li>
+<li>To remove them we could use <code>queue_free()</code> again:</li>
+</ol>
+<pre><code class="language-gdscript">func _on_body_entered(body):
+    queue_free()
+</code></pre>
+<p>That works, the fireball collides when it hits the <code>Tilemap</code>. However..</p>
+<p>..It will also disappear if it collides with the <code>Player</code>. </p>
+<h3 id="collision-layer-and-collision-mask"><code>Collision Layer</code> and <code>Collision Mask</code></h3>
+<p>To illustrate, make set its origin the <code>position</code>-property of the player again in <code>player.gd</code>:</p>
+<pre><code class="language-gdscript">        # comment out the next line with Ctrl+k
+#       var origin = position + Vector2(14, 0).rotated(cast_angle) + Vector2(0, 2)
+        # replace origin with position in next line
+        cast_projectile.emit(Fireball, cast_angle, position)
+</code></pre>
+<p>Depending on whether the fireballs are drawn over or behind the <code>Player</code> you will see either/or:
+- them pop in and out of existence
+- not at all</p>
+<p>This is because their <code>Collision Mask</code> overlaps the <code>Collision Layer</code> of the player. The answers here explain it nicely:
+<a href="https://ask.godotengine.org/4010/whats-difference-between-collision-layers-collision-masks">What's the difference between Collision layers and Collision masks?</a></p>
+<p>Let's apply what we've learned here like this:
+- <code>Player</code>: set both mask and layer to 1 (for now)
+- <code>World &gt; TileSet</code>: set both mask and layer to 1 <em>and</em> 2 (for now)
+- <code>Fireball</code>: set both mask and layer to 2 (for now)</p>
+<p><code>Player</code> is already set correctly. However, we might want more granularity later.</p>
+<h4 id="setting-collision-layer-and-collision-mask-for-fireball">Setting <code>Collision Layer</code> and <code>Collision Mask</code> for <code>Fireball</code></h4>
+<p>This is a set of properties most easily manipulated in the <code>Inpector</code>.</p>
+<ol>
+<li>Select <code>res://projectiles/fireball/fireball.tscn</code></li>
+<li>Click on the <code>Fireball</code> node</li>
+<li>Go to <code>Inspector &gt; Collision</code></li>
+<li>set both mask and layer to 2 (for now)</li>
+</ol>
+<p><img alt="collision mask and layer" src="../screenshots/collision-mask-and-layer.png" /></p>
+<h4 id="setting-it-for-world">Setting it for <code>World</code></h4>
+<p>But to set it for the <code>World</code> scene, be aware you also need to click on <code>Inspector &gt; Tile Set &gt; TileSet &gt; Physics Layers</code> as it is a property not of the <code>TileMap</code>, but of (one of) its <code>TileSet</code>(s)' <code>Physics Layer</code>(s) --&gt; if you can still follow.</p>
+<p><img alt="Our TileMap's TileSet's Physic Layer's Collision Mask and Collision Layer" src="../screenshots/tilemaps-tilesets-physicslayers-collisionlayerandmask.png" /></p>
+<h4 id="test-again">Test again</h4>
+<p>Press <code>F5</code> to test if the fireballs <em>do</em> collide with the <code>Tilemap</code> and <em>do not</em> collide with the <code>Player</code>. </p>
+<p>Then change back the <code>player.gd</code> script:</p>
+<pre><code class="language-gdscript">        var origin = position + Vector2(14, 0).rotated(cast_angle) + Vector2(0, 2)
+        cast_projectile.emit(Fireball, cast_angle, origin)
+</code></pre>
+<h3 id="add-some-smoothness-to-the-collided-fireballs">Add some smoothness to the collided fireballs</h3>
+<p>Right now the fireballs disappear very abrubtly because <code>queue_free()</code> is invoked immediately.</p>
+<p>We can smoothe this out a little by introducing a delay and slowing them down on impact:</p>
+<ol>
+<li>Go to <code>fireball.tscn</code></li>
+<li>Give it a <code>Timer</code> child node and call it <code>DissipateTimer</code></li>
+<li>Check <code>Inspector &gt; One Shot</code> to <code>On</code></li>
+<li>Set the <code>Wait Time</code> to <code>0.5</code></li>
+<li>Change+Add this script to <code>fireball.gd</code>:</li>
+</ol>
+<pre><code class="language-gdscript">func _on_body_entered(body):
+    # start the new timer in stead of calling queue_free here
+    $DissipateTimer.start()
+    # slow it down to 1/10th the speed
+    velocity *= 0.1
+</code></pre>
+<ol>
+<li>Click <code>DissipateTimer</code>-node</li>
+<li>Connect the <code>Node &gt; timeout()</code>-signal to the <code>Fireball</code></li>
+<li>Implement <code>_on_dissipate_timer_timeout()</code> like so:</li>
+</ol>
+<pre><code class="language-gdscript">func _on_dissipate_timer_timeout():
+    queue_free()
+</code></pre>
+<p>That's only a little better. We need an animation to make them fade into non-existence slowly.</p>
+<h2 id="generate-renditions-to-make-the-fireball-dissipate">Generate renditions to make the fireball dissipate</h2>
+<p>We could make this very ease on ourselves by drawing images manually in our <a href="https://www.gimp.org/">favourite image manipulation program</a>, but we'll do it the lazy way.</p>
+<p>Well, that is to say, the programmer's way, a.k.a. the reusable way. Remembering the original game we see a lot of stuff disappear in the same, lazy, reused way. We want to know how, right?</p>
+<h3 id="using-autoload-for-preprocessing">Using <code>Autoload</code> for preprocessing</h3>
+<p>So looking at the documentation it becomes clear that you can easily manipulate texture images using these two classes:
+- <a href="https://docs.godotengine.org/en/stable/classes/class_image.html#class-image">Image</a>
+- <a href="https://docs.godotengine.org/en/stable/classes/class_imagetexture.html">ImageTexture</a></p>
+<p>But what is less evident is how to do it only <em>one</em> time, in stead of all the <code>100.000</code>+ times a fireball collides. That would <em>not</em> perform <em>at all</em>.</p>
+<p>Luckily, when you search the docs for "<code>Singleton</code>" (my fifth attempt) you find the <code>Autoload</code>-class, which is meant for precisely this:</p>
+<ul>
+<li><a href="https://docs.godotengine.org/en/stable/tutorials/scripting/singletons_autoload.html">Singletons (Autoload)</a></li>
+</ul>
+<p>So, let us apply the steps and the test if we set it up properly.</p>
+<ol>
+<li>Go to <code>Project &gt; Project Settings &gt; Autoload</code> (4th tab)</li>
+<li>Click on the <code>Node Name</code> input</li>
+<li>Type in <code>TextureRenditions</code>, which will be the name of our first <code>Autoload</code></li>
+<li>Click <code>Add</code></li>
+<li>In the dialog, leave the defaults, creating a new script <code>res://texture_renditions.gd</code></li>
+<li>Leave the <code>Global Variable</code>-checkbox check on to <code>Enable</code></li>
+<li>Close the <code>Project Settings</code>-dialog again.</li>
+<li>Enter this test script in the file <code>texture_renditions.gd</code>:</li>
+</ol>
+<pre><code class="language-gdscript">extends Node
+
+var singleton_test : String
+
+func _ready():
+    singleton_test = &quot;singleton_test&quot;
+    print(&quot;asserting this print is called only once&quot;)
+</code></pre>
+<p>Run the project with <code>F5</code> and confirm in the console that yes indeed: </p>
+<pre><code>asserting this print is called only once
+--- Debugging process stopped ---
+</code></pre>
+<p>Also, test if <code>TextureRenditions.singleton_test</code> is indeed a globally accessible string in <code>fireball.gd</code>:</p>
+<pre><code class="language-gdscript">func _ready():
+    print(TextureRenditions.singleton_test)
+</code></pre>
+<p>Run the project again and confirm in the console after shooting some fireballs:</p>
+<pre><code>singleton_test
+singleton_test
+singleton_test
+singleton_test
+--- Debugging process stopped ---
+</code></pre>
+<h3 id="generate-the-dissipate-animation-with-image-and-imagetexture">Generate the dissipate animation with <code>Image</code> and <code>ImageTexture</code></h3>
+<p>So now we want to prepare the animation for the fireball in our <code>Autoload</code>-node called <code>TextureRenditions</code>. Open the <code>texture_renditions.gd</code> script again.</p>
+<ol>
+<li>Use <code>preload</code> to open the <code>fireball.png</code> texture and get an instance of its <code>Image</code>:</li>
+</ol>
+<pre><code class="language-gdscript">extends Node
+
+var fireball = preload(&quot;res://projectiles/fireball/fireball.png&quot;).get_image()
+</code></pre>
+<ol>
+<li>Prepare a global array to hold the preprocess images:</li>
+</ol>
+<pre><code>var fireball_dissipate : Array = []
+</code></pre>
+<ol>
+<li>In the <code>_ready()</code> function add this line:</li>
+</ol>
+<pre><code class="language-gdscript">func _ready():
+    fireball_dissipate = get_dissipate_renditions(fireball)
+</code></pre>
+<ol>
+<li>And then write the function <code>get_dissipate_renditions(...)</code></li>
+</ol>
+<pre><code class="language-gdscript"># Test if we can make one gray fireball first
+func get_dissipate_renditions(src_rendition):
+    # Create a new Image instance with the same properties as the source image
+    var dst_rendition = Image.create(src_rendition.get_width(), src_rendition.get_height(), false, src_rendition.get_format())
+    # Loop through all the pixels
+    for x in range(src_rendition.get_width()):
+        for y in range(src_rendition.get_height()):
+            # Get the original color
+            var src_color = src_rendition.get_pixel(x, y)
+            # Set red, green and blue to the red of the source color
+            # and keep the source alpha transparency
+            dst_rendition.set_pixel(x, y, Color(src_color.r, src_color.r, src_color.r, src_color.a))
+    # return a list of one gray-scaled image rendition
+    # converted to an instace of ImageTexture
+    return [ImageTexture.create_from_image(dst_rendition)]
+</code></pre>
+<ol>
+<li>Now edit <code>fireball.gd</code>, edit <code>_ready()</code> like this:</li>
+</ol>
+<pre><code class="language-gdscript">func _ready():
+    # Start playing the &quot;default&quot; animation
+    $AnimatedSprite2D.play(&quot;default&quot;)
+    # The sprite_frames of $AnimatedSprite2D is a singleton, so after calling 
+    # add_animation one time, it exists for all other instances
+    if &quot;dissipate&quot; not in $AnimatedSprite2D.sprite_frames.get_animation_names():
+        # Add a new animation to the SpriteFrames instance of the $AnimatedSprite2D node
+        $AnimatedSprite2D.sprite_frames.add_animation(&quot;dissipate&quot;)
+        # Loop through all rendition images in the global singleton fireball_dissipate
+        for rendition in TextureRenditions.fireball_dissipate:
+            # Add them as a frame to 
+            $AnimatedSprite2D.sprite_frames.add_frame(&quot;dissipate&quot;, rendition)
+
+</code></pre>
+<ol>
+<li>And change the animation on impact in <code>_on_body_entered</code>:</li>
+</ol>
+<pre><code class="language-gdscript">func _on_body_entered(body):
+    # play the dissipate animation we coded
+    $AnimatedSprite2D.play(&quot;dissipate&quot;)
+    # start the new timer in stead of calling queue_free here
+    $DissipateTimer.start()
+    # slow it down to 1/10th the speed
+    velocity *= 0.1
+</code></pre>
+<p>Test the project with <code>F5</code>. You should now see gray fireballs after collision:</p>
+<p><img alt="gray fireballs" src="../screenshots/gray-fireball.png" /></p>
+<h3 id="the-actual-rendition-script">The actual rendition script</h3>
+<p>Now that we established a simple list of one gray fireball rendition worked, let's finish up the rendition script in <code>texture_renditions.gd</code>:</p>
+<pre><code class="language-gdscript">func _ready():
+    fireball_dissipate = get_dissipate_renditions(fireball, 30, 1, 0.25)
+
+# Return a list of dissipating image renditions as an ImageTexture-Array
+# - src_rendition is the original Image
+# - amount is the amount of times to repeat the rendition effect
+# - scatter is the chance of a pixel being rendered again in a given rendeition
+# - fade is the factor by which the alpha channel transparency should be reduced 
+# in each rendition
+func get_dissipate_renditions(src_rendition : Image, amount : int = 14, scatter : int = 1, fade : float = 0.5):
+    var renditions = []
+    for n in range(amount):
+        # Create a new Image instance with the same properties as the source image
+        var dst_rendition = Image.create(src_rendition.get_width(), src_rendition.get_height(), false, src_rendition.get_format())
+        # Loop through all the pixels
+        for x in range(src_rendition.get_width()):
+            for y in range(src_rendition.get_height()):
+                # Get the original color
+                var src_color = src_rendition.get_pixel(x, y)
+                # Copy the source pixel if the random int between 0 and scatter
+                # hits one
+                if randi_range(0, scatter) == 1:
+                    # Copy the pixel, reduce opacity by factor fade
+                    dst_rendition.set_pixel(x, y, Color(src_color.r, src_color.g, src_color.b, src_color.a * fade))
+
+        # append this rendition to result array
+        renditions.append(ImageTexture.create_from_image(dst_rendition))
+        # overwrite the src_rendition variable with a new empty image
+        src_rendition = Image.create(src_rendition.get_width(), src_rendition.get_height(), false, src_rendition.get_format())
+        # copy the current rendition into this variable entirely to be
+        # manipulated in the next iteration
+        src_rendition.copy_from(dst_rendition)
+    # return the list of amount renditions
+    return renditions
+</code></pre>
+<p>Upon testing with <code>F5</code>, we should now see something like this:</p>
+<p><img alt="dissipating fireball" src="../screenshots/dissipating-fireball.png" /></p>
+<p>Tastes may differ, but personally I enjoy the fact that the random scatter in our renditions makes the fireball dissipate a little differently every time we play the game.</p>
+<h3 id="final-touch-show-behind-parent">Final touch: show behind parent</h3>
+<p>The fireball looks nicer if it's not drawn <em>over</em> the tiles (nor anything else). Drawing it behind the tiles (<em>and</em> everything else) makes it look like it really burns the target a little.</p>
+<p>There is a checkbox for that as well!</p>
+<ol>
+<li>Open the <code>Fireball</code> scene</li>
+<li>Click the <code>Fireball</code>-node</li>
+<li>Open the <code>Inspector</code></li>
+<li>Check the <code>Visibility &gt; Show Behind Parent</code>-property to <code>On</code></li>
+</ol>
+<p>This works because in our main scene, <code>World</code>, the <code>TileMap</code> is the parent node of the <code>Fireball</code>-instances.</p>
+<p>Test again:</p>
+<p><img alt="fireball behind parent" src="../screenshots/fireball-behind-parent.png" /></p>
+<h2 id="why-not-shaders">Why not shaders?</h2>
+<p>So, I also tried 2D shaders of the <code>canvas_item</code> type. But my first attempt failed.</p>
+<p>You can see my attempt in this branch: <a href="https://github.com/Teaching-myself-Godot/godot-zelia/tree/no-per-instance-shaders-for-canvas_items">Failed shader attempt on github</a></p>
+<p>So the (common) mistake I made was assuming that a shader script would be active on the <em>instance</em> of a fireball, so I attached it to the material of a <code>Sprite2D</code>. But that <a href="https://github.com/godotengine/godot/issues/62943">is not supported yet</a></p>
+<p>What would probably work is to make a hardcoded "dissipate" in our <code>$AnimatedSprite2D.SpriteSet</code> and invoke the script i have from there.</p>
+<p>Another thing is the display setting I chose: it mimics pixels, but just look at the picture just above here: it is perfectly rotated (like Mario Maker 2 seesaws). That makes shaders High Resolution. </p>
+<p>Tomorrow we should dive into shaders!</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../day-3/" class="btn btn-neutral float-left" title="Day 3 - Casting Sprites"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../day-5/" class="btn btn-neutral float-right" title="Day 5 - Slimes, Breaking tiles, Falling Tiles, Scenery Tiles and Shaders">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../day-3/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../day-5/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
