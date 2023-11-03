@@ -14,13 +14,13 @@ Clone or download the result of day 3 from [github](https://github.com/Teaching-
 4. [Generate renditions to make the fireball dissipate](#generate-renditions-to-make-the-fireball-dissipate)
 5. [Why not shaders?](#why-not-shaders)
 
-# Add a `Fireball` scene and test its flying
+## Add a `Fireball` scene and test its flying
 
 We will use a single `.png` image as a resource for the fireball. You can download it here:
 
 [assets/fireball.png](https://github.com/Teaching-myself-Godot/rewriting-zelia-tutorial/raw/main/assets/fireball.png)
 
-## Adding the fireball image asset and Fireball scene
+### Adding the fireball image asset and Fireball scene
 
 1. Create a resource dir `res://projectiles/fireball`
 2. Place `fireball.png` inside
@@ -40,7 +40,7 @@ Although we are using only one image, we are using `AnimatedSprite2D`, not simpl
 
 This is beacause in [step 4](#generate-renditions-to-make-the-fireball-dissipate) we will generate rendition images dynamically for a 'dissipating' animation.
 
-## Let it fly
+### Let it fly
 
 To make the fireball fly takes a very short script.
 
@@ -75,7 +75,7 @@ This makes the fireball fly out the viewport to the right, never to return.
 
 If we're going to spawn hundreds of thousands of them, it will become a dire memory leak.
 
-## Clean it up
+### Clean it up
 
 To clean up the potential mess, we'll follow some instructions about nodes leaving the viewport from here:
 
@@ -106,11 +106,11 @@ Now look at the node-tree under `Scene` until the fireball exits the game viewpo
 
 Congratulations, we deleted it.
 
-# Spawn fireballs when she casts
+## Spawn fireballs when she casts
 
 If you've looked at the [original Zelia game](https://renevanderark.itch.io/zelia-mystery-mage-and-adventure-maker), you know that she does not fire on button-press/click, but on fixed intervals while holding a button:
 
-## Add a `FireballIntervalTimer`
+### Add a `FireballIntervalTimer`
 
 1. Go to `FileSystem > player > player.tscn`
 2. Add a `Timer`-node to the `Player`-node
@@ -149,7 +149,7 @@ func _on_fireball_interval_timer_timeout():
 
 That's better. Let's shoot the fireballs next.
 
-## Spawning the fireballs
+### Spawning the fireballs
 
 For this section we follow these guides from the godot tutorials:
 - [Instancing](https://docs.godotengine.org/en/stable/getting_started/step_by_step/instancing.html#doc-instancing)
@@ -265,7 +265,7 @@ Also, her hands do not match up as nicely with the fireballs as they did in the 
 	var casting_down  = deg > 30   and deg < 160
 ```
 
-# Make fireballs collide with the `TileMap`, not with the `Player`
+## Make fireballs collide with the `TileMap`, not with the `Player`
 
 At the moment fireballs still fly out the game window. We want then to collide with the terrain tiles, however. 
 
@@ -287,7 +287,7 @@ That works, the fireball collides when it hits the `Tilemap`. However..
 
 ..It will also disappear if it collides with the `Player`. 
 
-## `Collision Layer` and `Collision Mask`
+### `Collision Layer` and `Collision Mask`
 
 To illustrate, make set its origin the `position`-property of the player again in `player.gd`:
 
@@ -312,7 +312,7 @@ Let's apply what we've learned here like this:
 
  `Player` is already set correctly. However, we might want more granularity later.
 
-### Setting `Collision Layer` and `Collision Mask` for `Fireball`
+#### Setting `Collision Layer` and `Collision Mask` for `Fireball`
 
 This is a set of properties most easily manipulated in the `Inpector`.
 
@@ -324,13 +324,13 @@ This is a set of properties most easily manipulated in the `Inpector`.
 ![collision mask and layer](screenshots/collision-mask-and-layer.png)
 
 
-### Setting it for `World`
+#### Setting it for `World`
 
 But to set it for the `World` scene, be aware you also need to click on `Inspector > Tile Set > TileSet > Physics Layers` as it is a property not of the `TileMap`, but of (one of) its `TileSet`(s)' `Physics Layer`(s) --> if you can still follow.
 
 ![Our TileMap's TileSet's Physic Layer's Collision Mask and Collision Layer](screenshots/tilemaps-tilesets-physicslayers-collisionlayerandmask.png)
 
-### Test again 
+#### Test again 
 
 Press `F5` to test if the fireballs _do_ collide with the `Tilemap` and _do not_ collide with the `Player`. 
 
@@ -340,7 +340,7 @@ Then change back the `player.gd` script:
 		cast_projectile.emit(Fireball, cast_angle, origin)
 ```
 
-## Add some smoothness to the collided fireballs
+### Add some smoothness to the collided fireballs
 
 Right now the fireballs disappear very abrubtly because `queue_free()` is invoked immediately.
 
@@ -371,13 +371,13 @@ func _on_dissipate_timer_timeout():
 
 That's only a little better. We need an animation to make them fade into non-existence slowly.
 
-# Generate renditions to make the fireball dissipate
+## Generate renditions to make the fireball dissipate
 
 We could make this very ease on ourselves by drawing images manually in our [favourite image manipulation program](https://www.gimp.org/), but we'll do it the lazy way.
 
 Well, that is to say, the programmer's way, a.k.a. the reusable way. Remembering the original game we see a lot of stuff disappear in the same, lazy, reused way. We want to know how, right?
 
-## Using `Autoload` for preprocessing
+### Using `Autoload` for preprocessing
 
 So looking at the documentation it becomes clear that you can easily manipulate texture images using these two classes:
 - [Image](https://docs.godotengine.org/en/stable/classes/class_image.html#class-image)
@@ -431,7 +431,7 @@ singleton_test
 --- Debugging process stopped ---
 ```
 
-## Generate the dissipate animation with `Image` and `ImageTexture`
+### Generate the dissipate animation with `Image` and `ImageTexture`
 
 So now we want to prepare the animation for the fireball in our `Autoload`-node called `TextureRenditions`. Open the `texture_renditions.gd` script again.
 
@@ -564,7 +564,7 @@ Test again:
 
 ![fireball behind parent](screenshots/fireball-behind-parent.png)
 
-# Why not shaders?
+## Why not shaders?
 
 So, I also tried 2D shaders of the `canvas_item` type. But my first attempt failed.
 

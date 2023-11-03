@@ -1,6 +1,6 @@
 # Learning Godot by rewriting Zelia
 
-Skip the elaborate intro and start:
+## Start right now!
 
 - [Day 1 - Controlling the Player](day-1.md)
 - [Day 2 - Adding some tiles and some physics](day-2.md)
@@ -8,7 +8,7 @@ Skip the elaborate intro and start:
 - [Day 4 - Casting Fireballs](day-4.md)
 - [Day 5 - Slimes, Breaking tiles, Falling Tiles, Scenery Tiles and Shaders](day-5.md)
 
-# Browse topics
+## Browse topics
 
 - [Generating textures dynamically in code](day-4.md#generate-renditions-to-make-the-fireball-dissipate)
 - [Singleton auto-loaded resources](day-4.md#generate-renditions-to-make-the-fireball-dissipate)
@@ -19,14 +19,14 @@ Skip the elaborate intro and start:
 - [Interactive TileMap Recipes](day-5.md#make-tiles-zelia-can-break)
 
 
-# Sneak preview
+## Sneak preview
 
 You can see a sneak preview of my progress on the itch.io draft via a (not so) secret url:
 
 [Sneak Preview](https://renevanderark.itch.io/zelia-from-teaching-myself-godot?secret=WDhw0zXEKFRo9QzGPMZmSG1vs)
 
 
-# Elaborate intro
+## Back story 
 
 Last year I collaborated with my son on creating a game from scratch. 
 

@@ -22,7 +22,7 @@ Clone or download the result of day 2 from [github](https://github.com/Teaching-
 5. [Draw the correct casting sprites based on cast direction](#draw-the-correct-casting-sprites-based-on-cast-direction)
 6. [Extract some functions for less messy code](#extract-some-functions-for-less-messy-code) (Technical debt 2)
 
-# Assign casting buttons
+## Assign casting buttons
 
 After day 3 Zelia will cast fireballs in all directions:
 - when holding gamepad button `B`, you can aim with the `L-stick`
@@ -43,7 +43,7 @@ Now to determine which of either is pressed we need to assign one to another nam
 
 ![Fireball buttons](screenshots/fireball-buttons-added.png)
 
-# Fix the casting sprites for Zelia
+## Fix the casting sprites for Zelia
 
 On day 1 we added one `SpriteFrames` entry for all casting images. 
 
@@ -70,7 +70,7 @@ We should have made an entry per image to cover all her angles of casting:
 
 (Her arms look really silly when pointing directly down)
 
-# Determine cast direction via mouse cursor position and L-stick axis
+## Determine cast direction via mouse cursor position and L-stick axis
 
 First let's write some code to see if we can set the angle of casting when one of the `Fireball button`s is pressed.
 
@@ -122,7 +122,7 @@ Check and see if the `Cast Angle` value changes when you:
 
 ![remote debug cast angle](screenshots/remote_debug_cast_angle.png)
 
-# Rearrange the code in `_physics_process` a little
+## Rearrange the code in `_physics_process` a little
 
 **NOTE** This section will rearrange code to look like this, in case you get stuck: 
 
@@ -130,14 +130,14 @@ Check and see if the `Cast Angle` value changes when you:
 
 You could also download it and [skip to the next section](#draw-the-correct-casting-sprites-based-on-cast-direction).
 
-## Let's get started
+### Let's get started
 
 We need to rearrange our code in the `_physics_process` a little in order to achieve 2 things:
 
 1. Let Zelia flip orientation based on her casting angle
 2. Let Zelia stop jumping and moving on the x-axis while casting
 
-## Flipping the player left and right by aiming 
+### Flipping the player left and right by aiming 
 
 Extend the code in the `if`-block we just created for setting the `cast_angle` to include setting the `orientation`-property correctly.
 
@@ -155,13 +155,13 @@ Extend the code in the `if`-block we just created for setting the `cast_angle` t
 
 Test using `F5`: when clicking with the mouse left of her she should now flip to look left.
 
-## Letting Zelia stop jumping and moving on the x-axis while casting
+### Letting Zelia stop jumping and moving on the x-axis while casting
 
 When she's casting she should not slide sideways.
 
 We don't want her to be able to move horizontally while casting in the air (which would make her way too powerful).
 
-### Step 1, move casting code up, stop her from sliding
+#### Step 1, move casting code up, stop her from sliding
 
 1. First move your entire `if Input.is_action_pressed("Fireball button")`-block all the way up to below `velocity.y += gravity * delta`.
 2. Change `if movement_state == MovementState.AIRBORNE` into `elif movement_state == MovementState.AIRBORNE`
@@ -185,7 +185,7 @@ We don't want her to be able to move horizontally while casting in the air (whic
 
 This stops her from sliding or moving around while in the air.
 
-### Step 2, only jump when not casting _and_ not airborne
+#### Step 2, only jump when not casting _and_ not airborne
 
 She can still jump while casting now, let's fix that.
 
@@ -220,7 +220,7 @@ Indent the `if Input.is_action_just_pressed("Jump") and is_on_floor()` to make i
 
 That stopped her from jumping while casting
 
-### Step 3, separate code for setting initial movement state from code updating positions.
+#### Step 3, separate code for setting initial movement state from code updating positions.
 
 This step will have no _functional_ effect, but it will prepare us for our "readable code refactor" that comes next.
 
@@ -262,13 +262,13 @@ Your script should now look like this:
 [player.gd  (tag = letting-zelia-stop-x-on-cast)](https://github.com/Teaching-myself-Godot/godot-zelia/blob/letting-zelia-stop-x-on-cast/player/player.gd)
 
 
-# Draw the correct casting sprites based on cast direction
+## Draw the correct casting sprites based on cast direction
 
 Let's make a well-named function to choose the correct sprite name to draw:
 
-## `func get_casting_sprite`
+### `func get_casting_sprite`
 ```gdscript
-# Determine the casting sprite name based on decimal degrees
+## Determine the casting sprite name based on decimal degrees
 func get_casting_sprite(deg) -> String:
 	var casting_left  = (deg > 120 and deg < 180) or (deg > -180 and deg < -120)
 	var casting_right = deg > -60  and deg < 60
@@ -311,7 +311,7 @@ Now let's also add the case for `MovementState.CASTING` to our `match`-statement
 
 Note the `rad_to_deg` there.
 
-# Extract some functions for less messy code
+## Extract some functions for less messy code
 
 Now it's really time to fix [Technical debt 2](day-1.md#technical-debt-2), because the debt became deeper.
 
@@ -321,7 +321,7 @@ Now it's really time to fix [Technical debt 2](day-1.md#technical-debt-2), becau
 And if you're already quite familiar with these types of refactor, here's a skip link to day 4:
 - [Day 4 - Casting fireballs](day-4.md)
 
-## The process of tyding up code
+### The process of tyding up code
 
 Now there must be a pattern or best practice name for this, but here's how it goes.
 
@@ -336,7 +336,7 @@ Spot a function with a lot of code in the function body and do:
 
 This refactor only applied step `1`, `2` and `3`
 
-### Spot a big function and apply the steps!
+#### Spot a big function and apply the steps!
 
 Let's rewrite the above [code](#rearrange-the-code-in-_physics_process-a-little) again.
 
@@ -422,7 +422,7 @@ func set_cast_angle():
 		cast_angle = get_l_stick_axis_vec().normalized().angle()
 ```
 
-### Rinse and repeat!
+#### Rinse and repeat!
 
 Now we spot this elaborate comment: 
 
@@ -452,7 +452,7 @@ func handle_movement_state():
 		handle_jumping()
 ```
 
-### Just 2 more funcs!
+#### Just 2 more funcs!
 
 1. Create the function `set_current_sprite`
 2. Put the entire block of `match (movement_state):` in it
@@ -465,7 +465,7 @@ And :
 3. Invoke it under `set_current_sprite()`
 
 
-## All tidied up 
+#### All tidied up 
 
 Your `_physics_process` should now look like this:
 
@@ -496,7 +496,7 @@ Your entire `player.gd` script should look like this:
 [`player.gd`](https://github.com/Teaching-myself-Godot/godot-zelia/blob/164027e6ed74a70c1222778ebcd8dffba24ec416/player/player.gd) - on github commit: _"use my own tutorial for day-3 part 1."_
 
 
-# Technical debt 5
+## Technical debt 5
 
 Two observation on remaining technical debt:
 

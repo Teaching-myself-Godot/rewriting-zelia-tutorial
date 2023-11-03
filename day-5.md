@@ -1,22 +1,6 @@
-# Slimes, Breaking tiles, Falling Tiles, Scenery Tiles and Shaders
+# Day 5 - Slimes, Breaking tiles, Falling Tiles, Scenery Tiles and Shaders
 
-So for you it is day five, for me it's now day 14. :D
-
-## Why so slow?
-
-The reason is the research I did into Godot stuff you don't get out of the box:
-
-- recipes that are stably invented for version 3, but need some translation to 4.1
-- shading language concepts (last time I tried _that_ was back when GLSL was just released)
-- which 'physics'-body to use for what and how (Rigid -> Static -> Rigid -> Character -> Area -> Static -> Rigid -> ooooh... I used the wrong method to apply the motion!)
-- where's that polygon?! TileMap -> get_used_cells() -> TileData -> no ... TileMap -> get_used_cells() -> TileSetSource -> TileSet**Atlas**Source -> TileData -> get_collision_polygon_points() -> no?? ... yes! ... forgot to draw a polygon!
-
-You're going to be spoiled with some 4.1 reïnvented recipes! (I hope)
-
-## Any other excuses?
-
-And the other reason is: my son wanted to write a 2.5D game last weekend: [Untitled Shoot 'em Up](https://github.com/Teaching-myself-Godot/untitled-shoot-em-up/tree/master)
-
+A long title for a long episode!
 
 ## What we'll do today
 
@@ -28,11 +12,11 @@ And the other reason is: my son wanted to write a 2.5D game last weekend: [Untit
 6. [Review my failed attempt to replace my TextureRenditions singleton with shaders](#review-my-failed-attempt-to-replace-my-texturerenditions-singleton-with-shaders)
 
 
-# Make a bouncing Slime monster
+## Make a bouncing Slime monster
 
 Every game needs one.
 
-## Setting up the slime scene
+### Setting up the slime scene
 
 1. Download the zip: [assets/green-slime.zip](https://github.com/Teaching-myself-Godot/rewriting-zelia-tutorial/raw/main/assets/green-slime.zip)
 2. Create the resource dirs `res://monsters/slime/green`
@@ -67,7 +51,7 @@ Next:
 
 ![slime capsule](screenshots/slime-capsule.png)
 
-## Setting up the `slime.gd` script
+### Setting up the `slime.gd` script
 
 Add the slime to the main scene:
 
@@ -176,7 +160,7 @@ func _physics_process(delta):
 	move_and_slide()
 ```
 
-## Programming the full slime behaviour in steps
+### Programming the full slime behaviour in steps
 
 Now we will reason our way to a working, bouncing slime. Coding it in small steps:
 
@@ -250,7 +234,7 @@ func set_movement_state():
 
 Test with `F5`: that looks a _lot_ better
 
-[![bouncies!](screenshots/bounce-anim.png)](https://raw.githubusercontent.com/Teaching-myself-Godot/rewriting-zelia-tutorial/main/screenshots/bounce-anim.mp4)
+[![bouncies!](screenshots/bounce-anim.png)](screenshots/bounce-anim.mp4)
 
 #### Refactor early.
 
@@ -366,7 +350,7 @@ func set_movement_state():
 
 Now press `F5` and test:
 
-[![slime film 2](screenshots/slime-film-2.png)](https://raw.githubusercontent.com/Teaching-myself-Godot/rewriting-zelia-tutorial/main/screenshots/slime-film2.mp4)
+[![slime film 2](screenshots/slime-film-2.png)](screenshots/slime-film2.mp4)
 
 
 The first jump looks great, but the second jump already has an issue.
@@ -497,7 +481,7 @@ So that mystery was solved quite quickly. Let's make sure that fireballs do _not
 
 That should fix it:
 
-[![slime film 3](screenshots/slime-film-2.png)](https://raw.githubusercontent.com/Teaching-myself-Godot/rewriting-zelia-tutorial/main/screenshots/slime-film3.mp4)
+[![slime film 3](screenshots/slime-film-2.png)](screenshots/slime-film3.mp4)
 
 
 ### Allow the slime to die from damage
@@ -725,7 +709,7 @@ func start_jump(init_velocity = JUMP_VELOCITY):
 Now in `damage_player` we can invoke it with a different init_velocity like:  `start_jump(-150)`, still taking `JUMP_VELOCITY` as its default value.
 
 
-# Add the `tree-trunk` terrain
+## Add the `tree-trunk` terrain
 
 Because Zelia (in the original game) runs into tiles that are not just squares, our rewrite must have them as well. Open `res://world.tscn`.
 
@@ -754,7 +738,7 @@ So that bit should look like this:
 ![tree trunk peering bits](screenshots/treetrunk-peering-bits.png)
 
 
-## Draw and test!
+### Draw and test!
 
 Can Zelia now run up a slope? Why not try it out yourself..
 
@@ -762,7 +746,7 @@ Anyway, the place to test it out is in `res://world.tscn` and drawing this new t
 
 ![slime on tree](screenshots/slime%20on%20tree.png)
 
-## Solve Technical debt 3
+### Solve Technical debt 3
 
 Now we want to achieve these next steps:
 1. breakable tiles
@@ -825,7 +809,7 @@ So we need to connect the `cast_projectile`-signal again to `_on_player_cast_pro
 Test the game with `F5`
 
 
-# Make tiles Zelia can break
+## Make tiles Zelia can break
 
 This next bit took quite some research and avenues attempted yet not taken.
 
@@ -833,7 +817,7 @@ It might seem like the steps are evident and told as if they're easy (or even mi
 
 That's why you just get the steps without the philosophies. 
 
-## The final approach in very simplified terms
+### The final approach in very simplified terms
 
 1. Say a `Terrains`-instance is `breakable` using `Metadata`
 2. When the `Terrains`-instance is `_ready()` check if this `breakable`-field is `true`.
@@ -845,7 +829,7 @@ That's why you just get the steps without the philosophies.
 
 But first: preparations!
 
-## Erase the tiles in the `Terrains`-scene
+### Erase the tiles in the `Terrains`-scene
 
 First let's erase the tiles in the `Terrains`-scene.
 
@@ -872,7 +856,7 @@ First let's erase the tiles in the `Terrains`-scene.
 9. Navigate to `TileMap > Terrains` in the bottom pane again
 10. And draw some terrain in the `Terrains`-_instance_ of the `Game`-scene
 
-## Adding a new `Terrain`-instance to `Game`
+### Adding a new `Terrain`-instance to `Game`
 
 Now, without too many philosophies (as promised), thus further ado:
 
@@ -887,7 +871,7 @@ Now, without too many philosophies (as promised), thus further ado:
 
 ![breakable block invisible](./screenshots/breakable-block-invisible.png)
 
-## Adding `Metadata` fields 
+### Adding `Metadata` fields 
 
 Now that we have a new _instance_ of terrain in the game, we need to transmogrify it into breakable terrain. That means _telling our code_ we intend to do that using _metadata_.
 
@@ -911,7 +895,7 @@ Now that we have a new _instance_ of terrain in the game, we need to transmogrif
 
 12. Also notice the revert arrow, which implies we overrode default behaviour
 
-## Attach a new `terrains.gd` script
+### Attach a new `terrains.gd` script
 
 1. Open `res://terrains.tscn`
 2. Click the ![attach script](./screenshots/attach-script.png)-button
@@ -1055,7 +1039,7 @@ texture:                       res://surface_maps/tree-trunk/1.png
 polygon:                       [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0.5, 4.5), (5.625, 5.75), (7.5, 7.5), (-7.5, 7.5)]
 ```
 
-## Declaring and emitting the `add_breakable_tile` signal
+### Declaring and emitting the `add_breakable_tile` signal
 
 Now that we've collected all the information we need for the game to spawn in _one_ `BreakableTile` per tile in our `BreakableTerrains`-instance we're ready to us it.
 
@@ -1118,7 +1102,7 @@ func _ready():
 
 If you test again now, all we have left is the print messages in our console, but the (as yet) unbreakable tiles from the `BreakableTerrains`-`TileMap` are gone.
 
-## Creating the `BreakableTile` scene
+### Creating the `BreakableTile` scene
 
 Now in order the `game.gd` to instantiate breakable tiles and attach then as children we first need to make a `BreakableTile`-scene.
 
@@ -1299,7 +1283,7 @@ Let's make them match.
 3. For `Layer` check both `1` and `2`
 4. And for `Mask` check both `1` and `2` as well
 
-## Make them break!!
+### Make them break!!
 
 _Finally_!
 
@@ -1311,7 +1295,7 @@ Here we will use a 2-step approach:
 1. [Give the breakable tiles an HP property, reduce it on 'take_damage', make them `queue_free`](#remove-tiles-that-are-broken)
 2. [Generate _'cracked'_ renditions of the terrain textures to show the user the damage](#generate-some-pretty-cracks-to-show-the-tile-damage)
 
-## Remove tiles that are broken
+### Remove tiles that are broken
 
 We made things that can take damage implement the `take_damage`-function. 
 
@@ -1413,7 +1397,7 @@ func _on_breakable_terrains_add_breakable_tile(
 
 To test, see how it works when you change `hp` metadata in the `BreakableTerrains` tilemap of your game.
 
-## Generate some pretty cracks to show the tile damage
+### Generate some pretty cracks to show the tile damage
 
 What is missing is some visual feedback of tiles breaking. For that effect, we will revisit our approach to [renditions](./day-4.md#generate-renditions-to-make-the-fireball-dissipate), like we did with the [dissipating fireballs](./day-4.md#generate-renditions-to-make-the-fireball-dissipate).
 
@@ -1424,16 +1408,17 @@ This time we will use a set of `.png` files as an alpha mask. You can download t
 1. Extract `cracked-renditions.zip` in `res://surface_maps`
 2. Open `res://texture_rendition.gd`
 
-# Allow those breakable tiles to fall down
+
+## Allow those breakable tiles to fall down
 
 Rigid -> Static -> Rigid -> Character -> Area -> Static -> Rigid -> ooooh...
 
 Spoiler: it was [StaticBody2D](https://docs.godotengine.org/en/stable/classes/class_staticbody2d.html#class-staticbody2d) I wanted all along.
 
-# Reuse tiles as background scenery
+## Reuse tiles as background scenery
 
 My first [shader](https://docs.godotengine.org/en/stable/tutorials/shaders/your_first_shader/your_first_2d_shader.html) was not that fancy at all.
 
-# Review my failed attempt to replace my TextureRenditions singleton with shaders
+## Review my failed attempt to replace my TextureRenditions singleton with shaders
 
 My [second shader](https://github.com/Teaching-myself-Godot/godot-zelia/blob/no-per-instance-shaders-for-canvas_items/dissipation_shader.gdshader) was pretty cool, but alas: all the fireballs scattered together.
