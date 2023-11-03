@@ -384,7 +384,7 @@ func _on_floor_bounce_timer_timeout():
         $AnimatedSprite2D.animation = &quot;airborne&quot;
 </code></pre>
 <p>Test with <code>F5</code>: that looks a <em>lot</em> better</p>
-<p><a href="https://raw.githubusercontent.com/Teaching-myself-Godot/rewriting-zelia-tutorial/main/screenshots/bounce-anim.mp4"><img alt="bouncies!" src="../screenshots/bounce-anim.png" /></a></p>
+<p><a href="../screenshots/bounce-anim.mp4"><img alt="bouncies!" src="../screenshots/bounce-anim.png" /></a></p>
 <h4 id="refactor-early">Refactor early.</h4>
 <p>The code is cluttering up already. Also, we have not made use of our somewhat artificial separation between <code>set_movement_state</code> and <code>handle_movement_state</code> yet. </p>
 <p>That separation was supposed to make the code easier to reason about, So now apply the following early '<em>incisions</em>' &gt;:)</p>
@@ -470,7 +470,7 @@ func set_movement_state():
 
 </code></pre>
 <p>Now press <code>F5</code> and test:</p>
-<p><a href="https://raw.githubusercontent.com/Teaching-myself-Godot/rewriting-zelia-tutorial/main/screenshots/slime-film2.mp4"><img alt="slime film 2" src="../screenshots/slime-film-2.png" /></a></p>
+<p><a href="../screenshots/slime-film2.mp4"><img alt="slime film 2" src="../screenshots/slime-film-2.png" /></a></p>
 <p>The first jump looks great, but the second jump already has an issue.</p>
 <p>So apparently, when the slime hits a wall, the <code>velocity.x</code> is set to zero by <code>move_and_slide()</code>... Sounds like it makes perfect sense.</p>
 <p>But we want it to fly left to reach te player, so we're going to <em>fight</em> this resistance! :D. We'll pick our battle with physics right here:</p>
@@ -562,7 +562,7 @@ func _on_body_entered(body):
 </ol>
 <p><img alt="fireball colli" src="../screenshots/fireball-collision-layer-mask.png" /></p>
 <p>That should fix it:</p>
-<p><a href="https://raw.githubusercontent.com/Teaching-myself-Godot/rewriting-zelia-tutorial/main/screenshots/slime-film3.mp4"><img alt="slime film 3" src="../screenshots/slime-film-2.png" /></a></p>
+<p><a href="../screenshots/slime-film3.mp4"><img alt="slime film 3" src="../screenshots/slime-film-2.png" /></a></p>
 <h3 id="allow-the-slime-to-die-from-damage">Allow the slime to die from damage</h3>
 <p>The next step is not to allow that strange bit of negative <code>hp</code>! </p>
 <p>All it takes is doing stuff we already did with the fireball: <a href="../day-4/#generate-renditions-to-make-the-fireball-dissipate">autoloaded texture renditions</a></p>
