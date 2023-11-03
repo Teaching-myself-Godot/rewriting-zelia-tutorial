@@ -1419,7 +1419,10 @@ What is missing is some visual feedback of tiles breaking. For that effect, we w
 
 This time we will use a set of `.png` files as an alpha mask. You can download them from here:
 
-[cracked-renditions.zip](https://github.com/Teaching-myself-Godot/rewriting-zelia-tutorial/raw/main/assets/cracked-renditions.zip)
+[Download cracked-renditions.zip](https://github.com/Teaching-myself-Godot/rewriting-zelia-tutorial/raw/main/assets/cracked-renditions.zip)
+
+1. Extract `cracked-renditions.zip` in `res://surface_maps`
+2. Open `res://texture_rendition.gd`
 
 # Allow those breakable tiles to fall down
 
