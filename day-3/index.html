@@ -167,7 +167,7 @@
 <li>Assign <code>Joypad Button 1</code> to <code>Fireball button</code></li>
 </ol>
 <p>Now to determine which of either is pressed we need to assign one to another name.</p>
-<ol>
+<ol start="7">
 <li>Choose <code>Add New Action</code></li>
 <li>Set the name to <code>Left mouse button</code></li>
 <li>Assign <code>Left Mouse Button</code> to your new action named <code>Left mouse button</code> </li>
@@ -204,12 +204,12 @@
 </ol>
 <pre><code class="language-gdscript">enum MovementState { IDLE, RUNNING, AIRBORNE, CASTING }
 </code></pre>
-<ol>
+<ol start="2">
 <li>Add a property for the direction of casting</li>
 </ol>
 <pre><code class="language-gdscript">@export var cast_angle : float
 </code></pre>
-<ol>
+<ol start="3">
 <li>In the <code>_physics_process</code>  set <code>cast_angle</code> and <code>movement_state</code> right above the jump code</li>
 </ol>
 <pre><code class="language-gdscript">    if Input.is_action_pressed(&quot;Fireball button&quot;):
@@ -223,7 +223,7 @@
 
     # Handle Jump, only when on the floor
 </code></pre>
-<ol>
+<ol start="4">
 <li>Test via remote debugging</li>
 </ol>
 <p>This time we will monitor the exported property <code>cast_angle</code>. </p>

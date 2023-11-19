@@ -203,7 +203,7 @@ func _physics_process(delta):
 <li>In the <code>2D</code> scene view make sure the <code>Rect</code> surrounds the fireball</li>
 </ol>
 <p><img alt="rect surrounds ball" src="../screenshots/rect-surrounds-ball.png" /></p>
-<ol>
+<ol start="3">
 <li>Click on <code>Node</code> next to <code>Inspector</code></li>
 <li>Double click <code>Signals &gt; screen_exited()</code></li>
 <li>Leave defaults in tact and click <code>Connect</code></li>
@@ -230,7 +230,7 @@ func _physics_process(delta):
 </ol>
 <p>This makes sure that the <code>FireballIntervalTimer</code> is activated when the <code>Player</code> is instantiated. </p>
 <p>So, in our current case, when the game starts.</p>
-<ol>
+<ol start="8">
 <li>Go to the <code>Node</code>-tab (next to <code>Inspector</code>)</li>
 <li>Double-click the <code>timeout()</code>-signal</li>
 <li>Keep the defaults and click <code>Connect</code></li>
@@ -297,7 +297,7 @@ func _on_fireball_interval_timer_timeout():
 </ol>
 <pre><code class="language-gdscript">extends TileMap
 </code></pre>
-<ol>
+<ol start="5">
 <li>Click on the <code>Player</code>-<strong>child-node</strong> <em>of</em> <code>World</code></li>
 <li>Pick <code>Node</code> next to <code>Inpector</code></li>
 <li>Double click <code>cast_projectile(...)</code></li>
@@ -401,7 +401,7 @@ func _on_fireball_interval_timer_timeout():
     # slow it down to 1/10th the speed
     velocity *= 0.1
 </code></pre>
-<ol>
+<ol start="6">
 <li>Click <code>DissipateTimer</code>-node</li>
 <li>Connect the <code>Node &gt; timeout()</code>-signal to the <code>Fireball</code></li>
 <li>Implement <code>_on_dissipate_timer_timeout()</code> like so:</li>
@@ -465,18 +465,18 @@ singleton_test
 
 var fireball = preload(&quot;res://projectiles/fireball/fireball.png&quot;).get_image()
 </code></pre>
-<ol>
+<ol start="2">
 <li>Prepare a global array to hold the preprocess images:</li>
 </ol>
 <pre><code>var fireball_dissipate : Array = []
 </code></pre>
-<ol>
+<ol start="3">
 <li>In the <code>_ready()</code> function add this line:</li>
 </ol>
 <pre><code class="language-gdscript">func _ready():
     fireball_dissipate = get_dissipate_renditions(fireball)
 </code></pre>
-<ol>
+<ol start="4">
 <li>And then write the function <code>get_dissipate_renditions(...)</code></li>
 </ol>
 <pre><code class="language-gdscript"># Test if we can make one gray fireball first
@@ -495,7 +495,7 @@ func get_dissipate_renditions(src_rendition):
     # converted to an instace of ImageTexture
     return [ImageTexture.create_from_image(dst_rendition)]
 </code></pre>
-<ol>
+<ol start="5">
 <li>Now edit <code>fireball.gd</code>, edit <code>_ready()</code> like this:</li>
 </ol>
 <pre><code class="language-gdscript">func _ready():
@@ -512,7 +512,7 @@ func get_dissipate_renditions(src_rendition):
             $AnimatedSprite2D.sprite_frames.add_frame(&quot;dissipate&quot;, rendition)
 
 </code></pre>
-<ol>
+<ol start="6">
 <li>And change the animation on impact in <code>_on_body_entered</code>:</li>
 </ol>
 <pre><code class="language-gdscript">func _on_body_entered(body):

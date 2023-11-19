@@ -163,9 +163,9 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#allow-those-breakable-tiles-to-fall-down">Allow those breakable tiles to fall down</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#reuse-tiles-as-background-scenery">Reuse tiles as background scenery</a>
+    <li class="toctree-l2"><a class="reference internal" href="#technical-debt-6">Technical debt 6</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#review-my-failed-attempt-to-replace-my-texturerenditions-singleton-with-shaders">Review my failed attempt to replace my TextureRenditions singleton with shaders</a>
+    <li class="toctree-l2"><a class="reference internal" href="#reuse-tiles-as-background-scenery">Reuse tiles as background scenery</a>
     </li>
     </ul>
                   </li>
@@ -202,8 +202,8 @@
 <li><a href="#add-the-tree-trunk-terrain">Add the tree-trunk terrain</a></li>
 <li><a href="#make-tiles-zelia-can-break">Make tiles Zelia can break</a></li>
 <li><a href="#allow-those-breakable-tiles-to-fall-down">Allow those breakable tiles to fall down</a></li>
+<li><a href="#technical-debt-6">Technical Debt 6</a></li>
 <li><a href="#reuse-tiles-as-background-scenery">Reuse tiles as background scenery</a></li>
-<li><a href="#review-my-failed-attempt-to-replace-my-texturerenditions-singleton-with-shaders">Review my failed attempt to replace my TextureRenditions singleton with shaders</a></li>
 </ol>
 <h2 id="make-a-bouncing-slime-monster">Make a bouncing Slime monster</h2>
 <p>Every game needs one.</p>
@@ -245,7 +245,7 @@
 <li>Test the main scene <code>World</code> with <code>F5</code> and observe that the slime hangs there doing nothing:</li>
 </ol>
 <p><img alt="slime hanging there" src="../screenshots/slime-hanging.png" /></p>
-<ol>
+<ol start="4">
 <li>Open the <code>res://monsters/slimes/slime.tscn</code> scene</li>
 <li>Attach a script to it, picking the default values in the dialog</li>
 <li>You might notice a lot of suggested code for a <code>CharacterBody2D</code> - although it could be fun to try it out, it's not what we're looking for.</li>
@@ -349,7 +349,7 @@ func pick_collision_shape_for_movement_state():
 </ol>
 <p>"Why <code>0.571s</code>," you say? Well, it's 7fps times 4 animation frames: 
 <code>1 / 7 * 4</code>.</p>
-<ol>
+<ol start="5">
 <li>Go to <code>Node &gt; Timer</code> and double-click <code>timeout()</code></li>
 <li>Keep the defaults and attach it to the <code>Slime</code>'s script</li>
 <li>So this is the moment we want the slime to jump up again, let's write:</li>
@@ -360,7 +360,7 @@ func pick_collision_shape_for_movement_state():
 func _on_floor_bounce_timer_timeout():
     start_jump()
 </code></pre>
-<ol>
+<ol start="8">
 <li>We also need to start the timer when we know the slime has landed:</li>
 </ol>
 <pre><code class="language-gdscript">func set_movement_state():
@@ -517,7 +517,7 @@ func take_damage(dmg: int):
 <img alt="pick pick" src="../screenshots/connect-trigger-click-pick.png" />
 And then choose the <code>_on_body_entered</code> method:
 <img alt="pick the method" src="../screenshots/pick-existing-listener.png" /></p>
-<ol>
+<ol start="6">
 <li>Adapt <code>func _on_body_entered</code> like so:</li>
 </ol>
 <pre><code class="language-gdscript">@export var damage = 1
@@ -573,7 +573,7 @@ func _on_body_entered(body):
 <pre><code class="language-gdscript">var slime = preload(&quot;res://monsters/slime/green/5.png&quot;).get_image()
 var slime_dissipate : Array = []
 </code></pre>
-<ol>
+<ol start="3">
 <li>And use <code>get_dissipate_renditions</code> to generate renditions for slime-death</li>
 </ol>
 <pre><code class="language-gdscript">func _ready():
@@ -596,7 +596,7 @@ var slime_dissipate : Array = []
             # Add them as a frame to 
             $AnimatedSprite2D.sprite_frames.add_frame(&quot;dissipate&quot;, rendition)
 </code></pre>
-<ol>
+<ol start="3">
 <li>Now open <code>res://monsters/slime/slime.gd</code></li>
 <li>And paste the copied code into the <code>_ready()</code> function, adjusting one bit: <code>.fireball_dissipate</code> becomes <code>.slime_dissipate</code></li>
 </ol>
@@ -608,13 +608,13 @@ var slime_dissipate : Array = []
             # Add them as a frame to 
             $AnimatedSprite2D.sprite_frames.add_frame(&quot;dissipate&quot;, rendition)
 </code></pre>
-<ol>
+<ol start="5">
 <li>When the slime's <code>hp</code> is <code>&lt;= 0</code> then it should <em>die</em></li>
 <li>Add the <code>MovementState.DYING</code> to the enum:</li>
 </ol>
 <pre><code class="language-gdscript">enum MovementState { AIRBORNE, FLOOR_BOUNCE, DYING }
 </code></pre>
-<ol>
+<ol start="7">
 <li>So when the slime takes damage and drops below zero, set it:</li>
 </ol>
 <pre><code class="language-gdscript">func take_damage(dmg: int):
@@ -622,7 +622,7 @@ var slime_dissipate : Array = []
     if hp &lt;= 0:
         movement_state = MovementState.DYING
 </code></pre>
-<ol>
+<ol start="8">
 <li>Make sure it is not <em>reset</em> in <code>set_movement_state()</code> and disable collisions:</li>
 </ol>
 <pre><code class="language-gdscript">func set_movement_state():
@@ -638,7 +638,7 @@ var slime_dissipate : Array = []
     else:
         movement_state = MovementState.AIRBORNE
 </code></pre>
-<ol>
+<ol start="8">
 <li>And <em>handle</em> it in the <code>movement_state</code> handler:</li>
 </ol>
 <pre><code class="language-gdscript">func handle_movement_state():
@@ -651,7 +651,7 @@ var slime_dissipate : Array = []
     pick_collision_shape_for_movement_state()
     pick_sprite_for_movement_state()
 </code></pre>
-<ol>
+<ol start="9">
 <li>And make sure the correct animation for dying is picked:</li>
 </ol>
 <pre><code class="language-gdscript">func pick_sprite_for_movement_state():
@@ -676,7 +676,7 @@ var slime_dissipate : Array = []
 <pre><code class="language-gdscript">func _on_dissipate_timer_timeout():
     queue_free()
 </code></pre>
-<ol>
+<ol start="8">
 <li>And of course let's not forget to fire the timer when the slime has no hp left:</li>
 </ol>
 <pre><code class="language-gdscript">func take_damage(dmg: int):
@@ -696,7 +696,7 @@ var slime_dissipate : Array = []
 </ol>
 <pre><code class="language-gdscript">@export var damage = 1
 </code></pre>
-<ol>
+<ol start="3">
 <li>Write a function <code>damage_player</code>:</li>
 </ol>
 <pre><code class="language-gdscript">func damage_player():
@@ -711,7 +711,7 @@ var slime_dissipate : Array = []
             collider.take_damage(damage)
 </code></pre>
 <p>Testing with <code>F5</code> we soon run into an issue: the player does not yet have the <code>take_damage</code> method.</p>
-<ol>
+<ol start="4">
 <li>Open <code>player.gd</code></li>
 <li>Write the method <code>take_damage</code>:</li>
 </ol>
@@ -801,7 +801,7 @@ Ouch! I took: 1 damage!
 <li>Detach the <code>world.gd</code>-script by right clicking on the <code>Terrains</code>-node:</li>
 </ol>
 <p><img alt="detach script" src="../screenshots/detach-script.png" /></p>
-<ol>
+<ol start="7">
 <li>Rename <code>res://world.gd</code> to <code>res://game.gd</code></li>
 <li>Now open the <code>game.tscn</code> again and attach the <code>game.gd</code> script to it</li>
 <li>Make sure the script now extends <code>Node</code> in stead of <code>TileMap</code>:</li>
@@ -815,7 +815,7 @@ func _on_player_cast_projectile(spell_class, direction, origin):
     spell.position = origin
     spell.velocity = Vector2.from_angle(direction) * 150.0
 </code></pre>
-<ol>
+<ol start="10">
 <li>Attach the following scenes as children for <code>Game</code> by dragging them from the <code>FileSystem</code> tab:</li>
 <li><code>res://terrains.tscn</code></li>
 <li><code>res://player/player.tscn</code></li>
@@ -863,20 +863,20 @@ func _on_player_cast_projectile(spell_class, direction, origin):
 <li>Select <code>TileMap</code> in the bottom pane</li>
 </ol>
 <p><img alt="select tilemap" src="../screenshots/select-tilemap.png" /></p>
-<ol>
+<ol start="4">
 <li>Select the <code>Terrains</code>-tab</li>
 </ol>
 <p><img alt="select terrains tab" src="../screenshots/draw_terrains_in_viewport.png" /></p>
-<ol>
+<ol start="5">
 <li>Pick on of the Terrains</li>
 <li>Select the eraser to erase the tiles</li>
 </ol>
 <p><img alt="no more tiles" src="../screenshots/no-more-tiles.png" /></p>
-<ol>
+<ol start="7">
 <li>Open <code>res://game.tscn</code></li>
 </ol>
 <p><img alt="no more tiles!" src="../screenshots/no-more-tiles-2.png" /></p>
-<ol>
+<ol start="8">
 <li>Now click the <em>child</em> node <code>Terrains</code></li>
 <li>Navigate to <code>TileMap &gt; Terrains</code> in the bottom pane again</li>
 <li>And draw some terrain in the <code>Terrains</code>-<em>instance</em> of the <code>Game</code>-scene</li>
@@ -890,7 +890,7 @@ func _on_player_cast_projectile(spell_class, direction, origin):
 <li>Draw one tile while <code>BreakableTerrains</code> is active.</li>
 </ol>
 <p><img alt="breakable block visible" src="../screenshots/breakable-block-visible.png" /></p>
-<ol>
+<ol start="5">
 <li>Test if it is indeed in a the separate node by toggling its visibility:</li>
 </ol>
 <p><img alt="breakable block invisible" src="../screenshots/breakable-block-invisible.png" /></p>
@@ -906,7 +906,7 @@ func _on_player_cast_projectile(spell_class, direction, origin):
 <li>Click <code>Add</code>:</li>
 </ol>
 <p><img alt="add breakable metadata field" src="../screenshots/add-breakable-metadata-field.png" /></p>
-<ol>
+<ol start="8">
 <li>Don't forget to save!</li>
 <li>Open <code>res://game.tscn</code></li>
 <li>Click on <code>BreakableTerrains</code></li>
@@ -914,7 +914,7 @@ func _on_player_cast_projectile(spell_class, direction, origin):
 <li>And <em>here</em> check <code>On</code> the <code>Breakable</code> field:</li>
 </ol>
 <p><img alt="check on breakable metadata field" src="../screenshots/set-breakable-metadata-field.png" /></p>
-<ol>
+<ol start="12">
 <li>Also notice the revert arrow, which implies we overrode default behaviour</li>
 </ol>
 <h3 id="attach-a-new-terrainsgd-script">Attach a new <code>terrains.gd</code> script</h3>
@@ -930,7 +930,7 @@ func _ready():
     if get_meta(&quot;breakable&quot;):
         print (name + &quot; is breakable&quot;)
 </code></pre>
-<ol>
+<ol start="5">
 <li>Test with <code>F5</code> and observe:</li>
 </ol>
 <pre><code>BreakableTerrains is breakable
@@ -949,7 +949,7 @@ func _ready():
             print(cell)
             print(cell * tile_set.tile_size)
 </code></pre>
-<ol>
+<ol start="2">
 <li>Observe the log:</li>
 </ol>
 <pre><code>BreakableTerrains is breakable
@@ -958,7 +958,7 @@ func _ready():
 </code></pre>
 <p>The <code>(7, 2)</code> is the string serialization of a <code>Vector2i</code>, which represents the position of this tile on the <code>TileMap</code>'s grid. </p>
 <p>Our <a href="https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-property-tile-set"><code>tile_set</code></a>.<a href="https://docs.godotengine.org/en/stable/classes/class_tileset.html#class-tileset-property-tile-size">tile_size</a> is <code>15x15</code> so the <code>position</code> of the <code>BreakableTile</code> will become <code>(105, 30)</code> <em>plus</em> the <code>position</code> of this <code>TileMap</code> instance.</p>
-<ol>
+<ol start="3">
 <li>Let's just print that <code>TileMap</code>-instance's <code>position</code> just to check:</li>
 </ol>
 <pre><code class="language-gdscript">extends TileMap
@@ -972,7 +972,7 @@ func _ready():
             print(&quot;Tile grid position:            &quot; + str(cell))
             print(&quot;BreakableTile target position: &quot; + str(Vector2i(position) + cell * tile_set.tile_size))
 </code></pre>
-<ol>
+<ol start="4">
 <li>Run with <code>F5</code> and inspect the log:</li>
 </ol>
 <pre><code>BreakableTerrains is breakable
@@ -980,14 +980,14 @@ BreakableTerrains's origin is: (0, 0)
 Tile grid position:            (7, 2)
 BreakableTile target position: (105, 30)
 </code></pre>
-<ol>
+<ol start="5">
 <li>Open <code>res://game.tscn</code> and select <code>BreakableTerrains</code></li>
 <li>Change its position in <code>Inspector &gt; Transform &gt; Position</code> </li>
 <li>Rerun the game and inspect the log again:</li>
 </ol>
 <pre><code>BreakableTile target position: (115, 41)
 </code></pre>
-<ol>
+<ol start="8">
 <li>Changed the <code>BreakableTerrains</code>' position by <code>+(10,11)</code> as can be observed in the log</li>
 <li>Quickly revert the <code>position</code> to <code>(0, 0)</code>, which makes reasoning easier.</li>
 <li>Next use <a href="https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-method-get-cell-source-id"><code>get_cell_source_id</code></a> and <a href="https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-property-tile-set"><code>tile_set</code></a>.<a href="https://docs.godotengine.org/en/stable/classes/class_tileset.html#class-tileset-method-get-source"><code>get_source</code></a> to obtain the <a href="https://docs.godotengine.org/en/stable/classes/class_tilesetatlassource.html"><code>TileSetAtlasSource</code></a> we used for our textures and physics polygons:</li>
@@ -999,7 +999,7 @@ BreakableTile target position: (105, 30)
             var tileset_source : TileSetAtlasSource = tile_set.get_source(source_id)
             print(&quot;TileSetAtlasSource:            &quot; + tileset_source.resource_name)
 </code></pre>
-<ol>
+<ol start="11">
 <li>Test with <code>F5</code> again:</li>
 </ol>
 <pre><code>BreakableTerrains is breakable
@@ -1008,23 +1008,23 @@ Tile grid position:            (7, 2)
 BreakableTile target position: (105, 30)
 TileSetAtlasSource:            grass-and-dirt
 </code></pre>
-<ol>
+<ol start="12">
 <li>Next use our <code>cell</code> to obtain the position in the <em>atlas</em> texture of the current tile using <a href="https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-method-get-cell-atlas-coords"><code>get_cell_atlas_coords</code></a></li>
 </ol>
 <pre><code class="language-gdscript">            var tile_atlas_coords = get_cell_atlas_coords(0, cell)
             print(&quot;tile_atlas_coords:             &quot; + str(tile_atlas_coords))
 </code></pre>
-<ol>
+<ol start="13">
 <li>And of course, this also should be multiplied by our <code>tile_set</code>.<code>tile_size</code> to get the pixel position on the underlying texture.</li>
 </ol>
 <pre><code class="language-gdscript">            print(&quot;tile_atlas_coords:             &quot; + str(tile_atlas_coords * tile_set.tile_size))
 </code></pre>
-<ol>
+<ol start="14">
 <li>In order to clip out the correct image we need the  <code>Texture2D</code>-resource of the <em>atlas</em> as well</li>
 </ol>
 <pre><code class="language-gdscript">            print(&quot;texture:                       &quot; + tileset_source.texture.resource_path)
 </code></pre>
-<ol>
+<ol start="15">
 <li>Just to be sure we're still on the same page, check your debug log again:</li>
 </ol>
 <pre><code>BreakableTerrains is breakable
@@ -1037,14 +1037,14 @@ texture:                       res://surface_maps/grass-and-dirt/1.png
 </code></pre>
 <p>The last bit of information up next was the one that took me the longest: the collision polygons of this tile (<em>especially because I forgot to draw the polygon for the tile I was testing :D</em>).</p>
 <p><em>Also, the obstinate use of <strong>obtain</strong> umpten times is intentional</em>: it's an <em>achievement</em>.</p>
-<ol>
+<ol start="16">
 <li>Use the <code>tile_atlas_coords</code> we obtained with the <code>tileset_source</code> we obtained to obtain the <a href="https://docs.godotengine.org/en/stable/classes/class_tiledata.html#class-tiledata"><code>tile_data</code></a> of this tile with <a href="https://docs.godotengine.org/en/stable/classes/class_tilesetatlassource.html#class-tilesetatlassource-method-get-tile-data"><code>get_tile_data</code></a></li>
 <li>And then invoke <a href="https://docs.godotengine.org/en/stable/classes/class_tiledata.html#class-tiledata-method-get-collision-polygon-points"><code>get_collision_polygon_points</code></a> to obtain the ... wait for it ... <code>PackedVector2Array</code> representing the collision polygon of this tile:</li>
 </ol>
 <pre><code class="language-gdscript">            var tile_data = tileset_source.get_tile_data(tile_atlas_coords, 0)
             print(&quot;polygon:                       &quot; + str(tile_data.get_collision_polygon_points(0, 0)))
 </code></pre>
-<ol>
+<ol start="18">
 <li>And that should look like this in your debug log:</li>
 </ol>
 <pre><code>polygon:                       [(-7.5, -7.5), (7.5, -7.5), (7.5, 7.5), (-7.5, 7.5)]
@@ -1072,7 +1072,7 @@ polygon:                       [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0
     collisigon   : PackedVector2Array
 )
 </code></pre>
-<ol>
+<ol start="2">
 <li>And <code>emit</code> it in the loop (<em>note we remove all the <code>print</code>s</em>):</li>
 </ol>
 <pre><code class="language-gdscript">func _ready():
@@ -1091,7 +1091,7 @@ polygon:                       [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0
                 tile_data.get_collision_polygon_points(0, 0)
             )
 </code></pre>
-<ol>
+<ol start="3">
 <li>Now in <code>res://game.tscn</code> select <code>BreakableTerrains</code> again</li>
 <li>Navigate to <code>Node &gt; Signals</code></li>
 <li>Double click <code>add_breakable_tile</code></li>
@@ -1109,7 +1109,7 @@ polygon:                       [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0
     print(&quot;Position of this tile in the atlas: &quot; + str(texture_pos))
     print(&quot;Collision polygon of this tile:     &quot; + str(collisigon))
 </code></pre>
-<ol>
+<ol start="8">
 <li>Go back to <code>res://terrains.gd</code></li>
 <li>Earlier <a href="#the-final-approach-in-very-simplified-terms">we announced</a> in step 7 we would call <code>queue_free</code> after all the tiles in the map were <em>signalled</em>:</li>
 </ol>
@@ -1149,7 +1149,7 @@ polygon:                       [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0
 </ol>
 <pre><code class="language-gdscript">var BreakableTile = preload(&quot;res://tiles/breakable_tile.tscn&quot;)
 </code></pre>
-<ol>
+<ol start="3">
 <li>Instatiate it in <code>_on_breakable_terrains_add_breakable_tile</code></li>
 <li>And then use the <code>position</code> argument to set its position property</li>
 </ol>
@@ -1227,7 +1227,7 @@ func _ready():
     print(&quot;BreakableTile.collisigon:  &quot; + str(collisigon))
 
 </code></pre>
-<ol>
+<ol start="6">
 <li>Open <code>res://game.gd</code></li>
 <li>Set these new public properties in our signal listener:</li>
 </ol>
@@ -1254,7 +1254,7 @@ BreakableTile.texture:     res://surface_maps/tree-trunk/1.png
 BreakableTile.texture_pos: (75, 0)
 BreakableTile.collisigon:  [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0.5, 4.5), (5.625, 5.75), (7.5, 7.5), (-7.5, 7.5)]
 </code></pre>
-<ol>
+<ol start="8">
 <li>Now let's set the correct texture, texture position and polygon in code:</li>
 </ol>
 <pre><code class="language-gdscript">func _ready():
@@ -1299,7 +1299,7 @@ Breakable tile taking 1 damage
 Breakable tile taking 1 damage
 </code></pre>
 <p>Yup! That works. Now let's add a public property called <code>hp</code> which we can set from <em>metadata</em> later.</p>
-<ol>
+<ol start="3">
 <li>Add the <code>hp</code> property on top of <code>breakable_tile.gd</code> and set it to <code>10</code> as a default.</li>
 </ol>
 <pre><code>extends StaticBody2D
@@ -1309,7 +1309,7 @@ Breakable tile taking 1 damage
 @export var texture_pos : Vector2i
 @export var collisigon  : PackedVector2Array
 </code></pre>
-<ol>
+<ol start="4">
 <li>Implement <code>take_damage</code> like this now:</li>
 </ol>
 <pre><code class="language-gdscript">func take_damage(dmg : float):
@@ -1340,7 +1340,7 @@ Breakable tile taking 1 damage
     hp           : float
 )
 </code></pre>
-<ol>
+<ol start="8">
 <li>Add the <code>hp</code>-metadata to the <code>emit_signal</code>-call for each tile:</li>
 </ol>
 <pre><code class="language-gdscript">            emit_signal(
@@ -1352,7 +1352,7 @@ Breakable tile taking 1 damage
                 get_meta(&quot;hp&quot;)
             )
 </code></pre>
-<ol>
+<ol start="9">
 <li>Open <code>res://game.gd</code></li>
 <li>Add the <code>hp</code> to <code>_on_breakable_terrains_add_breakable_tile</code> and set it on the <code>BreakableTile</code> instance there:</li>
 </ol>
@@ -1383,10 +1383,13 @@ Breakable tile taking 1 damage
 <h2 id="allow-those-breakable-tiles-to-fall-down">Allow those breakable tiles to fall down</h2>
 <p>Rigid -&gt; Static -&gt; Rigid -&gt; Character -&gt; Area -&gt; Static -&gt; Rigid -&gt; ooooh...</p>
 <p>Spoiler: it was <a href="https://docs.godotengine.org/en/stable/classes/class_staticbody2d.html#class-staticbody2d">StaticBody2D</a> I wanted all along.</p>
+<h2 id="technical-debt-6">Technical debt 6</h2>
+<p>While following the <a href="https://docs.godotengine.org/en/stable/getting_started/first_3d_game">my first 3D game</a> tutorial I was reminded of Godot's group tagging feature in part <a href="https://docs.godotengine.org/en/stable/getting_started/first_3d_game/06.jump_and_squash.html#squashing-monsters">06. on squashing monsters</a>:</p>
+<p><a href="https://docs.godotengine.org/en/stable/tutorials/scripting/groups.html#doc-groups">Group tagging in Godot</a></p>
+<p>Both our <code>BreakableTile</code>s and our <code>Slimes</code> should be tagged as part of some group in order for us to better determine what to do when a collision takes place with them. </p>
 <h2 id="reuse-tiles-as-background-scenery">Reuse tiles as background scenery</h2>
-<p>My first <a href="https://docs.godotengine.org/en/stable/tutorials/shaders/your_first_shader/your_first_2d_shader.html">shader</a> was not that fancy at all.</p>
-<h2 id="review-my-failed-attempt-to-replace-my-texturerenditions-singleton-with-shaders">Review my failed attempt to replace my TextureRenditions singleton with shaders</h2>
-<p>My <a href="https://github.com/Teaching-myself-Godot/godot-zelia/blob/no-per-instance-shaders-for-canvas_items/dissipation_shader.gdshader">second shader</a> was pretty cool, but alas: all the fireballs scattered together.</p>
+<p>The <a href="https://renevanderark.itch.io/zelia-mystery-mage-and-adventure-maker">original Zelia game</a> used a simple trick for background textures: add a little transparency to the terrain maps and draw them behind the rest of the game.</p>
+<p>Although we could probably do this without any complexity, let's use this oppurtunity to explore 2D fragment shaders.</p>
               
             </div>
           </div><footer>
