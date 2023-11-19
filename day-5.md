@@ -8,8 +8,9 @@ A long title for a long episode!
 2. [Add the tree-trunk terrain](#add-the-tree-trunk-terrain)
 3. [Make tiles Zelia can break](#make-tiles-zelia-can-break)
 4. [Allow those breakable tiles to fall down](#allow-those-breakable-tiles-to-fall-down)
+5. [Technical Debt 6](#technical-debt-6)
 5. [Reuse tiles as background scenery](#reuse-tiles-as-background-scenery)
-6. [Review my failed attempt to replace my TextureRenditions singleton with shaders](#review-my-failed-attempt-to-replace-my-texturerenditions-singleton-with-shaders)
+
 
 
 ## Make a bouncing Slime monster
@@ -1415,10 +1416,19 @@ Rigid -> Static -> Rigid -> Character -> Area -> Static -> Rigid -> ooooh...
 
 Spoiler: it was [StaticBody2D](https://docs.godotengine.org/en/stable/classes/class_staticbody2d.html#class-staticbody2d) I wanted all along.
 
+
+## Technical debt 6
+
+While following the [my first 3D game](https://docs.godotengine.org/en/stable/getting_started/first_3d_game) tutorial I was reminded of Godot's group tagging feature in part [06. on squashing monsters](https://docs.godotengine.org/en/stable/getting_started/first_3d_game/06.jump_and_squash.html#squashing-monsters):
+
+[Group tagging in Godot](https://docs.godotengine.org/en/stable/tutorials/scripting/groups.html#doc-groups)
+
+Both our `BreakableTile`s and our `Slimes` should be tagged as part of some group in order for us to better determine what to do when a collision takes place with them. 
+
+
 ## Reuse tiles as background scenery
 
-My first [shader](https://docs.godotengine.org/en/stable/tutorials/shaders/your_first_shader/your_first_2d_shader.html) was not that fancy at all.
+The [original Zelia game](https://renevanderark.itch.io/zelia-mystery-mage-and-adventure-maker) used a simple trick for background textures: add a little transparency to the terrain maps and draw them behind the rest of the game.
 
-## Review my failed attempt to replace my TextureRenditions singleton with shaders
+Although we could probably do this without any complexity, let's use this oppurtunity to explore 2D fragment shaders.
 
-My [second shader](https://github.com/Teaching-myself-Godot/godot-zelia/blob/no-per-instance-shaders-for-canvas_items/dissipation_shader.gdshader) was pretty cool, but alas: all the fireballs scattered together.
