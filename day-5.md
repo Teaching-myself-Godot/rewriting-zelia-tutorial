@@ -491,7 +491,7 @@ The next step is not to allow that strange bit of negative `hp`!
 
 All it takes is doing stuff we already did with the fireball: [autoloaded texture renditions](day-4.md#generate-renditions-to-make-the-fireball-dissipate)
 
-1. Open `res://cracked_renditions.gd`
+1. Open `res://texture_renditions.gd`
 2. Add the properties `slime` and `slime_dissipate`
 
 ```gdscript
