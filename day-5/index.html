@@ -1518,7 +1518,7 @@ Breakable tile taking 1 damage
 
 <span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Assert single invocation for get_cracked_renditions:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">source_id</span><span class="p">))</span>
 
-<span class="w">    </span><span class="c1"># copy the source image into the rendition map</span>
+<span class="w">    </span><span class="c1"># copy the source image into the rendition map as the 1st rendition in the list</span>
 <span class="w">    </span><span class="n">cracked_rendition_map</span><span class="p">[</span><span class="n">source_id</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">ImageTexture</span><span class="o">.</span><span class="n">create_from_image</span><span class="p">(</span><span class="n">src_image</span><span class="p">)]</span>
 
 <span class="w">    </span><span class="c1"># for each alpha mask we preloaded into the crack_masks array ...</span>
@@ -1529,6 +1529,56 @@ Breakable tile taking 1 damage
 
 <span class="w">    </span><span class="c1"># of course return the dictionary</span>
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">cracked_rendition_map</span><span class="p">[</span><span class="n">source_id</span><span class="p">]</span>
+</code></pre></div>
+
+<ol start="7">
+<li>Now we must adapt our code in <code>res://tiles/breakable_tile.gd</code> to generate the renditions:</li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="c1"># add a property to store the renditions in</span>
+<span class="k">var</span><span class="w"> </span><span class="n">cracked_renditions</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Array</span>
+
+<span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="c1"># create the renditions, or get the stored renditions using the texture&#39;s RID as key</span>
+<span class="w">    </span><span class="n">cracked_renditions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TextureRenditions</span><span class="o">.</span><span class="n">get_cracked_renditions</span><span class="p">(</span><span class="n">texture</span><span class="o">.</span><span class="n">get_rid</span><span class="p">()</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span><span class="w"> </span><span class="n">texture</span><span class="o">.</span><span class="n">get_image</span><span class="p">())</span>
+<span class="w">    </span><span class="c1"># Set the currrent texture to the first rendition (a copy of the original)</span>
+<span class="w">    </span><span class="o">$</span><span class="n">Sprite2D</span><span class="o">.</span><span class="n">set_texture</span><span class="p">(</span><span class="n">cracked_renditions</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="w">    </span><span class="c1"># The rest remains the same</span>
+<span class="w">    </span><span class="o">$</span><span class="n">Sprite2D</span><span class="o">.</span><span class="n">region_rect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb nb-Type">Rect2</span><span class="p">(</span><span class="n">texture_pos</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">texture_pos</span><span class="o">.</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span><span class="w"> </span><span class="mi">15</span><span class="p">)</span>
+<span class="w">    </span><span class="o">$</span><span class="n">CollisionPolygon2D</span><span class="o">.</span><span class="n">polygon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">collisigon</span>
+</code></pre></div>
+
+<ol start="8">
+<li>And adapt it to <em>use</em> the renditions:</li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="k">var</span><span class="w"> </span><span class="n">cracked_renditions</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Array</span>
+<span class="c1"># Add a property to store the start_hp in (in order to calculate how much is left)</span>
+<span class="k">var</span><span class="w"> </span><span class="n">start_hp</span><span class="w">            </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">float</span>
+
+<span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="c1"># and set it to the initial value of hp </span>
+<span class="w">    </span><span class="n">start_hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hp</span>
+<span class="w">    </span><span class="n">cracked_renditions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TextureRenditions</span><span class="o">.</span><span class="n">get_cracked_renditions</span><span class="p">(</span><span class="n">texture</span><span class="o">.</span><span class="n">get_rid</span><span class="p">()</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span><span class="w"> </span><span class="n">texture</span><span class="o">.</span><span class="n">get_image</span><span class="p">())</span>
+<span class="w">    </span><span class="c1"># ... keep the rest</span>
+
+<span class="k">func</span><span class="w"> </span><span class="n">take_damage</span><span class="p">(</span><span class="n">dmg</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">float</span><span class="p">):</span>
+<span class="w">    </span><span class="n">hp</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">dmg</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">hp</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">:</span>
+<span class="w">        </span><span class="n">queue_free</span><span class="p">()</span>
+
+<span class="w">    </span><span class="c1"># calculate the percentage of damage done</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">perc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hp</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">start_hp</span>
+
+<span class="w">    </span><span class="c1"># set the cracked rendition accordingly </span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">perc</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">.</span><span class="mi">9</span><span class="p">:</span>
+<span class="w">        </span><span class="o">$</span><span class="n">Sprite2D</span><span class="o">.</span><span class="n">set_texture</span><span class="p">(</span><span class="n">cracked_renditions</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">perc</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">.</span><span class="mi">8</span><span class="p">:</span>
+<span class="w">        </span><span class="o">$</span><span class="n">Sprite2D</span><span class="o">.</span><span class="n">set_texture</span><span class="p">(</span><span class="n">cracked_renditions</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">perc</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">.</span><span class="mi">6</span><span class="p">:</span>
+<span class="w">        </span><span class="o">$</span><span class="n">Sprite2D</span><span class="o">.</span><span class="n">set_texture</span><span class="p">(</span><span class="n">cracked_renditions</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">perc</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">.</span><span class="mi">3</span><span class="p">:</span>
+<span class="w">        </span><span class="o">$</span><span class="n">Sprite2D</span><span class="o">.</span><span class="n">set_texture</span><span class="p">(</span><span class="n">cracked_renditions</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="o">$</span><span class="n">Sprite2D</span><span class="o">.</span><span class="n">set_texture</span><span class="p">(</span><span class="n">cracked_renditions</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
 </code></pre></div>
 
 <h2 id="allow-those-breakable-tiles-to-fall-down">Allow those breakable tiles to fall down</h2>
