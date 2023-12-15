@@ -251,61 +251,66 @@
 <li>You might notice a lot of suggested code for a <code>CharacterBody2D</code> - although it could be fun to try it out, it's not what we're looking for.</li>
 <li>Remove all code and replace the <code>_physics_process</code> function body with <code>pass</code>:</li>
 </ol>
-<pre><code class="language-gdscript">extends CharacterBody2D
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">CharacterBody2D</span>
 
 
-func _physics_process(delta):
-    pass
-</code></pre>
+<span class="k">func</span><span class="w"> </span><span class="n">_physics_process</span><span class="p">(</span><span class="n">delta</span><span class="p">):</span>
+<span class="w">    </span><span class="k">pass</span>
+</code></pre></div>
+
 <h3 id="adding-the-movementstates">Adding the <code>MovementState</code>s</h3>
 <p>We have 2 animations currently, so let's create 2 movement states to match:</p>
-<pre><code class="language-gdscript">extends CharacterBody2D
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">CharacterBody2D</span>
 
-enum MovementState { AIRBORNE, FLOOR_BOUNCE }
+<span class="k">enum</span><span class="w"> </span><span class="n">MovementState</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">AIRBORNE</span><span class="p">,</span><span class="w"> </span><span class="n">FLOOR_BOUNCE</span><span class="w"> </span><span class="p">}</span>
 
-var movement_state : int
+<span class="k">var</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">int</span>
 
-func _ready():
-    # assume it starts out hanging in the air
-    movement_state = MovementState.AIRBORNE
+<span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="c1"># assume it starts out hanging in the air</span>
+<span class="w">    </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
 
-    # start up the correct animated sprite sprite frames for that state
-    $AnimatedSprite2D.animation = &quot;airborne&quot;
-    $AnimatedSprite2D.play()
+<span class="w">    </span><span class="c1"># start up the correct animated sprite sprite frames for that state</span>
+<span class="w">    </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;airborne&quot;</span>
+<span class="w">    </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+</code></pre></div>
 
-</code></pre>
 <p>We also know the slime must bounce around. We can use some familiar stuff for that:</p>
-<pre><code class="language-gdscript"># We want the level designer to be able to modify stuff like this.
-@export var JUMP_VELOCITY = -400.0
-var gravity = ProjectSettings.get_setting(&quot;physics/2d/default_gravity&quot;)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c1"># We want the level designer to be able to modify stuff like this.</span>
+<span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">JUMP_VELOCITY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">400.0</span>
+<span class="k">var</span><span class="w"> </span><span class="n">gravity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ProjectSettings</span><span class="o">.</span><span class="n">get_setting</span><span class="p">(</span><span class="s2">&quot;physics/2d/default_gravity&quot;</span><span class="p">)</span>
+</code></pre></div>
+
 <p>Now let's at the very least allow some <code>move_and_slide()</code> in the <code>_physics_process</code>, applying the gravity:</p>
-<pre><code class="language-gdscript">func _physics_process(delta):
-    velocity.y += gravity * delta
-    move_and_slide()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_physics_process</span><span class="p">(</span><span class="n">delta</span><span class="p">):</span>
+<span class="w">    </span><span class="n">velocity</span><span class="o">.</span><span class="n">y</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">gravity</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">delta</span>
+<span class="w">    </span><span class="n">move_and_slide</span><span class="p">()</span>
+</code></pre></div>
+
 <p>Now test again ith <code>F5</code> - the slime falls down and lands on the tiles.</p>
 <h3 id="picking-the-right-collision-shape">Picking the right collision shape</h3>
 <p>As we saw when we were setting up the scene, the slime has 2 <code>CollisionShapes2D</code>s attached of which only one should be active at a time, base on its <code>movement_state</code>.</p>
 <p>Create a func <code>pick_collision_shape_for_movement_state</code>:</p>
-<pre><code class="language-gdscript"># enable the collision shape that matches the current movement state
-func pick_collision_shape_for_movement_state():
-    match (movement_state):
-        MovementState.AIRBORNE:
-            $AirborneCollisionShape.disabled = false
-            $FloorBounceCollisionShape.disabled = true
-        MovementState.FLOOR_BOUNCE:
-            $AirborneCollisionShape.disabled = true
-            $FloorBounceCollisionShape.disabled = false
-</code></pre>
-<p>And make sure to invoke it once the slime is instantiated:</p>
-<pre><code class="language-gdscript">func _ready():
-    # assume it starts out hanging in the air
-    movement_state = MovementState.AIRBORNE
+<div class="codehilite"><pre><span></span><code><span class="c1"># enable the collision shape that matches the current movement state</span>
+<span class="k">func</span><span class="w"> </span><span class="n">pick_collision_shape_for_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="k">match</span><span class="w"> </span><span class="p">(</span><span class="n">movement_state</span><span class="p">):</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AirborneCollisionShape</span><span class="o">.</span><span class="n">disabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">false</span>
+<span class="w">            </span><span class="o">$</span><span class="n">FloorBounceCollisionShape</span><span class="o">.</span><span class="n">disabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">true</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">FLOOR_BOUNCE</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AirborneCollisionShape</span><span class="o">.</span><span class="n">disabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">true</span>
+<span class="w">            </span><span class="o">$</span><span class="n">FloorBounceCollisionShape</span><span class="o">.</span><span class="n">disabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">false</span>
+</code></pre></div>
 
-    # enable the collision shape that matches the movement state
-    pick_collision_shape_for_movement_state()
-</code></pre>
+<p>And make sure to invoke it once the slime is instantiated:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="c1"># assume it starts out hanging in the air</span>
+<span class="w">    </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
+
+<span class="w">    </span><span class="c1"># enable the collision shape that matches the movement state</span>
+<span class="w">    </span><span class="n">pick_collision_shape_for_movement_state</span><span class="p">()</span>
+</code></pre></div>
+
 <h3 id="setting-the-right-movement-state-in-the-_physics_process">Setting the right movement state in the <code>_physics_process</code></h3>
 <p>When we programmed the player (hacked it together the 1st time) we had to do a lot of refactor work early on to make the <code>player.gd</code> code more understandable and maintainable.</p>
 <p>The most important step we took was to separate out two stages in the <code>_physics_process</code> to determine what the player should do in this <em>iteration</em> (this time around in the infinite loop):
@@ -313,15 +318,16 @@ func pick_collision_shape_for_movement_state():
 2. <code>handle_movement_state()</code></p>
 <p>Even though it felt artificial to force such a hard separation in 2 functions, it made some code that is easier for a human (like us, I hope) to reason about.</p>
 <p>Let's reapply it here, so first create the 2 new empty functions <code>set_movement_state</code> and <code>handle_movement_state</code> and invoke them from <code>_physics_process</code>, right after the gravity is applied:</p>
-<pre><code class="language-gdscript">func _physics_process(delta):
-    # Apply gravity
-    velocity.y += gravity * delta
-    # Set, and handle movement state 
-    set_movement_state()
-    handle_movement_state()
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_physics_process</span><span class="p">(</span><span class="n">delta</span><span class="p">):</span>
+<span class="w">    </span><span class="c1"># Apply gravity</span>
+<span class="w">    </span><span class="n">velocity</span><span class="o">.</span><span class="n">y</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">gravity</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">delta</span>
+<span class="w">    </span><span class="c1"># Set, and handle movement state </span>
+<span class="w">    </span><span class="n">set_movement_state</span><span class="p">()</span>
+<span class="w">    </span><span class="n">handle_movement_state</span><span class="p">()</span>
 
-    move_and_slide()
-</code></pre>
+<span class="w">    </span><span class="n">move_and_slide</span><span class="p">()</span>
+</code></pre></div>
+
 <h3 id="programming-the-full-slime-behaviour-in-steps">Programming the full slime behaviour in steps</h3>
 <p>Now we will reason our way to a working, bouncing slime. Coding it in small steps:</p>
 <ol>
@@ -333,12 +339,13 @@ func pick_collision_shape_for_movement_state():
 </ol>
 <h3 id="make-the-slime-bounce-up-and-down">Make the slime bounce up and down</h3>
 <p>Let's start out by making it land nicely. So we set the correct movement state and animated sprite when the slime is on the floor:</p>
-<pre><code class="language-gdscript">func set_movement_state():
-    if is_on_floor():
-        movement_state = MovementState.FLOOR_BOUNCE
-        pick_collision_shape_for_movement_state()
-        $AnimatedSprite2D.animation = &quot;floor_bounce&quot;
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">set_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">is_on_floor</span><span class="p">():</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">FLOOR_BOUNCE</span>
+<span class="w">        </span><span class="n">pick_collision_shape_for_movement_state</span><span class="p">()</span>
+<span class="w">        </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;floor_bounce&quot;</span>
+</code></pre></div>
+
 <p>Test using <code>F5</code>.</p>
 <p>The next step is to make it bounce up again round about when the <code>"floor_bounce"</code> animation finishes. We'll need a one-shot timer for that and we need to start it at the right moment:</p>
 <ol>
@@ -354,73 +361,80 @@ func pick_collision_shape_for_movement_state():
 <li>Keep the defaults and attach it to the <code>Slime</code>'s script</li>
 <li>So this is the moment we want the slime to jump up again, let's write:</li>
 </ol>
-<pre><code class="language-gdscript">func start_jump():
-    velocity.y = JUMP_VELOCITY
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">start_jump</span><span class="p">():</span>
+<span class="w">    </span><span class="n">velocity</span><span class="o">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JUMP_VELOCITY</span>
 
-func _on_floor_bounce_timer_timeout():
-    start_jump()
-</code></pre>
+<span class="k">func</span><span class="w"> </span><span class="n">_on_floor_bounce_timer_timeout</span><span class="p">():</span>
+<span class="w">    </span><span class="n">start_jump</span><span class="p">()</span>
+</code></pre></div>
+
 <ol start="8">
 <li>We also need to start the timer when we know the slime has landed:</li>
 </ol>
-<pre><code class="language-gdscript">func set_movement_state():
-    if is_on_floor():
-        # place this new code _before_ changing the movement_state!
-        # so only start the timer at the moment of _landing_
-        if movement_state == MovementState.AIRBORNE:
-            $FloorBounceTimer.start()
-        movement_state = MovementState.FLOOR_BOUNCE
-        pick_collision_shape_for_movement_state()
-        $AnimatedSprite2D.animation = &quot;floor_bounce&quot;
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">set_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">is_on_floor</span><span class="p">():</span>
+<span class="w">        </span><span class="c1"># place this new code _before_ changing the movement_state!</span>
+<span class="w">        </span><span class="c1"># so only start the timer at the moment of _landing_</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">FloorBounceTimer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">FLOOR_BOUNCE</span>
+<span class="w">        </span><span class="n">pick_collision_shape_for_movement_state</span><span class="p">()</span>
+<span class="w">        </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;floor_bounce&quot;</span>
+</code></pre></div>
+
 <p>Test with <code>F5</code>: it only flies up once and it looks off.</p>
 <p>We're still missing something! We need to set the correct movement state, animation and collision shape for when <code>is_on_floor()</code> is <code>false</code>:</p>
-<pre><code class="language-gdscript">func set_movement_state():
-    if is_on_floor():
-        # ... leave the same ...
-    else:
-        movement_state = MovementState.AIRBORNE
-        pick_collision_shape_for_movement_state()
-        $AnimatedSprite2D.animation = &quot;airborne&quot;
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">set_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">is_on_floor</span><span class="p">():</span>
+<span class="w">        </span><span class="c1"># ... leave the same ...</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
+<span class="w">        </span><span class="n">pick_collision_shape_for_movement_state</span><span class="p">()</span>
+<span class="w">        </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;airborne&quot;</span>
+</code></pre></div>
+
 <p>Test with <code>F5</code>: that looks a <em>lot</em> better</p>
 <p><a href="../screenshots/bounce-anim.mp4"><img alt="bouncies!" src="../screenshots/bounce-anim.png" /></a></p>
 <h4 id="refactor-early">Refactor early.</h4>
 <p>The code is cluttering up already. Also, we have not made use of our somewhat artificial separation between <code>set_movement_state</code> and <code>handle_movement_state</code> yet. </p>
 <p>That separation was supposed to make the code easier to reason about, So now apply the following early '<em>incisions</em>' &gt;:)</p>
 <p>Move the code that is more about <em>handling</em> the current <code>movement_state</code> to the function <code>handle_movement_state</code>:</p>
-<pre><code class="language-gdscript">func handle_movement_state():
-    pick_collision_shape_for_movement_state()
-    # pick the animation sprite for the current movement state
-    match(movement_state):
-        MovementState.FLOOR_BOUNCE:
-            $AnimatedSprite2D.animation = &quot;floor_bounce&quot;
-        MovementState.AIRBORNE:
-            $AnimatedSprite2D.animation = &quot;airborne&quot;
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">handle_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="n">pick_collision_shape_for_movement_state</span><span class="p">()</span>
+<span class="w">    </span><span class="c1"># pick the animation sprite for the current movement state</span>
+<span class="w">    </span><span class="k">match</span><span class="p">(</span><span class="n">movement_state</span><span class="p">):</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">FLOOR_BOUNCE</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;floor_bounce&quot;</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;airborne&quot;</span>
+</code></pre></div>
+
 <p>Now you can remove a lot of code from <code>set_movement_state</code>, leaving only the stuff that is more about <em>setting</em> a new <code>movement_state</code>:</p>
-<pre><code class="language-gdscript">func set_movement_state():
-    if is_on_floor():
-        if movement_state == MovementState.AIRBORNE:
-            $FloorBounceTimer.start()
-        movement_state = MovementState.FLOOR_BOUNCE
-    else:
-        movement_state = MovementState.AIRBORNE
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">set_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">is_on_floor</span><span class="p">():</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">FloorBounceTimer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">FLOOR_BOUNCE</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
+</code></pre></div>
+
 <p>We still have a <code>match</code>-block that needs a comment to explain what it does. </p>
 <p>Let's fix that by creating a function for it:</p>
-<pre><code class="language-gdscript">func pick_sprite_for_movement_state():
-    match(movement_state):
-        MovementState.FLOOR_BOUNCE:
-            $AnimatedSprite2D.animation = &quot;floor_bounce&quot;
-        MovementState.AIRBORNE:
-            $AnimatedSprite2D.animation = &quot;airborne&quot;
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">pick_sprite_for_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="k">match</span><span class="p">(</span><span class="n">movement_state</span><span class="p">):</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">FLOOR_BOUNCE</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;floor_bounce&quot;</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;airborne&quot;</span>
+</code></pre></div>
+
 <p>And invoke it from <code>handle_movement_state</code> like so:</p>
-<pre><code class="language-gdscript">func handle_movement_state():
-    pick_collision_shape_for_movement_state()
-    pick_sprite_for_movement_state()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">handle_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="n">pick_collision_shape_for_movement_state</span><span class="p">()</span>
+<span class="w">    </span><span class="n">pick_sprite_for_movement_state</span><span class="p">()</span>
+</code></pre></div>
+
 <p>Did you notice we applied the lesson we learned on day 3 about <a href="../day-3/#extract-some-functions-for-less-messy-code">refactoring big functions</a>?</p>
 <h3 id="make-the-slime-bounce-in-the-direction-of-the-player">Make the slime bounce in the direction of the player</h3>
 <p>So, now that the slimes are bouncing up and down nicely, we need to make them aware of where their only enemy is: <em>you</em>, the player.</p>
@@ -433,79 +447,84 @@ func _on_floor_bounce_timer_timeout():
 <li>Add a <code>var position</code> of type <code>Vector2</code></li>
 <li>When <code>_ready</code> initialize it with <code>Vector2.ZERO</code>:</li>
 </ol>
-<pre><code class="language-gdscript">extends Node
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">Node</span>
 
-var position : Vector2
+<span class="k">var</span><span class="w"> </span><span class="n">position</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Vector2</span>
 
-func _ready():
-    position = Vector2.ZERO
-</code></pre>
+<span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="o">.</span><span class="n">ZERO</span>
+</code></pre></div>
+
 <h4 id="updating-playerstateposition">Updating <code>PlayerState.position</code></h4>
 <p>Now this new <code>PlayerState</code> singleton must be updated at least every time the player moves. Do this by adding this one line to a suitable function in <code>player.gd</code>:</p>
-<pre><code class="language-gdscript">func _process(_delta)
-    PlayerState.position = position
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_process</span><span class="p">(</span><span class="n">_delta</span><span class="p">)</span>
+<span class="w">    </span><span class="n">PlayerState</span><span class="o">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">position</span>
+</code></pre></div>
+
 <h4 id="using-playerstateposition-in-slimegd">Using <code>PlayerState.position</code> in <code>slime.gd</code></h4>
 <p>Now the slime can't fly, so the only property we need to update in <code>slime.gd</code> is the x-position.</p>
 <p>The effect we want to achieve is that the slime only moves on the x-axis when airborne. That makes sense because slimes are sticky and do not slide around while stuck to the floor.</p>
 <p>So the moment that we want to decide its <code>velocity.x</code> is when its jump starts and the moment that we want to stop x movement is when it lands. Go script it:</p>
-<pre><code class="language-gdscript">@export var X_VELOCITY = 100
+<div class="codehilite"><pre><span></span><code><span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">X_VELOCITY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span>
 
-func start_jump():
-    velocity.y = JUMP_VELOCITY
-    if PlayerState.position.x &lt; position.x:
-        velocity.x = -X_VELOCITY
-    else:
-        velocity.x = X_VELOCITY
+<span class="k">func</span><span class="w"> </span><span class="n">start_jump</span><span class="p">():</span>
+<span class="w">    </span><span class="n">velocity</span><span class="o">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JUMP_VELOCITY</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">PlayerState</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="p">:</span>
+<span class="w">        </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">X_VELOCITY</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">X_VELOCITY</span>
 
-func set_movement_state():
-    if is_on_floor():
-        if movement_state == MovementState.AIRBORNE:
-            # new line:
-            velocity.x = 0
-            $FloorBounceTimer.start()
-        movement_state = MovementState.FLOOR_BOUNCE
-    else:
-        movement_state = MovementState.AIRBORNE
+<span class="k">func</span><span class="w"> </span><span class="n">set_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">is_on_floor</span><span class="p">():</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">            </span><span class="c1"># new line:</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">            </span><span class="o">$</span><span class="n">FloorBounceTimer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">FLOOR_BOUNCE</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
+</code></pre></div>
 
-</code></pre>
 <p>Now press <code>F5</code> and test:</p>
 <p><a href="../screenshots/slime-film2.mp4"><img alt="slime film 2" src="../screenshots/slime-film-2.png" /></a></p>
 <p>The first jump looks great, but the second jump already has an issue.</p>
 <p>So apparently, when the slime hits a wall, the <code>velocity.x</code> is set to zero by <code>move_and_slide()</code>... Sounds like it makes perfect sense.</p>
 <p>But we want it to fly left to reach te player, so we're going to <em>fight</em> this resistance! :D. We'll pick our battle with physics right here:</p>
-<pre><code class="language-gdscript">func handle_movement_state():
-    # keep trying to reach the player, even when bumping against the wall
-    if is_on_wall():
-        if PlayerState.position.x &lt; position.x:
-            velocity.x = -X_VELOCITY
-        else:
-            velocity.x = X_VELOCITY
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">handle_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="c1"># keep trying to reach the player, even when bumping against the wall</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">is_on_wall</span><span class="p">():</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">PlayerState</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="p">:</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">X_VELOCITY</span>
+<span class="w">        </span><span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">X_VELOCITY</span>
 
-    pick_collision_shape_for_movement_state()
-    pick_sprite_for_movement_state()
-</code></pre>
+<span class="w">    </span><span class="n">pick_collision_shape_for_movement_state</span><span class="p">()</span>
+<span class="w">    </span><span class="n">pick_sprite_for_movement_state</span><span class="p">()</span>
+</code></pre></div>
+
 <h4 id="refactor-early-part-2">Refactor early part 2</h4>
 <p>So I'm often a lone programmer, which is <em>bad</em>. One rule of thumb I learned concerning the DRY (Don't Repeat Yourself) principle I learned - when I <em>did</em> work in a team - is: if you see the same snippet of code duplicated 3 times, refactor.</p>
 <p>Well, I'm annoyed seeing it just <em>2</em> times right now, so let's fix it <em>early</em>:</p>
-<pre><code class="language-gdscript">func follow_player():
-    if PlayerState.position.x &lt; position.x:
-        velocity.x = -X_VELOCITY
-    else:
-        velocity.x = X_VELOCITY
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">follow_player</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">PlayerState</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">position</span><span class="o">.</span><span class="n">x</span><span class="p">:</span>
+<span class="w">        </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">X_VELOCITY</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">X_VELOCITY</span>
+</code></pre></div>
+
 <p>Invoke it in <code>handle_movement_state</code> and <code>start_jump.</code>. Now your code is <em><code>DRY</code></em> again.</p>
 <h3 id="make-the-slime-take-damage-from-fireballs">Make the slime take damage from fireballs</h3>
 <p>When a fireball hits a slime we can detect it, but which of the two should detect the collision?</p>
 <p>Turns out we'll be handling this one, reasoning from the fireball. Which makes sense. The fireball will know how much punch it packs and it will deal it to anything that can <code>take_damage(...)</code>.</p>
 <p>So the first thing we <em>will</em> do is implement that method for the slime:</p>
-<pre><code class="language-gdscript">@export var hp = 10
+<div class="codehilite"><pre><span></span><code><span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">hp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span>
 
-func take_damage(dmg: int):
-    hp -= dmg
-    # test if it works
-    print(&quot;Ouch! hp = &quot; + str(hp))
-</code></pre>
+<span class="k">func</span><span class="w"> </span><span class="n">take_damage</span><span class="p">(</span><span class="n">dmg</span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">int</span><span class="p">):</span>
+<span class="w">    </span><span class="n">hp</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">dmg</span>
+<span class="w">    </span><span class="c1"># test if it works</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ouch! hp = &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">hp</span><span class="p">))</span>
+</code></pre></div>
+
 <p>Now add the collision detection to the fireball like this:
 1. Open <code>res://projectiles/fireball/fireball.tscn</code>
 2. Select <code>Scene &gt; Fireball</code>
@@ -520,15 +539,16 @@ And then choose the <code>_on_body_entered</code> method:
 <ol start="6">
 <li>Adapt <code>func _on_body_entered</code> like so:</li>
 </ol>
-<pre><code class="language-gdscript">@export var damage = 1
+<div class="codehilite"><pre><span></span><code><span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">damage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
 
-func _on_body_entered(body):
-    # if the body _can_ take damage, give it _my_damage
-    if body.has_method(&quot;take_damage&quot;):
-        body.take_damage(damage)
+<span class="k">func</span><span class="w"> </span><span class="n">_on_body_entered</span><span class="p">(</span><span class="n">body</span><span class="p">):</span>
+<span class="w">    </span><span class="c1"># if the body _can_ take damage, give it _my_damage</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">body</span><span class="o">.</span><span class="n">has_method</span><span class="p">(</span><span class="s2">&quot;take_damage&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="n">body</span><span class="o">.</span><span class="n">take_damage</span><span class="p">(</span><span class="n">damage</span><span class="p">)</span>
 
-    # ... leave the rest ...
-</code></pre>
+<span class="w">    </span><span class="c1"># ... leave the rest ...</span>
+</code></pre></div>
+
 <p>So the var named <code>body</code> can be a slime and a slime will have the method <code>take_damage</code>. If it does, we invoke it! If not, it's not <em>'damageable'</em>.</p>
 <p><strong>Programmer's rant</strong></p>
 <p>We call this duck-typing: 
@@ -570,99 +590,108 @@ func _on_body_entered(body):
 <li>Open <code>res://texture_renditions.gd</code></li>
 <li>Add the properties <code>slime</code> and <code>slime_dissipate</code></li>
 </ol>
-<pre><code class="language-gdscript">var slime = preload(&quot;res://monsters/slime/green/5.png&quot;).get_image()
-var slime_dissipate : Array = []
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">var</span><span class="w"> </span><span class="n">slime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">preload</span><span class="p">(</span><span class="s2">&quot;res://monsters/slime/green/5.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_image</span><span class="p">()</span>
+<span class="k">var</span><span class="w"> </span><span class="n">slime_dissipate</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Array</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+</code></pre></div>
+
 <ol start="3">
 <li>And use <code>get_dissipate_renditions</code> to generate renditions for slime-death</li>
 </ol>
-<pre><code class="language-gdscript">func _ready():
-    slime_dissipate = get_dissipate_renditions(slime, 10, 2, 0.9)
-    fireball_dissipate = get_dissipate_renditions(fireball, 15, 1, 0.5)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="n">slime_dissipate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_dissipate_renditions</span><span class="p">(</span><span class="n">slime</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9</span><span class="p">)</span>
+<span class="w">    </span><span class="n">fireball_dissipate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_dissipate_renditions</span><span class="p">(</span><span class="n">fireball</span><span class="p">,</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span>
+</code></pre></div>
+
 <h4 id="add-a-movementstate-and-animation-for-slime-death">Add a <code>MovementState</code> and animation for slime death</h4>
 <p>Next open the slime script to add the renditions.</p>
 <ol>
 <li>Open <code>res://projectiles/fireball/fireball.gd</code></li>
 <li>Copy the rendition load code to your paste-buffer (<code>Ctrl + C</code>)</li>
 </ol>
-<pre><code class="language-gdscript">    # The sprite_frames of $AnimatedSprite2D is a singleton, so after calling 
-    # add_animation one time, it exists for all other instances
-    if &quot;dissipate&quot; not in $AnimatedSprite2D.sprite_frames.get_animation_names():
-        # Add a new animation to the SpriteFrames instance of the $AnimatedSprite2D node
-        $AnimatedSprite2D.sprite_frames.add_animation(&quot;dissipate&quot;)
-        # Loop through all rendition images in the global singleton fireball_dissipate
-        for rendition in TextureRenditions.fireball_dissipate:
-            # Add them as a frame to 
-            $AnimatedSprite2D.sprite_frames.add_frame(&quot;dissipate&quot;, rendition)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="c1"># The sprite_frames of $AnimatedSprite2D is a singleton, so after calling </span>
+<span class="w">    </span><span class="c1"># add_animation one time, it exists for all other instances</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="s2">&quot;dissipate&quot;</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">sprite_frames</span><span class="o">.</span><span class="n">get_animation_names</span><span class="p">():</span>
+<span class="w">        </span><span class="c1"># Add a new animation to the SpriteFrames instance of the $AnimatedSprite2D node</span>
+<span class="w">        </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">sprite_frames</span><span class="o">.</span><span class="n">add_animation</span><span class="p">(</span><span class="s2">&quot;dissipate&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="c1"># Loop through all rendition images in the global singleton fireball_dissipate</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">rendition</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">TextureRenditions</span><span class="o">.</span><span class="n">fireball_dissipate</span><span class="p">:</span>
+<span class="w">            </span><span class="c1"># Add them as a frame to </span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">sprite_frames</span><span class="o">.</span><span class="n">add_frame</span><span class="p">(</span><span class="s2">&quot;dissipate&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rendition</span><span class="p">)</span>
+</code></pre></div>
+
 <ol start="3">
 <li>Now open <code>res://monsters/slime/slime.gd</code></li>
 <li>And paste the copied code into the <code>_ready()</code> function, adjusting one bit: <code>.fireball_dissipate</code> becomes <code>.slime_dissipate</code></li>
 </ol>
-<pre><code class="language-gdscript">    if &quot;dissipate&quot; not in $AnimatedSprite2D.sprite_frames.get_animation_names():
-        # Add a new animation to the SpriteFrames instance of the $AnimatedSprite2D node
-        $AnimatedSprite2D.sprite_frames.add_animation(&quot;dissipate&quot;)
-        # Loop through all rendition images in the global singleton 
-        for rendition in TextureRenditions.slime_dissipate:
-            # Add them as a frame to 
-            $AnimatedSprite2D.sprite_frames.add_frame(&quot;dissipate&quot;, rendition)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="s2">&quot;dissipate&quot;</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">sprite_frames</span><span class="o">.</span><span class="n">get_animation_names</span><span class="p">():</span>
+<span class="w">        </span><span class="c1"># Add a new animation to the SpriteFrames instance of the $AnimatedSprite2D node</span>
+<span class="w">        </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">sprite_frames</span><span class="o">.</span><span class="n">add_animation</span><span class="p">(</span><span class="s2">&quot;dissipate&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="c1"># Loop through all rendition images in the global singleton </span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">rendition</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">TextureRenditions</span><span class="o">.</span><span class="n">slime_dissipate</span><span class="p">:</span>
+<span class="w">            </span><span class="c1"># Add them as a frame to </span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">sprite_frames</span><span class="o">.</span><span class="n">add_frame</span><span class="p">(</span><span class="s2">&quot;dissipate&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rendition</span><span class="p">)</span>
+</code></pre></div>
+
 <ol start="5">
 <li>When the slime's <code>hp</code> is <code>&lt;= 0</code> then it should <em>die</em></li>
 <li>Add the <code>MovementState.DYING</code> to the enum:</li>
 </ol>
-<pre><code class="language-gdscript">enum MovementState { AIRBORNE, FLOOR_BOUNCE, DYING }
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">enum</span><span class="w"> </span><span class="n">MovementState</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">AIRBORNE</span><span class="p">,</span><span class="w"> </span><span class="n">FLOOR_BOUNCE</span><span class="p">,</span><span class="w"> </span><span class="n">DYING</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
 <ol start="7">
 <li>So when the slime takes damage and drops below zero, set it:</li>
 </ol>
-<pre><code class="language-gdscript">func take_damage(dmg: int):
-    hp -= dmg
-    if hp &lt;= 0:
-        movement_state = MovementState.DYING
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">take_damage</span><span class="p">(</span><span class="n">dmg</span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">int</span><span class="p">):</span>
+<span class="w">    </span><span class="n">hp</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">dmg</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">hp</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">:</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">DYING</span>
+</code></pre></div>
+
 <ol start="8">
 <li>Make sure it is not <em>reset</em> in <code>set_movement_state()</code> and disable collisions:</li>
 </ol>
-<pre><code class="language-gdscript">func set_movement_state():
-    if movement_state == MovementState.DYING:
-        # FIXME: move to pick_collision_shape_for_movement_state
-        $AirborneCollisionShape.disabled = true
-        $FloorBounceCollisionShape.disabled = true
-    elif is_on_floor():
-        if movement_state == MovementState.AIRBORNE:
-            velocity.x = 0
-            $FloorBounceTimer.start()
-        movement_state = MovementState.FLOOR_BOUNCE
-    else:
-        movement_state = MovementState.AIRBORNE
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">set_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">DYING</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># FIXME: move to pick_collision_shape_for_movement_state</span>
+<span class="w">        </span><span class="o">$</span><span class="n">AirborneCollisionShape</span><span class="o">.</span><span class="n">disabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">true</span>
+<span class="w">        </span><span class="o">$</span><span class="n">FloorBounceCollisionShape</span><span class="o">.</span><span class="n">disabled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">true</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">is_on_floor</span><span class="p">():</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">            </span><span class="o">$</span><span class="n">FloorBounceTimer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">FLOOR_BOUNCE</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
+</code></pre></div>
+
 <ol start="8">
 <li>And <em>handle</em> it in the <code>movement_state</code> handler:</li>
 </ol>
-<pre><code class="language-gdscript">func handle_movement_state():
-    if movement_state == MovementState.DYING:
-        velocity = Vector2(0, 0)
-    # the rest was there already (behind 'el')
-    elif is_on_wall():
-        follow_player()
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">handle_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">DYING</span><span class="p">:</span>
+<span class="w">        </span><span class="n">velocity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">    </span><span class="c1"># the rest was there already (behind &#39;el&#39;)</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">is_on_wall</span><span class="p">():</span>
+<span class="w">        </span><span class="n">follow_player</span><span class="p">()</span>
 
-    pick_collision_shape_for_movement_state()
-    pick_sprite_for_movement_state()
-</code></pre>
+<span class="w">    </span><span class="n">pick_collision_shape_for_movement_state</span><span class="p">()</span>
+<span class="w">    </span><span class="n">pick_sprite_for_movement_state</span><span class="p">()</span>
+</code></pre></div>
+
 <ol start="9">
 <li>And make sure the correct animation for dying is picked:</li>
 </ol>
-<pre><code class="language-gdscript">func pick_sprite_for_movement_state():
-    match(movement_state):
-        MovementState.FLOOR_BOUNCE:
-            $AnimatedSprite2D.animation = &quot;floor_bounce&quot;
-        MovementState.AIRBORNE:
-            $AnimatedSprite2D.animation = &quot;airborne&quot;
-        MovementState.DYING:
-            $AnimatedSprite2D.animation = &quot;dissipate&quot;
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">pick_sprite_for_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="k">match</span><span class="p">(</span><span class="n">movement_state</span><span class="p">):</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">FLOOR_BOUNCE</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;floor_bounce&quot;</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;airborne&quot;</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">DYING</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;dissipate&quot;</span>
+</code></pre></div>
+
 <h4 id="the-dissipate-timer">The dissipate timer</h4>
 <ol>
 <li>Now let's add a <code>DissipateTimer</code> to the <code>Slime</code> scene</li>
@@ -673,18 +702,20 @@ var slime_dissipate : Array = []
 <li>Connect its <code>timeout()</code>-signal to <code>slime.gd</code> in the usual way (defaults in dialog and such)</li>
 <li>Implement as follows:</li>
 </ol>
-<pre><code class="language-gdscript">func _on_dissipate_timer_timeout():
-    queue_free()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_dissipate_timer_timeout</span><span class="p">():</span>
+<span class="w">    </span><span class="n">queue_free</span><span class="p">()</span>
+</code></pre></div>
+
 <ol start="8">
 <li>And of course let's not forget to fire the timer when the slime has no hp left:</li>
 </ol>
-<pre><code class="language-gdscript">func take_damage(dmg: int):
-    hp -= dmg
-    if hp &lt;= 0:
-        movement_state = MovementState.DYING
-        $DissipateTimer.start()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">take_damage</span><span class="p">(</span><span class="n">dmg</span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">int</span><span class="p">):</span>
+<span class="w">    </span><span class="n">hp</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">dmg</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">hp</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">:</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">DYING</span>
+<span class="w">        </span><span class="o">$</span><span class="n">DissipateTimer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</code></pre></div>
+
 <p>Test again and make sure the slime does stay dead...</p>
 <h3 id="make-the-slime-hurt-the-player-by-bouncing-into-the-player">Make the slime hurt the player by bouncing into the player</h3>
 <p>Being a <code>CharacterBody2D</code>, same as the <code>Player</code> is, the <code>Slime</code> does not have the <code>body_entered</code>, nor does it have <code>area_entered</code> out of the box. </p>
@@ -694,32 +725,35 @@ var slime_dissipate : Array = []
 <li>Open <code>slime.gd</code></li>
 <li>Add a default damage as public property:</li>
 </ol>
-<pre><code class="language-gdscript">@export var damage = 1
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">damage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+</code></pre></div>
+
 <ol start="3">
 <li>Write a function <code>damage_player</code>:</li>
 </ol>
-<pre><code class="language-gdscript">func damage_player():
-    # detect collisions based on collision count
-    for i in get_slide_collision_count():
-        # get current colliding other thing
-        var collider = get_slide_collision(i).get_collider()
-        # test if other thing is the Player
-        # (collider could be null, so test existence first)
-        if collider and collider.name == &quot;Player&quot;:
-            # make the player take damage
-            collider.take_damage(damage)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">damage_player</span><span class="p">():</span>
+<span class="w">    </span><span class="c1"># detect collisions based on collision count</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">get_slide_collision_count</span><span class="p">():</span>
+<span class="w">        </span><span class="c1"># get current colliding other thing</span>
+<span class="w">        </span><span class="k">var</span><span class="w"> </span><span class="n">collider</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_slide_collision</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">get_collider</span><span class="p">()</span>
+<span class="w">        </span><span class="c1"># test if other thing is the Player</span>
+<span class="w">        </span><span class="c1"># (collider could be null, so test existence first)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">collider</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">collider</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;Player&quot;</span><span class="p">:</span>
+<span class="w">            </span><span class="c1"># make the player take damage</span>
+<span class="w">            </span><span class="n">collider</span><span class="o">.</span><span class="n">take_damage</span><span class="p">(</span><span class="n">damage</span><span class="p">)</span>
+</code></pre></div>
+
 <p>Testing with <code>F5</code> we soon run into an issue: the player does not yet have the <code>take_damage</code> method.</p>
 <ol start="4">
 <li>Open <code>player.gd</code></li>
 <li>Write the method <code>take_damage</code>:</li>
 </ol>
-<pre><code class="language-gdscript">func take_damage(damage : float):
-    print(&quot;Ouch! I took: &quot; + str(damage) + &quot; damage!&quot;)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">take_damage</span><span class="p">(</span><span class="n">damage</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">float</span><span class="p">):</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Ouch! I took: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">damage</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot; damage!&quot;</span><span class="p">)</span>
+</code></pre></div>
+
 <p>Test with <code>F5</code> again and notice: she's taking a <em>lot</em> of damage:</p>
-<pre><code>Ouch! I took: 1 damage!
+<div class="codehilite"><pre><span></span><code>Ouch! I took: 1 damage!
 Ouch! I took: 1 damage!
 Ouch! I took: 1 damage!
 Ouch! I took: 1 damage!
@@ -731,36 +765,41 @@ Ouch! I took: 1 damage!
 Ouch! I took: 1 damage!
 Ouch! I took: 1 damage!
 Ouch! I took: 1 damage!
-</code></pre>
+</code></pre></div>
+
 <p>So let's leave our player immortal for a while longer, because tweaking how fast she should die is pretty hard. </p>
 <p>We want to move on to bigger and better things for now.</p>
 <p>Just take a <em>pass</em> on her <code>take_damage</code> function for now so we don't clog up the log:</p>
-<pre><code class="language-gdscript">func take_damage(_damage):
-    # leave Zelia immortal for a while longer
-    pass
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">take_damage</span><span class="p">(</span><span class="n">_damage</span><span class="p">):</span>
+<span class="w">    </span><span class="c1"># leave Zelia immortal for a while longer</span>
+<span class="w">    </span><span class="k">pass</span>
+</code></pre></div>
+
 <h4 id="just-one-more-tweak-bounce-off-of-the-player">Just one more tweak: bounce off of the player</h4>
 <p>One thing we should do now to finish the <code>Slime</code> behaviour is to allow it to bounce off of the player a little with the extra benefit that it won't collide into her <em>that</em> often.</p>
 <p>We can reuse its <code>start_jump</code> method for that:</p>
-<pre><code class="language-gdscript">        # test if other thing is the Player
-        if collider.name == &quot;Player&quot;:
-            # make the player take damage
-            collider.take_damage(damage)
-            # this is new
-            start_jump()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">        </span><span class="c1"># test if other thing is the Player</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">collider</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;Player&quot;</span><span class="p">:</span>
+<span class="w">            </span><span class="c1"># make the player take damage</span>
+<span class="w">            </span><span class="n">collider</span><span class="o">.</span><span class="n">take_damage</span><span class="p">(</span><span class="n">damage</span><span class="p">)</span>
+<span class="w">            </span><span class="c1"># this is new</span>
+<span class="w">            </span><span class="n">start_jump</span><span class="p">()</span>
+</code></pre></div>
+
 <p>Testing again shows one more error: the slime double jumps! You can fix it by killing the <code>FlourBounceTimer</code> when a jump is started:</p>
-<pre><code class="language-gdscript">func start_jump():
-    $FloorBounceTimer.stop()
-    velocity.y = JUMP_VELOCITY
-    follow_player()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">start_jump</span><span class="p">():</span>
+<span class="w">    </span><span class="o">$</span><span class="n">FloorBounceTimer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+<span class="w">    </span><span class="n">velocity</span><span class="o">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JUMP_VELOCITY</span>
+<span class="w">    </span><span class="n">follow_player</span><span class="p">()</span>
+</code></pre></div>
+
 <p>That's a little much, maybe the slime should bounce off a bit less high:</p>
-<pre><code class="language-gdscript">func start_jump(init_velocity = JUMP_VELOCITY):
-    $FloorBounceTimer.stop()
-    velocity.y = init_velocity
-    follow_player()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">start_jump</span><span class="p">(</span><span class="n">init_velocity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JUMP_VELOCITY</span><span class="p">):</span>
+<span class="w">    </span><span class="o">$</span><span class="n">FloorBounceTimer</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+<span class="w">    </span><span class="n">velocity</span><span class="o">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">init_velocity</span>
+<span class="w">    </span><span class="n">follow_player</span><span class="p">()</span>
+</code></pre></div>
+
 <p>Now in <code>damage_player</code> we can invoke it with a different init_velocity like:  <code>start_jump(-150)</code>, still taking <code>JUMP_VELOCITY</code> as its default value.</p>
 <h2 id="add-the-tree-trunk-terrain">Add the <code>tree-trunk</code> terrain</h2>
 <p>Because Zelia (in the original game) runs into tiles that are not just squares, our rewrite must have them as well. Open <code>res://world.tscn</code>.</p>
@@ -806,15 +845,16 @@ Ouch! I took: 1 damage!
 <li>Now open the <code>game.tscn</code> again and attach the <code>game.gd</code> script to it</li>
 <li>Make sure the script now extends <code>Node</code> in stead of <code>TileMap</code>:</li>
 </ol>
-<pre><code class="language-gdscript">extends Node
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">Node</span>
 
-func _on_player_cast_projectile(spell_class, direction, origin):
-    var spell = spell_class.instantiate()
-    add_child(spell)
-    spell.rotation = direction
-    spell.position = origin
-    spell.velocity = Vector2.from_angle(direction) * 150.0
-</code></pre>
+<span class="k">func</span><span class="w"> </span><span class="n">_on_player_cast_projectile</span><span class="p">(</span><span class="n">spell_class</span><span class="p">,</span><span class="w"> </span><span class="n">direction</span><span class="p">,</span><span class="w"> </span><span class="n">origin</span><span class="p">):</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">spell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">spell_class</span><span class="o">.</span><span class="n">instantiate</span><span class="p">()</span>
+<span class="w">    </span><span class="n">add_child</span><span class="p">(</span><span class="n">spell</span><span class="p">)</span>
+<span class="w">    </span><span class="n">spell</span><span class="o">.</span><span class="n">rotation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">direction</span>
+<span class="w">    </span><span class="n">spell</span><span class="o">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">origin</span>
+<span class="w">    </span><span class="n">spell</span><span class="o">.</span><span class="n">velocity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="o">.</span><span class="n">from_angle</span><span class="p">(</span><span class="n">direction</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">150.0</span>
+</code></pre></div>
+
 <ol start="10">
 <li>Attach the following scenes as children for <code>Game</code> by dragging them from the <code>FileSystem</code> tab:</li>
 <li><code>res://terrains.tscn</code></li>
@@ -924,173 +964,191 @@ func _on_player_cast_projectile(spell_class, direction, origin):
 <li>Leave defaults active and click <code>Create</code></li>
 <li>First let's check if our new <code>Metadata</code>-field works:</li>
 </ol>
-<pre><code class="language-gdscript">extends TileMap
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">TileMap</span>
 
-func _ready():
-    if get_meta(&quot;breakable&quot;):
-        print (name + &quot; is breakable&quot;)
-</code></pre>
+<span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">get_meta</span><span class="p">(</span><span class="s2">&quot;breakable&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="nb">print</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot; is breakable&quot;</span><span class="p">)</span>
+</code></pre></div>
+
 <ol start="5">
 <li>Test with <code>F5</code> and observe:</li>
 </ol>
-<pre><code>BreakableTerrains is breakable
-</code></pre>
+<div class="codehilite"><pre><span></span><code>BreakableTerrains is breakable
+</code></pre></div>
+
 <h3 id="a-thorough-guide-to-the-poor-mans-debugger">A thorough guide to the <em>poor man's debugger</em></h3>
 <p>Now we will loop through the tiles and read <em>all</em> the properties we'll need to signal the game to create that <code>BreakableTile</code>-instance <a href="#the-final-approach-in-very-simplified-terms">we announced before</a>. </p>
 <p>All the godot methods and properties used are linked to their respective class-references:</p>
 <ol>
 <li>Loop through the tiles in our current (only) layer using <a href="https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-method-get-used-cells">get_used_cells</a></li>
 </ol>
-<pre><code class="language-gdscript">func _ready():
-    if get_meta(&quot;breakable&quot;):
-        print (name + &quot; is breakable&quot;)
-        # Loop through the tile positions in our current (only) layer
-        for cell in get_used_cells(0):
-            print(cell)
-            print(cell * tile_set.tile_size)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">get_meta</span><span class="p">(</span><span class="s2">&quot;breakable&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="nb">print</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot; is breakable&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="c1"># Loop through the tile positions in our current (only) layer</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">get_used_cells</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">            </span><span class="nb">print</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
+<span class="w">            </span><span class="nb">print</span><span class="p">(</span><span class="n">cell</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tile_set</span><span class="o">.</span><span class="n">tile_size</span><span class="p">)</span>
+</code></pre></div>
+
 <ol start="2">
 <li>Observe the log:</li>
 </ol>
-<pre><code>BreakableTerrains is breakable
+<div class="codehilite"><pre><span></span><code>BreakableTerrains is breakable
 (7, 2)
 (105, 30)
-</code></pre>
+</code></pre></div>
+
 <p>The <code>(7, 2)</code> is the string serialization of a <code>Vector2i</code>, which represents the position of this tile on the <code>TileMap</code>'s grid. </p>
 <p>Our <a href="https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-property-tile-set"><code>tile_set</code></a>.<a href="https://docs.godotengine.org/en/stable/classes/class_tileset.html#class-tileset-property-tile-size">tile_size</a> is <code>15x15</code> so the <code>position</code> of the <code>BreakableTile</code> will become <code>(105, 30)</code> <em>plus</em> the <code>position</code> of this <code>TileMap</code> instance.</p>
 <ol start="3">
 <li>Let's just print that <code>TileMap</code>-instance's <code>position</code> just to check:</li>
 </ol>
-<pre><code class="language-gdscript">extends TileMap
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">TileMap</span>
 
-func _ready():
-    if get_meta(&quot;breakable&quot;):
-        print (name + &quot; is breakable&quot;)
-        print (name + &quot;'s origin is: &quot; + str(position))
-        # Loop through the tile positions in our current (only) layer
-        for cell in get_used_cells(0):
-            print(&quot;Tile grid position:            &quot; + str(cell))
-            print(&quot;BreakableTile target position: &quot; + str(Vector2i(position) + cell * tile_set.tile_size))
-</code></pre>
+<span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">get_meta</span><span class="p">(</span><span class="s2">&quot;breakable&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="nb">print</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot; is breakable&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="nb">print</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;&#39;s origin is: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">position</span><span class="p">))</span>
+<span class="w">        </span><span class="c1"># Loop through the tile positions in our current (only) layer</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">get_used_cells</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">            </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tile grid position:            &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">cell</span><span class="p">))</span>
+<span class="w">            </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BreakableTile target position: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">Vector2i</span><span class="p">(</span><span class="n">position</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tile_set</span><span class="o">.</span><span class="n">tile_size</span><span class="p">))</span>
+</code></pre></div>
+
 <ol start="4">
 <li>Run with <code>F5</code> and inspect the log:</li>
 </ol>
-<pre><code>BreakableTerrains is breakable
-BreakableTerrains's origin is: (0, 0)
+<div class="codehilite"><pre><span></span><code>BreakableTerrains is breakable
+BreakableTerrains&#39;s origin is: (0, 0)
 Tile grid position:            (7, 2)
 BreakableTile target position: (105, 30)
-</code></pre>
+</code></pre></div>
+
 <ol start="5">
 <li>Open <code>res://game.tscn</code> and select <code>BreakableTerrains</code></li>
 <li>Change its position in <code>Inspector &gt; Transform &gt; Position</code> </li>
 <li>Rerun the game and inspect the log again:</li>
 </ol>
-<pre><code>BreakableTile target position: (115, 41)
-</code></pre>
+<div class="codehilite"><pre><span></span><code>BreakableTile target position: (115, 41)
+</code></pre></div>
+
 <ol start="8">
 <li>Changed the <code>BreakableTerrains</code>' position by <code>+(10,11)</code> as can be observed in the log</li>
 <li>Quickly revert the <code>position</code> to <code>(0, 0)</code>, which makes reasoning easier.</li>
 <li>Next use <a href="https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-method-get-cell-source-id"><code>get_cell_source_id</code></a> and <a href="https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-property-tile-set"><code>tile_set</code></a>.<a href="https://docs.godotengine.org/en/stable/classes/class_tileset.html#class-tileset-method-get-source"><code>get_source</code></a> to obtain the <a href="https://docs.godotengine.org/en/stable/classes/class_tilesetatlassource.html"><code>TileSetAtlasSource</code></a> we used for our textures and physics polygons:</li>
 </ol>
-<pre><code class="language-gdscript">        for cell in get_used_cells(0):
-            print(&quot;Tile grid position:            &quot; + str(cell))
-            print(&quot;BreakableTile target position: &quot; + str(Vector2i(position) + cell * tile_set.tile_size))
-            var source_id = get_cell_source_id(0, cell)
-            var tileset_source : TileSetAtlasSource = tile_set.get_source(source_id)
-            print(&quot;TileSetAtlasSource:            &quot; + tileset_source.resource_name)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">get_used_cells</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">            </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tile grid position:            &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">cell</span><span class="p">))</span>
+<span class="w">            </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BreakableTile target position: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">Vector2i</span><span class="p">(</span><span class="n">position</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tile_set</span><span class="o">.</span><span class="n">tile_size</span><span class="p">))</span>
+<span class="w">            </span><span class="k">var</span><span class="w"> </span><span class="n">source_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_cell_source_id</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">cell</span><span class="p">)</span>
+<span class="w">            </span><span class="k">var</span><span class="w"> </span><span class="n">tileset_source</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">TileSetAtlasSource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tile_set</span><span class="o">.</span><span class="n">get_source</span><span class="p">(</span><span class="n">source_id</span><span class="p">)</span>
+<span class="w">            </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TileSetAtlasSource:            &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tileset_source</span><span class="o">.</span><span class="n">resource_name</span><span class="p">)</span>
+</code></pre></div>
+
 <ol start="11">
 <li>Test with <code>F5</code> again:</li>
 </ol>
-<pre><code>BreakableTerrains is breakable
-BreakableTerrains's origin is: (0, 0)
+<div class="codehilite"><pre><span></span><code>BreakableTerrains is breakable
+BreakableTerrains&#39;s origin is: (0, 0)
 Tile grid position:            (7, 2)
 BreakableTile target position: (105, 30)
 TileSetAtlasSource:            grass-and-dirt
-</code></pre>
+</code></pre></div>
+
 <ol start="12">
 <li>Next use our <code>cell</code> to obtain the position in the <em>atlas</em> texture of the current tile using <a href="https://docs.godotengine.org/en/stable/classes/class_tilemap.html#class-tilemap-method-get-cell-atlas-coords"><code>get_cell_atlas_coords</code></a></li>
 </ol>
-<pre><code class="language-gdscript">            var tile_atlas_coords = get_cell_atlas_coords(0, cell)
-            print(&quot;tile_atlas_coords:             &quot; + str(tile_atlas_coords))
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">            </span><span class="k">var</span><span class="w"> </span><span class="n">tile_atlas_coords</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_cell_atlas_coords</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">cell</span><span class="p">)</span>
+<span class="w">            </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;tile_atlas_coords:             &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">tile_atlas_coords</span><span class="p">))</span>
+</code></pre></div>
+
 <ol start="13">
 <li>And of course, this also should be multiplied by our <code>tile_set</code>.<code>tile_size</code> to get the pixel position on the underlying texture.</li>
 </ol>
-<pre><code class="language-gdscript">            print(&quot;tile_atlas_coords:             &quot; + str(tile_atlas_coords * tile_set.tile_size))
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">            </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;tile_atlas_coords:             &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">tile_atlas_coords</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tile_set</span><span class="o">.</span><span class="n">tile_size</span><span class="p">))</span>
+</code></pre></div>
+
 <ol start="14">
 <li>In order to clip out the correct image we need the  <code>Texture2D</code>-resource of the <em>atlas</em> as well</li>
 </ol>
-<pre><code class="language-gdscript">            print(&quot;texture:                       &quot; + tileset_source.texture.resource_path)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">            </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;texture:                       &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tileset_source</span><span class="o">.</span><span class="n">texture</span><span class="o">.</span><span class="n">resource_path</span><span class="p">)</span>
+</code></pre></div>
+
 <ol start="15">
 <li>Just to be sure we're still on the same page, check your debug log again:</li>
 </ol>
-<pre><code>BreakableTerrains is breakable
-BreakableTerrains's origin is: (0, 0)
+<div class="codehilite"><pre><span></span><code>BreakableTerrains is breakable
+BreakableTerrains&#39;s origin is: (0, 0)
 Tile grid position:            (7, 2)
 BreakableTile target position: (105, 30)
 TileSetAtlasSource:            grass-and-dirt
 tile_atlas_coords:             (60, 15)
 texture:                       res://surface_maps/grass-and-dirt/1.png
-</code></pre>
+</code></pre></div>
+
 <p>The last bit of information up next was the one that took me the longest: the collision polygons of this tile (<em>especially because I forgot to draw the polygon for the tile I was testing :D</em>).</p>
 <p><em>Also, the obstinate use of <strong>obtain</strong> umpten times is intentional</em>: it's an <em>achievement</em>.</p>
 <ol start="16">
 <li>Use the <code>tile_atlas_coords</code> we obtained with the <code>tileset_source</code> we obtained to obtain the <a href="https://docs.godotengine.org/en/stable/classes/class_tiledata.html#class-tiledata"><code>tile_data</code></a> of this tile with <a href="https://docs.godotengine.org/en/stable/classes/class_tilesetatlassource.html#class-tilesetatlassource-method-get-tile-data"><code>get_tile_data</code></a></li>
 <li>And then invoke <a href="https://docs.godotengine.org/en/stable/classes/class_tiledata.html#class-tiledata-method-get-collision-polygon-points"><code>get_collision_polygon_points</code></a> to obtain the ... wait for it ... <code>PackedVector2Array</code> representing the collision polygon of this tile:</li>
 </ol>
-<pre><code class="language-gdscript">            var tile_data = tileset_source.get_tile_data(tile_atlas_coords, 0)
-            print(&quot;polygon:                       &quot; + str(tile_data.get_collision_polygon_points(0, 0)))
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">            </span><span class="k">var</span><span class="w"> </span><span class="n">tile_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tileset_source</span><span class="o">.</span><span class="n">get_tile_data</span><span class="p">(</span><span class="n">tile_atlas_coords</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">            </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;polygon:                       &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">tile_data</span><span class="o">.</span><span class="n">get_collision_polygon_points</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)))</span>
+</code></pre></div>
+
 <ol start="18">
 <li>And that should look like this in your debug log:</li>
 </ol>
-<pre><code>polygon:                       [(-7.5, -7.5), (7.5, -7.5), (7.5, 7.5), (-7.5, 7.5)]
-</code></pre>
+<div class="codehilite"><pre><span></span><code>polygon:                       [(-7.5, -7.5), (7.5, -7.5), (7.5, 7.5), (-7.5, 7.5)]
+</code></pre></div>
+
 <p>Now, just to make sure we did everything correctly (<em>did you also notice the 5 magic zeroes <code>0</code> we introduced, representing layers and layers and more layers of which we only seem to have one at each turn?</em>).. Let plant a tree with a divergent polygon as well (in our <code>BreakableTerrains</code>-instance of course):</p>
 <p><img alt="divergent polygon" src="../screenshots/tree-polygons.png" /></p>
 <p>That should log something similar to this:</p>
-<pre><code>Tile grid position:            (9, 3)
+<div class="codehilite"><pre><span></span><code>Tile grid position:            (9, 3)
 BreakableTile target position: (135, 45)
 TileSetAtlasSource:            tree-trunk
 tile_atlas_coords:             (75, 0)
 texture:                       res://surface_maps/tree-trunk/1.png
 polygon:                       [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0.5, 4.5), (5.625, 5.75), (7.5, 7.5), (-7.5, 7.5)]
-</code></pre>
+</code></pre></div>
+
 <h3 id="declaring-and-emitting-the-add_breakable_tile-signal">Declaring and emitting the <code>add_breakable_tile</code> signal</h3>
 <p>Now that we've collected all the information we need for the game to spawn in <em>one</em> <code>BreakableTile</code> per tile in our <code>BreakableTerrains</code>-instance we're ready to us it.</p>
 <ol>
 <li>Declare the signal <code>add_breakable_tile</code> as follows in <code>terrains.gd</code>:</li>
 </ol>
-<pre><code class="language-gdscript">signal add_breakable_tile(
-    position     : Vector2i, 
-    texture      : Texture2D, 
-    texture_pos  : Vector2i,
-    # collisigon is my personal shorthand for &quot;collision polygon&quot;
-    collisigon   : PackedVector2Array
-)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">signal</span><span class="w"> </span><span class="n">add_breakable_tile</span><span class="p">(</span>
+<span class="w">    </span><span class="n">position</span><span class="w">     </span><span class="p">:</span><span class="w"> </span><span class="n">Vector2i</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="n">texture</span><span class="w">      </span><span class="p">:</span><span class="w"> </span><span class="n">Texture2D</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="n">texture_pos</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="n">Vector2i</span><span class="p">,</span>
+<span class="w">    </span><span class="c1"># collisigon is my personal shorthand for &quot;collision polygon&quot;</span>
+<span class="w">    </span><span class="n">collisigon</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">PackedVector2Array</span>
+<span class="p">)</span>
+</code></pre></div>
+
 <ol start="2">
 <li>And <code>emit</code> it in the loop (<em>note we remove all the <code>print</code>s</em>):</li>
 </ol>
-<pre><code class="language-gdscript">func _ready():
-    if get_meta(&quot;breakable&quot;):
-        # Loop through the tile positions in our current (only) layer
-        for cell in get_used_cells(0):
-            var source_id = get_cell_source_id(0, cell)
-            var tileset_source : TileSetAtlasSource = tile_set.get_source(source_id)
-            var tile_atlas_coords = get_cell_atlas_coords(0, cell)
-            var tile_data = tileset_source.get_tile_data(tile_atlas_coords, 0)
-            emit_signal(
-                &quot;add_breakable_tile&quot;,
-                Vector2i(position) + cell * tile_set.tile_size,
-                tileset_source.texture,
-                tile_atlas_coords * tile_set.tile_size,
-                tile_data.get_collision_polygon_points(0, 0)
-            )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">get_meta</span><span class="p">(</span><span class="s2">&quot;breakable&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="c1"># Loop through the tile positions in our current (only) layer</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">get_used_cells</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">            </span><span class="k">var</span><span class="w"> </span><span class="n">source_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_cell_source_id</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">cell</span><span class="p">)</span>
+<span class="w">            </span><span class="k">var</span><span class="w"> </span><span class="n">tileset_source</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">TileSetAtlasSource</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tile_set</span><span class="o">.</span><span class="n">get_source</span><span class="p">(</span><span class="n">source_id</span><span class="p">)</span>
+<span class="w">            </span><span class="k">var</span><span class="w"> </span><span class="n">tile_atlas_coords</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_cell_atlas_coords</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">cell</span><span class="p">)</span>
+<span class="w">            </span><span class="k">var</span><span class="w"> </span><span class="n">tile_data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tileset_source</span><span class="o">.</span><span class="n">get_tile_data</span><span class="p">(</span><span class="n">tile_atlas_coords</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">            </span><span class="n">emit_signal</span><span class="p">(</span>
+<span class="w">                </span><span class="s2">&quot;add_breakable_tile&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="n">Vector2i</span><span class="p">(</span><span class="n">position</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tile_set</span><span class="o">.</span><span class="n">tile_size</span><span class="p">,</span>
+<span class="w">                </span><span class="n">tileset_source</span><span class="o">.</span><span class="n">texture</span><span class="p">,</span>
+<span class="w">                </span><span class="n">tile_atlas_coords</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tile_set</span><span class="o">.</span><span class="n">tile_size</span><span class="p">,</span>
+<span class="w">                </span><span class="n">tile_data</span><span class="o">.</span><span class="n">get_collision_polygon_points</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">            </span><span class="p">)</span>
+</code></pre></div>
+
 <ol start="3">
 <li>Now in <code>res://game.tscn</code> select <code>BreakableTerrains</code> again</li>
 <li>Navigate to <code>Node &gt; Signals</code></li>
@@ -1098,28 +1156,30 @@ polygon:                       [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0
 <li>Leave the defaults (so target is <code>game.gd</code>) and click <code>Connect</code></li>
 <li>Now print the inputs in this new listener:</li>
 </ol>
-<pre><code class="language-gdscript">func _on_breakable_terrains_add_breakable_tile(
-    target_pos  : Vector2,
-    texture     : Texture2D,
-    texture_pos : Vector2i,
-    collisigon  : PackedVector2Array
-):
-    print(&quot;Target position of BreakableTile:   &quot; + str(target_pos))
-    print(&quot;Atlas texture resource dir:         &quot; + str(texture.resource_path))
-    print(&quot;Position of this tile in the atlas: &quot; + str(texture_pos))
-    print(&quot;Collision polygon of this tile:     &quot; + str(collisigon))
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_breakable_terrains_add_breakable_tile</span><span class="p">(</span>
+<span class="w">    </span><span class="n">target_pos</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">,</span>
+<span class="w">    </span><span class="n">texture</span><span class="w">     </span><span class="p">:</span><span class="w"> </span><span class="n">Texture2D</span><span class="p">,</span>
+<span class="w">    </span><span class="n">texture_pos</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Vector2i</span><span class="p">,</span>
+<span class="w">    </span><span class="n">collisigon</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">PackedVector2Array</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Target position of BreakableTile:   &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">target_pos</span><span class="p">))</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Atlas texture resource dir:         &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">texture</span><span class="o">.</span><span class="n">resource_path</span><span class="p">))</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Position of this tile in the atlas: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">texture_pos</span><span class="p">))</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Collision polygon of this tile:     &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">collisigon</span><span class="p">))</span>
+</code></pre></div>
+
 <ol start="8">
 <li>Go back to <code>res://terrains.gd</code></li>
 <li>Earlier <a href="#the-final-approach-in-very-simplified-terms">we announced</a> in step 7 we would call <code>queue_free</code> after all the tiles in the map were <em>signalled</em>:</li>
 </ol>
-<pre><code class="language-gdscript">func _ready():
-    if get_meta(&quot;breakable&quot;):
-        # Loop through the tile positions in our current (only) layer
-        # ... leave the for-loop in tact of course ...
-        # Remove this TileMap from the parent scene
-        queue_free()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">get_meta</span><span class="p">(</span><span class="s2">&quot;breakable&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="c1"># Loop through the tile positions in our current (only) layer</span>
+<span class="w">        </span><span class="c1"># ... leave the for-loop in tact of course ...</span>
+<span class="w">        </span><span class="c1"># Remove this TileMap from the parent scene</span>
+<span class="w">        </span><span class="n">queue_free</span><span class="p">()</span>
+</code></pre></div>
+
 <p>If you test again now, all we have left is the print messages in our console, but the (as yet) unbreakable tiles from the <code>BreakableTerrains</code>-<code>TileMap</code> are gone.</p>
 <h3 id="creating-the-breakabletile-scene">Creating the <code>BreakableTile</code> scene</h3>
 <p>Now in order the <code>game.gd</code> to instantiate breakable tiles and attach then as children we first need to make a <code>BreakableTile</code>-scene.</p>
@@ -1147,50 +1207,55 @@ polygon:                       [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0
 <li>Open <code>res://game.gd</code></li>
 <li>Use <a href="https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/static_typing.html#custom-variable-types"><code>preload</code></a> to import the <code>BreakableTile</code>-scene:</li>
 </ol>
-<pre><code class="language-gdscript">var BreakableTile = preload(&quot;res://tiles/breakable_tile.tscn&quot;)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">var</span><span class="w"> </span><span class="n">BreakableTile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">preload</span><span class="p">(</span><span class="s2">&quot;res://tiles/breakable_tile.tscn&quot;</span><span class="p">)</span>
+</code></pre></div>
+
 <ol start="3">
 <li>Instatiate it in <code>_on_breakable_terrains_add_breakable_tile</code></li>
 <li>And then use the <code>position</code> argument to set its position property</li>
 </ol>
-<pre><code class="language-gdscript">func _on_breakable_terrains_add_breakable_tile(
-    target_pos  : Vector2,
-    texture     : Texture2D,
-    texture_pos : Vector2i,
-    collisigon  : PackedVector2Array
-):
-    var new_tile : StaticBody2D = BreakableTile.instantiate()
-    new_tile.position = target_pos
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_breakable_terrains_add_breakable_tile</span><span class="p">(</span>
+<span class="w">    </span><span class="n">target_pos</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">,</span>
+<span class="w">    </span><span class="n">texture</span><span class="w">     </span><span class="p">:</span><span class="w"> </span><span class="n">Texture2D</span><span class="p">,</span>
+<span class="w">    </span><span class="n">texture_pos</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Vector2i</span><span class="p">,</span>
+<span class="w">    </span><span class="n">collisigon</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">PackedVector2Array</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">new_tile</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">StaticBody2D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BreakableTile</span><span class="o">.</span><span class="n">instantiate</span><span class="p">()</span>
+<span class="w">    </span><span class="n">new_tile</span><span class="o">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">target_pos</span>
+</code></pre></div>
+
 <p>This still does nothing visible. </p>
 <p>We need to add the <code>BreakableTile</code>-instance(s) to the game tree, which would make us see our <code>rest://tiles/placholder.png</code>-texture.</p>
 <p><strong>HEADS UP!</strong> This next snippet won't work:</p>
-<pre><code class="language-gdscript">func _on_breakable_terrains_add_breakable_tile(
-    target_pos  : Vector2,
-    texture     : Texture2D,
-    texture_pos : Vector2i,
-    collisigon  : PackedVector2Array
-):
-    var new_tile : StaticBody2D = BreakableTile.instantiate()
-    new_tile.position = target_pos
-    # this is the code we want to execute
-    add_child(new_tile)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_breakable_terrains_add_breakable_tile</span><span class="p">(</span>
+<span class="w">    </span><span class="n">target_pos</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">,</span>
+<span class="w">    </span><span class="n">texture</span><span class="w">     </span><span class="p">:</span><span class="w"> </span><span class="n">Texture2D</span><span class="p">,</span>
+<span class="w">    </span><span class="n">texture_pos</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Vector2i</span><span class="p">,</span>
+<span class="w">    </span><span class="n">collisigon</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">PackedVector2Array</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">new_tile</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">StaticBody2D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BreakableTile</span><span class="o">.</span><span class="n">instantiate</span><span class="p">()</span>
+<span class="w">    </span><span class="n">new_tile</span><span class="o">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">target_pos</span>
+<span class="w">    </span><span class="c1"># this is the code we want to execute</span>
+<span class="w">    </span><span class="n">add_child</span><span class="p">(</span><span class="n">new_tile</span><span class="p">)</span>
+</code></pre></div>
+
 <p>For the sake of learning, press <code>F5</code>.</p>
 <p>So now we get this error in our console:</p>
-<pre><code>game.gd:16 @ _on_breakable_terrains_add_breakable_tile(): Parent node is busy setting up children, `add_child()` failed. Consider using `add_child.call_deferred(child)` instead.
-</code></pre>
+<div class="codehilite"><pre><span></span><code>game.gd:16 @ _on_breakable_terrains_add_breakable_tile(): Parent node is busy setting up children, <span class="sb">`add_child()`</span> failed. Consider using <span class="sb">`add_child.call_deferred(child)`</span> instead.
+</code></pre></div>
+
 <p>That sounds super helpful! Let's try it out!</p>
-<pre><code class="language-gdscript">func _on_breakable_terrains_add_breakable_tile(
-    target_pos  : Vector2,
-    texture     : Texture2D,
-    texture_pos : Vector2i,
-    collisigon  : PackedVector2Array
-):
-    var new_tile : StaticBody2D = BreakableTile.instantiate()
-    new_tile.position = target_pos
-    add_child.call_deferred(new_tile)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_breakable_terrains_add_breakable_tile</span><span class="p">(</span>
+<span class="w">    </span><span class="n">target_pos</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">,</span>
+<span class="w">    </span><span class="n">texture</span><span class="w">     </span><span class="p">:</span><span class="w"> </span><span class="n">Texture2D</span><span class="p">,</span>
+<span class="w">    </span><span class="n">texture_pos</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Vector2i</span><span class="p">,</span>
+<span class="w">    </span><span class="n">collisigon</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">PackedVector2Array</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">new_tile</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">StaticBody2D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BreakableTile</span><span class="o">.</span><span class="n">instantiate</span><span class="p">()</span>
+<span class="w">    </span><span class="n">new_tile</span><span class="o">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">target_pos</span>
+<span class="w">    </span><span class="n">add_child</span><span class="o">.</span><span class="n">call_deferred</span><span class="p">(</span><span class="n">new_tile</span><span class="p">)</span>
+</code></pre></div>
+
 <p>Test again with <code>F5</code> and voilà, our pretty placeholder is added tot the scene:</p>
 <p><img alt="breakable tiles misplaced" src="../screenshots/breakable-tile-misplaced.png" /></p>
 <h3 id="but-wait-whats-wrong-with-this-picture">But wait, what's wrong with this picture?</h3>
@@ -1214,38 +1279,39 @@ polygon:                       [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0
 <li>Leave the defaults and save into <code>res://tiles/breakable_tile.gd</code></li>
 <li>Add these public properties:</li>
 </ol>
-<pre><code class="language-gdscript">extends StaticBody2D
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">StaticBody2D</span>
 
-@export var texture     : Texture2D
-@export var texture_pos : Vector2i
-@export var collisigon  : PackedVector2Array
+<span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">texture</span><span class="w">     </span><span class="p">:</span><span class="w"> </span><span class="n">Texture2D</span>
+<span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">texture_pos</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Vector2i</span>
+<span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">collisigon</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">PackedVector2Array</span>
 
-func _ready():
-    print(&quot;BreakableTile.position:    &quot; + str(position))
-    print(&quot;BreakableTile.texture:     &quot; + str(texture.resource_path))
-    print(&quot;BreakableTile.texture_pos: &quot; + str(texture_pos))
-    print(&quot;BreakableTile.collisigon:  &quot; + str(collisigon))
+<span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BreakableTile.position:    &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">position</span><span class="p">))</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BreakableTile.texture:     &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">texture</span><span class="o">.</span><span class="n">resource_path</span><span class="p">))</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BreakableTile.texture_pos: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">texture_pos</span><span class="p">))</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BreakableTile.collisigon:  &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">collisigon</span><span class="p">))</span>
+</code></pre></div>
 
-</code></pre>
 <ol start="6">
 <li>Open <code>res://game.gd</code></li>
 <li>Set these new public properties in our signal listener:</li>
 </ol>
-<pre><code class="language-gdscript">func _on_breakable_terrains_add_breakable_tile(
-    target_pos  : Vector2,
-    texture     : Texture2D,
-    texture_pos : Vector2i,
-    collisigon  : PackedVector2Array
-):
-    var new_tile = BreakableTile.instantiate()
-    new_tile.position    = target_pos
-    new_tile.texture     = texture
-    new_tile.texture_pos = texture_pos
-    new_tile.collisigon  = collisigon
-    add_child.call_deferred(new_tile)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_breakable_terrains_add_breakable_tile</span><span class="p">(</span>
+<span class="w">    </span><span class="n">target_pos</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">,</span>
+<span class="w">    </span><span class="n">texture</span><span class="w">     </span><span class="p">:</span><span class="w"> </span><span class="n">Texture2D</span><span class="p">,</span>
+<span class="w">    </span><span class="n">texture_pos</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Vector2i</span><span class="p">,</span>
+<span class="w">    </span><span class="n">collisigon</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">PackedVector2Array</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">new_tile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BreakableTile</span><span class="o">.</span><span class="n">instantiate</span><span class="p">()</span>
+<span class="w">    </span><span class="n">new_tile</span><span class="o">.</span><span class="n">position</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">target_pos</span>
+<span class="w">    </span><span class="n">new_tile</span><span class="o">.</span><span class="n">texture</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">texture</span>
+<span class="w">    </span><span class="n">new_tile</span><span class="o">.</span><span class="n">texture_pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">texture_pos</span>
+<span class="w">    </span><span class="n">new_tile</span><span class="o">.</span><span class="n">collisigon</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">collisigon</span>
+<span class="w">    </span><span class="n">add_child</span><span class="o">.</span><span class="n">call_deferred</span><span class="p">(</span><span class="n">new_tile</span><span class="p">)</span>
+</code></pre></div>
+
 <p>Test this code again with <code>F5</code> and confirm we're still seeing the same thing in our consoles:</p>
-<pre><code>BreakableTile.position:    (105, 30)
+<div class="codehilite"><pre><span></span><code>BreakableTile.position:    (105, 30)
 BreakableTile.texture:     res://surface_maps/grass-and-dirt/1.png
 BreakableTile.texture_pos: (60, 15)
 BreakableTile.collisigon:  [(-7.5, -7.5), (7.5, -7.5), (7.5, 7.5), (-7.5, 7.5)]
@@ -1253,15 +1319,17 @@ BreakableTile.position:    (135, 45)
 BreakableTile.texture:     res://surface_maps/tree-trunk/1.png
 BreakableTile.texture_pos: (75, 0)
 BreakableTile.collisigon:  [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0.5, 4.5), (5.625, 5.75), (7.5, 7.5), (-7.5, 7.5)]
-</code></pre>
+</code></pre></div>
+
 <ol start="8">
 <li>Now let's set the correct texture, texture position and polygon in code:</li>
 </ol>
-<pre><code class="language-gdscript">func _ready():
-    $Sprite2D.set_texture(texture)
-    $Sprite2D.region_rect = Rect2(texture_pos.x, texture_pos.y, 15, 15)
-    $CollisionPolygon2D.polygon = collisigon
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="o">$</span><span class="n">Sprite2D</span><span class="o">.</span><span class="n">set_texture</span><span class="p">(</span><span class="n">texture</span><span class="p">)</span>
+<span class="w">    </span><span class="o">$</span><span class="n">Sprite2D</span><span class="o">.</span><span class="n">region_rect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb nb-Type">Rect2</span><span class="p">(</span><span class="n">texture_pos</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">texture_pos</span><span class="o">.</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span><span class="w"> </span><span class="mi">15</span><span class="p">)</span>
+<span class="w">    </span><span class="o">$</span><span class="n">CollisionPolygon2D</span><span class="o">.</span><span class="n">polygon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">collisigon</span>
+</code></pre></div>
+
 <p>Testing with <code>F5</code> you'll probably get this, like me (the entire atlas as a texture):
 <img alt="the entire atlas" src="../screenshots/the-entire-atlas.png" /></p>
 <p>That is because you need to <em>enable</em> the <code>region_rect</code> feature we used. You can either do this in code or in the <code>BreakableTile</code>-inspector. 
@@ -1290,33 +1358,37 @@ BreakableTile.collisigon:  [(-7.5, -7.5), (-6.125, -7.5), (-3.25, 0.125), (0.5, 
 <p>Let's see if we can achieve that effect right now
 1. Open <code>res://tiles/breakable_tile.gd</code>
 2. Implement <code>take_damage()</code> like this:</p>
-<pre><code class="language-gdscript">func take_damage(dmg : float):
-    print(&quot;Breakable tile taking &quot; + str(dmg) + &quot; damage&quot;)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">take_damage</span><span class="p">(</span><span class="n">dmg</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">float</span><span class="p">):</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Breakable tile taking &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">dmg</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot; damage&quot;</span><span class="p">)</span>
+</code></pre></div>
+
 <p>Then press <code>F5</code> and shoot some fireballs at it. Check the console if we're still seeing the same things:</p>
-<pre><code>Breakable tile taking 1 damage
+<div class="codehilite"><pre><span></span><code>Breakable tile taking 1 damage
 Breakable tile taking 1 damage
 Breakable tile taking 1 damage
-</code></pre>
+</code></pre></div>
+
 <p>Yup! That works. Now let's add a public property called <code>hp</code> which we can set from <em>metadata</em> later.</p>
 <ol start="3">
 <li>Add the <code>hp</code> property on top of <code>breakable_tile.gd</code> and set it to <code>10</code> as a default.</li>
 </ol>
-<pre><code>extends StaticBody2D
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">StaticBody2D</span>
 
-@export var hp          : float = 10.0
-@export var texture     : Texture2D
-@export var texture_pos : Vector2i
-@export var collisigon  : PackedVector2Array
-</code></pre>
+<span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">hp</span><span class="w">          </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">float</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10.0</span>
+<span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">texture</span><span class="w">     </span><span class="p">:</span><span class="w"> </span><span class="n">Texture2D</span>
+<span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">texture_pos</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Vector2i</span>
+<span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">collisigon</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">PackedVector2Array</span>
+</code></pre></div>
+
 <ol start="4">
 <li>Implement <code>take_damage</code> like this now:</li>
 </ol>
-<pre><code class="language-gdscript">func take_damage(dmg : float):
-    hp -= dmg
-    if hp &lt;= 0:
-        queue_free()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">take_damage</span><span class="p">(</span><span class="n">dmg</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">float</span><span class="p">):</span>
+<span class="w">    </span><span class="n">hp</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">dmg</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">hp</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">:</span>
+<span class="w">        </span><span class="n">queue_free</span><span class="p">()</span>
+</code></pre></div>
+
 <p>Then press <code>F5</code> and shoot some fireballs at it <em>again</em>. </p>
 <p>Watch with satisfaction as these tiles disappear after only <code>10</code> hits with a fireball:</p>
 <p><a href="../screenshots/break-a-tile.mp4"><img alt="break a tile" src="../screenshots/break-a-tile.png" /></a></p>
@@ -1332,45 +1404,48 @@ Breakable tile taking 1 damage
 <li>Now open <code>res://terrains.gd</code></li>
 <li>Add <code>hp</code> as a 5th parameter to <code>add_breakable_tile</code></li>
 </ol>
-<pre><code class="language-gdscript">signal add_breakable_tile(
-    position     : Vector2i, 
-    texture      : Texture2D, 
-    texture_pos  : Vector2i,
-    collisigon   : PackedVector2Array,
-    hp           : float
-)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">signal</span><span class="w"> </span><span class="n">add_breakable_tile</span><span class="p">(</span>
+<span class="w">    </span><span class="n">position</span><span class="w">     </span><span class="p">:</span><span class="w"> </span><span class="n">Vector2i</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="n">texture</span><span class="w">      </span><span class="p">:</span><span class="w"> </span><span class="n">Texture2D</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="n">texture_pos</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="n">Vector2i</span><span class="p">,</span>
+<span class="w">    </span><span class="n">collisigon</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">PackedVector2Array</span><span class="p">,</span>
+<span class="w">    </span><span class="n">hp</span><span class="w">           </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">float</span>
+<span class="p">)</span>
+</code></pre></div>
+
 <ol start="8">
 <li>Add the <code>hp</code>-metadata to the <code>emit_signal</code>-call for each tile:</li>
 </ol>
-<pre><code class="language-gdscript">            emit_signal(
-                &quot;add_breakable_tile&quot;,
-                Vector2i(position) + cell * tile_set.tile_size,
-                tileset_source.texture,
-                tile_atlas_coords * tile_set.tile_size,
-                tile_data.get_collision_polygon_points(0, 0),
-                get_meta(&quot;hp&quot;)
-            )
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">            </span><span class="n">emit_signal</span><span class="p">(</span>
+<span class="w">                </span><span class="s2">&quot;add_breakable_tile&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="n">Vector2i</span><span class="p">(</span><span class="n">position</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cell</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tile_set</span><span class="o">.</span><span class="n">tile_size</span><span class="p">,</span>
+<span class="w">                </span><span class="n">tileset_source</span><span class="o">.</span><span class="n">texture</span><span class="p">,</span>
+<span class="w">                </span><span class="n">tile_atlas_coords</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">tile_set</span><span class="o">.</span><span class="n">tile_size</span><span class="p">,</span>
+<span class="w">                </span><span class="n">tile_data</span><span class="o">.</span><span class="n">get_collision_polygon_points</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">),</span>
+<span class="w">                </span><span class="n">get_meta</span><span class="p">(</span><span class="s2">&quot;hp&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="p">)</span>
+</code></pre></div>
+
 <ol start="9">
 <li>Open <code>res://game.gd</code></li>
 <li>Add the <code>hp</code> to <code>_on_breakable_terrains_add_breakable_tile</code> and set it on the <code>BreakableTile</code> instance there:</li>
 </ol>
-<pre><code class="language-gdscript">func _on_breakable_terrains_add_breakable_tile(
-    target_pos  : Vector2,
-    texture     : Texture2D,
-    texture_pos : Vector2i,
-    collisigon  : PackedVector2Array,
-    hp          : float
-):
-    var new_tile = BreakableTile.instantiate()
-    new_tile.position    = target_pos
-    new_tile.texture     = texture
-    new_tile.texture_pos = texture_pos
-    new_tile.collisigon  = collisigon
-    new_tile.hp          = hp
-    add_child.call_deferred(new_tile)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_breakable_terrains_add_breakable_tile</span><span class="p">(</span>
+<span class="w">    </span><span class="n">target_pos</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">,</span>
+<span class="w">    </span><span class="n">texture</span><span class="w">     </span><span class="p">:</span><span class="w"> </span><span class="n">Texture2D</span><span class="p">,</span>
+<span class="w">    </span><span class="n">texture_pos</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Vector2i</span><span class="p">,</span>
+<span class="w">    </span><span class="n">collisigon</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">PackedVector2Array</span><span class="p">,</span>
+<span class="w">    </span><span class="n">hp</span><span class="w">          </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">float</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">new_tile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BreakableTile</span><span class="o">.</span><span class="n">instantiate</span><span class="p">()</span>
+<span class="w">    </span><span class="n">new_tile</span><span class="o">.</span><span class="n">position</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">target_pos</span>
+<span class="w">    </span><span class="n">new_tile</span><span class="o">.</span><span class="n">texture</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">texture</span>
+<span class="w">    </span><span class="n">new_tile</span><span class="o">.</span><span class="n">texture_pos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">texture_pos</span>
+<span class="w">    </span><span class="n">new_tile</span><span class="o">.</span><span class="n">collisigon</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">collisigon</span>
+<span class="w">    </span><span class="n">new_tile</span><span class="o">.</span><span class="n">hp</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="n">hp</span>
+<span class="w">    </span><span class="n">add_child</span><span class="o">.</span><span class="n">call_deferred</span><span class="p">(</span><span class="n">new_tile</span><span class="p">)</span>
+</code></pre></div>
+
 <p>To test, see how it works when you change <code>hp</code> metadata in the <code>BreakableTerrains</code> tilemap of your game.</p>
 <h3 id="generate-some-pretty-cracks-to-show-the-tile-damage">Generate some pretty cracks to show the tile damage</h3>
 <p>What is missing is some visual feedback of tiles breaking. For that effect, we will revisit our approach to <a href="../day-4/#generate-renditions-to-make-the-fireball-dissipate">renditions</a>, like we did with the <a href="../day-4/#generate-renditions-to-make-the-fireball-dissipate">dissipating fireballs</a>.</p>
@@ -1381,17 +1456,19 @@ Breakable tile taking 1 damage
 <li>Open <code>res://texture_rendition.gd</code></li>
 <li>Preload the files as an image resource like this:</li>
 </ol>
-<pre><code class="language-gdscript">var crack_mask_0 = preload(&quot;res://surface_maps/crack-mask-0.png&quot;).get_image()
-var crack_mask_1 = preload(&quot;res://surface_maps/crack-mask-1.png&quot;).get_image()
-var crack_mask_2 = preload(&quot;res://surface_maps/crack-mask-2.png&quot;).get_image()
-var crack_mask_3 = preload(&quot;res://surface_maps/crack-mask-3.png&quot;).get_image()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">var</span><span class="w"> </span><span class="n">crack_mask_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">preload</span><span class="p">(</span><span class="s2">&quot;res://surface_maps/crack-mask-0.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_image</span><span class="p">()</span>
+<span class="k">var</span><span class="w"> </span><span class="n">crack_mask_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">preload</span><span class="p">(</span><span class="s2">&quot;res://surface_maps/crack-mask-1.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_image</span><span class="p">()</span>
+<span class="k">var</span><span class="w"> </span><span class="n">crack_mask_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">preload</span><span class="p">(</span><span class="s2">&quot;res://surface_maps/crack-mask-2.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_image</span><span class="p">()</span>
+<span class="k">var</span><span class="w"> </span><span class="n">crack_mask_3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">preload</span><span class="p">(</span><span class="s2">&quot;res://surface_maps/crack-mask-3.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_image</span><span class="p">()</span>
+</code></pre></div>
+
 <ol start="4">
 <li>And prepare these 2 data objects to be used in our rendition code:</li>
 </ol>
-<pre><code class="language-gdscript">var crack_masks = [crack_mask_0, crack_mask_1, crack_mask_2, crack_mask_3]
-var cracked_rendition_map : Dictionary = {}
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">var</span><span class="w"> </span><span class="n">crack_masks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">crack_mask_0</span><span class="p">,</span><span class="w"> </span><span class="n">crack_mask_1</span><span class="p">,</span><span class="w"> </span><span class="n">crack_mask_2</span><span class="p">,</span><span class="w"> </span><span class="n">crack_mask_3</span><span class="p">]</span>
+<span class="k">var</span><span class="w"> </span><span class="n">cracked_rendition_map</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span>
+</code></pre></div>
+
 <ol start="5">
 <li>The first function we'll write is a reusable function <code>get_alpha_mask_rendition</code>, which takes 2 arguments<ul>
 <li><code>src_image : Image</code>, the image we want to make partly transparent using an alpha mask</li>
@@ -1399,34 +1476,35 @@ var cracked_rendition_map : Dictionary = {}
 </ul>
 </li>
 </ol>
-<pre><code class="language-gdscript">func get_alpha_mask_rendition(src_image : Image, alpha_map : Image):
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">get_alpha_mask_rendition</span><span class="p">(</span><span class="n">src_image</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Image</span><span class="p">,</span><span class="w"> </span><span class="n">alpha_map</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Image</span><span class="p">):</span>
 
-    # create a destination image with the same properties as the source image
-    var dst_rendition = Image.create(src_image.get_width(), src_image.get_height(), false, src_image.get_format())
+<span class="w">    </span><span class="c1"># create a destination image with the same properties as the source image</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">dst_rendition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Image</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">src_image</span><span class="o">.</span><span class="n">get_width</span><span class="p">(),</span><span class="w"> </span><span class="n">src_image</span><span class="o">.</span><span class="n">get_height</span><span class="p">(),</span><span class="w"> </span><span class="bp">false</span><span class="p">,</span><span class="w"> </span><span class="n">src_image</span><span class="o">.</span><span class="n">get_format</span><span class="p">())</span>
 
-    # loop through all the pixels in the source image
-    for x in range(src_image.get_width()):
-        for y in range(src_image.get_height()):
+<span class="w">    </span><span class="c1"># loop through all the pixels in the source image</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">range</span><span class="p">(</span><span class="n">src_image</span><span class="o">.</span><span class="n">get_width</span><span class="p">()):</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">range</span><span class="p">(</span><span class="n">src_image</span><span class="o">.</span><span class="n">get_height</span><span class="p">()):</span>
 
-            # Get the original color
-            var src_color = src_image.get_pixel(x, y)
+<span class="w">            </span><span class="c1"># Get the original color</span>
+<span class="w">            </span><span class="k">var</span><span class="w"> </span><span class="n">src_color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">src_image</span><span class="o">.</span><span class="n">get_pixel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span>
 
-            # Get the color representing the amount of transparency to draw
-            var alpha_color = alpha_map.get_pixel(x, y)
+<span class="w">            </span><span class="c1"># Get the color representing the amount of transparency to draw</span>
+<span class="w">            </span><span class="k">var</span><span class="w"> </span><span class="n">alpha_color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alpha_map</span><span class="o">.</span><span class="n">get_pixel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span>
 
-            # Calculate how much transparency this should be, by inverting
-            # the alpha-amount of the mask's color
-            var dest_alpha = 1.0 - alpha_color.a if 1.0 - alpha_color.a &gt; 0.0 else 0.0
+<span class="w">            </span><span class="c1"># Calculate how much transparency this should be, by inverting</span>
+<span class="w">            </span><span class="c1"># the alpha-amount of the mask&#39;s color</span>
+<span class="w">            </span><span class="k">var</span><span class="w"> </span><span class="n">dest_alpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">alpha_color</span><span class="o">.</span><span class="n">a</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">alpha_color</span><span class="o">.</span><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="mf">0.0</span>
 
-            # draw a pixel to the destination image based on the source pixel
-            # and set the alpha to the lowest of these 2 alpha values:
-            #  1. dest_alpha
-            #  2. the alpha of the source pixel
-            dst_rendition.set_pixel(x, y, Color(src_color.r, src_color.g, src_color.b, min(src_color.a, dest_alpha)))
+<span class="w">            </span><span class="c1"># draw a pixel to the destination image based on the source pixel</span>
+<span class="w">            </span><span class="c1"># and set the alpha to the lowest of these 2 alpha values:</span>
+<span class="w">            </span><span class="c1">#  1. dest_alpha</span>
+<span class="w">            </span><span class="c1">#  2. the alpha of the source pixel</span>
+<span class="w">            </span><span class="n">dst_rendition</span><span class="o">.</span><span class="n">set_pixel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="nb nb-Type">Color</span><span class="p">(</span><span class="n">src_color</span><span class="o">.</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">src_color</span><span class="o">.</span><span class="n">g</span><span class="p">,</span><span class="w"> </span><span class="n">src_color</span><span class="o">.</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="nb">min</span><span class="p">(</span><span class="n">src_color</span><span class="o">.</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">dest_alpha</span><span class="p">)))</span>
 
-    # return the destination image as an ImageTexture object
-    return ImageTexture.create_from_image(dst_rendition)
-</code></pre>
+<span class="w">    </span><span class="c1"># return the destination image as an ImageTexture object</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ImageTexture</span><span class="o">.</span><span class="n">create_from_image</span><span class="p">(</span><span class="n">dst_rendition</span><span class="p">)</span>
+</code></pre></div>
+
 <ol start="6">
 <li>Let's then write a function <code>get_cracked_renditions</code> which takes 2 arguments<ul>
 <li><code>source_id : int</code>, a key for our dictionary to make sure the rendition is generated only once in code (singleton pattern)</li>
@@ -1434,24 +1512,25 @@ var cracked_rendition_map : Dictionary = {}
 </ul>
 </li>
 </ol>
-<pre><code class="language-gdscript">func get_cracked_renditions(source_id: int, src_image : Image):
-    if source_id in cracked_rendition_map:
-        return cracked_rendition_map[source_id]
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">get_cracked_renditions</span><span class="p">(</span><span class="n">source_id</span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">int</span><span class="p">,</span><span class="w"> </span><span class="n">src_image</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Image</span><span class="p">):</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">source_id</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">cracked_rendition_map</span><span class="p">:</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">cracked_rendition_map</span><span class="p">[</span><span class="n">source_id</span><span class="p">]</span>
 
-    print(&quot;Assert single invocation for get_cracked_renditions:&quot; + str(source_id))
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Assert single invocation for get_cracked_renditions:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">str</span><span class="p">(</span><span class="n">source_id</span><span class="p">))</span>
 
-    # copy the source image into the rendition map
-    cracked_rendition_map[source_id] = [ImageTexture.create_from_image(src_image)]
+<span class="w">    </span><span class="c1"># copy the source image into the rendition map</span>
+<span class="w">    </span><span class="n">cracked_rendition_map</span><span class="p">[</span><span class="n">source_id</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">ImageTexture</span><span class="o">.</span><span class="n">create_from_image</span><span class="p">(</span><span class="n">src_image</span><span class="p">)]</span>
 
-    # for each alpha mask we preloaded into the crack_masks array ...
-    for crack_mask in crack_masks:
-        # ... make a rendition with get_alpha_mask_rendition and add it to
-        # the dictionary using source_id as key
-        cracked_rendition_map[source_id].append(get_alpha_mask_rendition(src_image, crack_mask))
+<span class="w">    </span><span class="c1"># for each alpha mask we preloaded into the crack_masks array ...</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">crack_mask</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">crack_masks</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># ... make a rendition with get_alpha_mask_rendition and add it to</span>
+<span class="w">        </span><span class="c1"># the dictionary using source_id as key</span>
+<span class="w">        </span><span class="n">cracked_rendition_map</span><span class="p">[</span><span class="n">source_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_alpha_mask_rendition</span><span class="p">(</span><span class="n">src_image</span><span class="p">,</span><span class="w"> </span><span class="n">crack_mask</span><span class="p">))</span>
 
-    # of course return the dictionary
-    return cracked_rendition_map[source_id]
-</code></pre>
+<span class="w">    </span><span class="c1"># of course return the dictionary</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">cracked_rendition_map</span><span class="p">[</span><span class="n">source_id</span><span class="p">]</span>
+</code></pre></div>
+
 <h2 id="allow-those-breakable-tiles-to-fall-down">Allow those breakable tiles to fall down</h2>
 <p>Rigid -&gt; Static -&gt; Rigid -&gt; Character -&gt; Area -&gt; Static -&gt; Rigid -&gt; ooooh...</p>
 <p>Spoiler: it was <a href="https://docs.godotengine.org/en/stable/classes/class_staticbody2d.html#class-staticbody2d">StaticBody2D</a> I wanted all along.</p>

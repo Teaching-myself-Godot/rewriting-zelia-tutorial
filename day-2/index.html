@@ -262,98 +262,100 @@
 <li>Choose <code>CharacterBody2D</code></li>
 <li>Edit <code>res://player/player.gd</code> and change the extends line:</li>
 </ol>
-<pre><code class="language-gdscript">extends CharacterBody2D # this first line changed!
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">CharacterBody2D</span><span class="w"> </span><span class="c1"># this first line changed!</span>
+</code></pre></div>
+
 <p>Test by running the project. That changed nothing (for now).</p>
 <h2 id="adapting-her-script-to-characterbody2d">Adapting her script to <code>CharacterBody2D</code></h2>
 <p>So let's try this out: <a href="https://docs.godotengine.org/en/stable/tutorials/physics/using_character_body_2d.html#platformer-movement">CharacterBody2D platformer movement</a>.</p>
 <p>Much has change, feel free to copy/paste this first and see if it works, but you probably know the most imporant law of cheating with <code>Stackoverflow</code>: type it out yourself to learn better.</p>
-<pre><code class="language-gdscript">extends CharacterBody2D
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">CharacterBody2D</span>
 
-enum Orientation   { LEFT, RIGHT }
-enum MovementState { IDLE, RUNNING, AIRBORNE }
+<span class="k">enum</span><span class="w"> </span><span class="n">Orientation</span><span class="w">   </span><span class="p">{</span><span class="w"> </span><span class="n">LEFT</span><span class="p">,</span><span class="w"> </span><span class="n">RIGHT</span><span class="w"> </span><span class="p">}</span>
+<span class="k">enum</span><span class="w"> </span><span class="n">MovementState</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">IDLE</span><span class="p">,</span><span class="w"> </span><span class="n">RUNNING</span><span class="p">,</span><span class="w"> </span><span class="n">AIRBORNE</span><span class="w"> </span><span class="p">}</span>
 
-# I removed the exports for now, no debugging needed at the moment
-var movement_state : int
-var orientation    : int
+<span class="c1"># I removed the exports for now, no debugging needed at the moment</span>
+<span class="k">var</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">int</span>
+<span class="k">var</span><span class="w"> </span><span class="n">orientation</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">int</span>
 
-# Get the gravity from the project settings so you can sync with rigid body nodes.
-# NOTE: I changed the default from 980 to 1300, Zelia jumps high yet falls fast.
-var gravity    = ProjectSettings.get_setting(&quot;physics/2d/default_gravity&quot;)
-# The most realistic speed for Zelia's feet
-var speed      = 120.0
-# Funnily the original game had jump_speed set to -4.0 and gravity to 13.0
-var jump_speed = -400.0
+<span class="c1"># Get the gravity from the project settings so you can sync with rigid body nodes.</span>
+<span class="c1"># NOTE: I changed the default from 980 to 1300, Zelia jumps high yet falls fast.</span>
+<span class="k">var</span><span class="w"> </span><span class="n">gravity</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">ProjectSettings</span><span class="o">.</span><span class="n">get_setting</span><span class="p">(</span><span class="s2">&quot;physics/2d/default_gravity&quot;</span><span class="p">)</span>
+<span class="c1"># The most realistic speed for Zelia&#39;s feet</span>
+<span class="k">var</span><span class="w"> </span><span class="n">speed</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="mf">120.0</span>
+<span class="c1"># Funnily the original game had jump_speed set to -4.0 and gravity to 13.0</span>
+<span class="k">var</span><span class="w"> </span><span class="n">jump_speed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">400.0</span>
 
-# No changes here
-func _ready():
-    movement_state = MovementState.IDLE
-    orientation    = Orientation.RIGHT
-    $AnimatedSprite2D.play()
+<span class="c1"># No changes here</span>
+<span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">IDLE</span>
+<span class="w">    </span><span class="n">orientation</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">RIGHT</span>
+<span class="w">    </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
 
-# Changed _process to _physics_process
-func _physics_process(delta):
-    # Apply the gravity.
-    velocity.y += gravity * delta
+<span class="c1"># Changed _process to _physics_process</span>
+<span class="k">func</span><span class="w"> </span><span class="n">_physics_process</span><span class="p">(</span><span class="n">delta</span><span class="p">):</span>
+<span class="w">    </span><span class="c1"># Apply the gravity.</span>
+<span class="w">    </span><span class="n">velocity</span><span class="o">.</span><span class="n">y</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">gravity</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">delta</span>
 
-    # Update the MovementState based on the collisions observed
-    if movement_state == MovementState.AIRBORNE:
-        # If she's airborne right now
-        if is_on_floor():
-            # .. and hits the floor, she's idle
-            movement_state = MovementState.IDLE
-        elif Input.is_action_pressed(&quot;Run right&quot;):
-            # Else you can still move her right
-            orientation = Orientation.RIGHT
-            velocity.x = speed
-        elif Input.is_action_pressed(&quot;Run left&quot;):
-            # ... and left
-            orientation = Orientation.LEFT
-            velocity.x = -speed
-        else:
-            velocity.x = 0
-    else:
-        # Else we are not airborne right now
-        if Input.is_action_pressed(&quot;Run right&quot;):
-            # so we run right when run right is pressed
-            orientation = Orientation.RIGHT
-            movement_state = MovementState.RUNNING
-            velocity.x = speed
-        elif Input.is_action_pressed(&quot;Run left&quot;):
-            # .. and left ...
-            orientation = Orientation.LEFT
-            movement_state = MovementState.RUNNING
-            velocity.x = -speed
-        else:
-            # and stand idle if no x-movement button is pressed
-            velocity.x = 0
-            movement_state = MovementState.IDLE  
+<span class="w">    </span><span class="c1"># Update the MovementState based on the collisions observed</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># If she&#39;s airborne right now</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">is_on_floor</span><span class="p">():</span>
+<span class="w">            </span><span class="c1"># .. and hits the floor, she&#39;s idle</span>
+<span class="w">            </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">IDLE</span>
+<span class="w">        </span><span class="k">elif</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Run right&quot;</span><span class="p">):</span>
+<span class="w">            </span><span class="c1"># Else you can still move her right</span>
+<span class="w">            </span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">RIGHT</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">speed</span>
+<span class="w">        </span><span class="k">elif</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Run left&quot;</span><span class="p">):</span>
+<span class="w">            </span><span class="c1"># ... and left</span>
+<span class="w">            </span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">LEFT</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">speed</span>
+<span class="w">        </span><span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># Else we are not airborne right now</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Run right&quot;</span><span class="p">):</span>
+<span class="w">            </span><span class="c1"># so we run right when run right is pressed</span>
+<span class="w">            </span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">RIGHT</span>
+<span class="w">            </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">RUNNING</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">speed</span>
+<span class="w">        </span><span class="k">elif</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Run left&quot;</span><span class="p">):</span>
+<span class="w">            </span><span class="c1"># .. and left ...</span>
+<span class="w">            </span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">LEFT</span>
+<span class="w">            </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">RUNNING</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">speed</span>
+<span class="w">        </span><span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="c1"># and stand idle if no x-movement button is pressed</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">            </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">IDLE</span><span class="w">  </span>
 
-    # Handle Jump, only when on the floor
-    if Input.is_action_just_pressed(&quot;Jump&quot;) and is_on_floor():
-        $JumpSound.play()
-        movement_state = MovementState.AIRBORNE
-        velocity.y = jump_speed
+<span class="w">    </span><span class="c1"># Handle Jump, only when on the floor</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_just_pressed</span><span class="p">(</span><span class="s2">&quot;Jump&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">is_on_floor</span><span class="p">():</span>
+<span class="w">        </span><span class="o">$</span><span class="n">JumpSound</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
+<span class="w">        </span><span class="n">velocity</span><span class="o">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jump_speed</span>
 
-    # This code has not changed
-    match (movement_state):
-        MovementState.RUNNING:
-            $AnimatedSprite2D.animation = &quot;running&quot;
-        # This was added
-        MovementState.AIRBORNE:
-            $AnimatedSprite2D.animation = &quot;jumping&quot;
-        _: # MovementState.IDLE
-            $AnimatedSprite2D.animation = &quot;idle&quot;
+<span class="w">    </span><span class="c1"># This code has not changed</span>
+<span class="w">    </span><span class="k">match</span><span class="w"> </span><span class="p">(</span><span class="n">movement_state</span><span class="p">):</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;running&quot;</span>
+<span class="w">        </span><span class="c1"># This was added</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;jumping&quot;</span>
+<span class="w">        </span><span class="n">_</span><span class="p">:</span><span class="w"> </span><span class="c1"># MovementState.IDLE</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;idle&quot;</span>
 
-    # Neither has this
-    if orientation == Orientation.LEFT:
-        $AnimatedSprite2D.flip_h = true
-    else:
-        $AnimatedSprite2D.flip_h = false
+<span class="w">    </span><span class="c1"># Neither has this</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">orientation</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">LEFT</span><span class="p">:</span>
+<span class="w">        </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">flip_h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">true</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">flip_h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">false</span>
 
-    # Yet this is new
-    move_and_slide()
-</code></pre>
+<span class="w">    </span><span class="c1"># Yet this is new</span>
+<span class="w">    </span><span class="n">move_and_slide</span><span class="p">()</span>
+</code></pre></div>
+
 <p>And it just works! Frankly: it's much better than the original.</p>
 <p>If you are as new to Godot and perfab 2D physics engines as I am, make sure you read the tutorial and the docs carefully and try to write the script yourself:</p>
 <ul>

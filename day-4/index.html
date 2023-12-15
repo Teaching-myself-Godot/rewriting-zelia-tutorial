@@ -175,15 +175,16 @@
 <p>To make the fireball fly takes a very short script.</p>
 <p>Attach a script to the fireball scene by right-clicking <code>Scene &gt; Fireball</code> and picking <code>Attach Script</code> from the context menu. </p>
 <p>Leave the defaults in place, and write the script:</p>
-<pre><code class="language-gdscript">extends Area2D
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">Area2D</span>
 
-# Initialize the fireball with zero speed (x = 0, y = 0)
-@export var velocity = Vector2.ZERO
+<span class="c1"># Initialize the fireball with zero speed (x = 0, y = 0)</span>
+<span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">velocity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="o">.</span><span class="n">ZERO</span>
 
-func _physics_process(delta):
-    # Update position by velocity-vector
-    position += velocity * delta
-</code></pre>
+<span class="k">func</span><span class="w"> </span><span class="n">_physics_process</span><span class="p">(</span><span class="n">delta</span><span class="p">):</span>
+<span class="w">    </span><span class="c1"># Update position by velocity-vector</span>
+<span class="w">    </span><span class="n">position</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">velocity</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">delta</span>
+</code></pre></div>
+
 <p>We exported the <code>velocity</code>-property so we can test this code.</p>
 <p>Run the current scene by pressing <code>F6</code>.</p>
 <p>Wile the scene is running:
@@ -209,9 +210,10 @@ func _physics_process(delta):
 <li>Leave defaults in tact and click <code>Connect</code></li>
 <li>Now add this line to the new function <code>_on_visible_on_screen_notifier_2d_screen_exited</code>:</li>
 </ol>
-<pre><code class="language-gdscript">func _on_visible_on_screen_notifier_2d_screen_exited():
-    queue_free()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_visible_on_screen_notifier_2d_screen_exited</span><span class="p">():</span>
+<span class="w">    </span><span class="n">queue_free</span><span class="p">()</span>
+</code></pre></div>
+
 <p>Run the current scene again by pressing <code>F6</code> and repeat the remote debugging instructions, setting x to <code>50</code></p>
 <p><img alt="remote debug" src="../screenshots/remote_debug_fireball.png" /></p>
 <p>Now look at the node-tree under <code>Scene</code> until the fireball exits the game viewport.</p>
@@ -236,16 +238,18 @@ func _physics_process(delta):
 <li>Keep the defaults and click <code>Connect</code></li>
 </ol>
 <p>So now, let's check if our new listener <code>_on_fireball_interval_timer_timeout()</code> is set up properly:</p>
-<pre><code class="language-gdscript">func _on_fireball_interval_timer_timeout():
-    print(&quot;Pow!&quot;)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_fireball_interval_timer_timeout</span><span class="p">():</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pow!&quot;</span><span class="p">)</span>
+</code></pre></div>
+
 <p>Test by pressing <code>F5</code>, and look at the console:</p>
 <p><img alt="console prints &quot;pow&quot;" src="../screenshots/console-prints-pow.png" /></p>
 <p>Ok, so the <code>FireballIntervalTimer</code> works, but she should only shoot fireballs when holding the <code>Fireball button</code>:</p>
-<pre><code class="language-gdscript">func _on_fireball_interval_timer_timeout():
-    if movement_state == MovementState.CASTING:
-        rint(&quot;Pow!&quot;)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_fireball_interval_timer_timeout</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">CASTING</span><span class="p">:</span>
+<span class="w">        </span><span class="n">rint</span><span class="p">(</span><span class="s2">&quot;Pow!&quot;</span><span class="p">)</span>
+</code></pre></div>
+
 <p>That's better. Let's shoot the fireballs next.</p>
 <h3 id="spawning-the-fireballs">Spawning the fireballs</h3>
 <p>For this section we follow these guides from the godot tutorials:
@@ -270,22 +274,23 @@ func _physics_process(delta):
 <h3 id="declare-and-invoke-a-signal-to-cast-spells">Declare and invoke a signal to "cast spells"</h3>
 <p>What we're doing next is explained in detail in <a href="https://docs.godotengine.org/en/stable/tutorials/scripting/instancing_with_signals.html">Instancing with signals</a>.</p>
 <p>We're just going to apply here what we learned.</p>
-<pre><code class="language-gdscript">## top of script
-# Preload the Fireball class, used to identify it in cast_projectile
-var Fireball = preload(&quot;res://projectiles/fireball/fireball.tscn&quot;)
+<div class="codehilite"><pre><span></span><code><span class="c1">## top of script</span>
+<span class="c1"># Preload the Fireball class, used to identify it in cast_projectile</span>
+<span class="k">var</span><span class="w"> </span><span class="n">Fireball</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">preload</span><span class="p">(</span><span class="s2">&quot;res://projectiles/fireball/fireball.tscn&quot;</span><span class="p">)</span>
 
-# Declare a signal to cast a projectile spell (like Fireball) 
-# in the given direction, from the given origin
-signal cast_projectile(spell_class, direction : Vector2, origin : Vector2)
+<span class="c1"># Declare a signal to cast a projectile spell (like Fireball) </span>
+<span class="c1"># in the given direction, from the given origin</span>
+<span class="k">signal</span><span class="w"> </span><span class="n">cast_projectile</span><span class="p">(</span><span class="n">spell_class</span><span class="p">,</span><span class="w"> </span><span class="n">direction</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">,</span><span class="w"> </span><span class="n">origin</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">)</span>
 
-## bottom of script
-# Spawn a fireball every 100ms if Fireball button is held
-func _on_fireball_interval_timer_timeout():
-    if movement_state == MovementState.CASTING:
-        # Signal that a fireball should be cast at casting angle and 
-        # from Player's position
-        cast_projectile.emit(Fireball, cast_angle, position)
-</code></pre>
+<span class="c1">## bottom of script</span>
+<span class="c1"># Spawn a fireball every 100ms if Fireball button is held</span>
+<span class="k">func</span><span class="w"> </span><span class="n">_on_fireball_interval_timer_timeout</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">CASTING</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># Signal that a fireball should be cast at casting angle and </span>
+<span class="w">        </span><span class="c1"># from Player&#39;s position</span>
+<span class="w">        </span><span class="n">cast_projectile</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">Fireball</span><span class="p">,</span><span class="w"> </span><span class="n">cast_angle</span><span class="p">,</span><span class="w"> </span><span class="n">position</span><span class="p">)</span>
+</code></pre></div>
+
 <h3 id="let-the-world-scene-listen-to-the-signal">Let the world scene listen to the signal</h3>
 <p>The main scene of our game (currently <code>World</code>) should get a script with a listener to the casting signal.</p>
 <p>Upon that signal, it must <code>instantiate</code> a new <code>Fireball</code>-node and let it fly:</p>
@@ -295,8 +300,9 @@ func _on_fireball_interval_timer_timeout():
 <li>Use the defaults and click <code>Create</code></li>
 <li>Clear the script to one line:</li>
 </ol>
-<pre><code class="language-gdscript">extends TileMap
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">TileMap</span>
+</code></pre></div>
+
 <ol start="5">
 <li>Click on the <code>Player</code>-<strong>child-node</strong> <em>of</em> <code>World</code></li>
 <li>Pick <code>Node</code> next to <code>Inpector</code></li>
@@ -304,36 +310,39 @@ func _on_fireball_interval_timer_timeout():
 <li>Leave defaults to <code>Connect</code> to <code>World</code></li>
 <li>Implement <code>_on_player_cast_projectile</code> like this:</li>
 </ol>
-<pre><code class="language-gdscript"># world.gd
-func _on_player_cast_projectile(spell_class, direction, origin):
-    var spell = spell_class.instantiate()
-    add_child(spell)
-    spell.rotation = direction
-    spell.position = origin
-    spell.velocity = Vector2.from_angle(direction) * 150.0
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c1"># world.gd</span>
+<span class="k">func</span><span class="w"> </span><span class="n">_on_player_cast_projectile</span><span class="p">(</span><span class="n">spell_class</span><span class="p">,</span><span class="w"> </span><span class="n">direction</span><span class="p">,</span><span class="w"> </span><span class="n">origin</span><span class="p">):</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">spell</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">spell_class</span><span class="o">.</span><span class="n">instantiate</span><span class="p">()</span>
+<span class="w">    </span><span class="n">add_child</span><span class="p">(</span><span class="n">spell</span><span class="p">)</span>
+<span class="w">    </span><span class="n">spell</span><span class="o">.</span><span class="n">rotation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">direction</span>
+<span class="w">    </span><span class="n">spell</span><span class="o">.</span><span class="n">position</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">origin</span>
+<span class="w">    </span><span class="n">spell</span><span class="o">.</span><span class="n">velocity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="o">.</span><span class="n">from_angle</span><span class="p">(</span><span class="n">direction</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">150.0</span>
+</code></pre></div>
+
 <p>Test the main scene using <code>F5</code></p>
 <p><strong>NOTE</strong>: the fireball should come from her belly in the center at this time. If you made the <em>same mistake I did</em> it might spawn out at another place. </p>
 <p><strong>FIX</strong>: The rootnode <code>Fireball</code> of the <code>fireball.tscn</code>-scene should be in the center of its sprite; it's a subtle grey-plus on the <code>2D</code>-scene until you click on it.</p>
 <h3 id="fix-the-fireballs-origin-tweak-casting-sprites-with-angle-of-fireball">Fix the fireballs' origin, tweak casting sprites with angle of fireball</h3>
 <p>So we don't want Zelia to shoot fire from her belly, but from her hands.</p>
 <p>This script calculates a new and better origin.</p>
-<pre><code class="language-gdscript"># Spawn a fireball every 100ms if Fireball button is held
-func _on_fireball_interval_timer_timeout():
-    if movement_state == MovementState.CASTING:
-        # Signal that a fireball should be cast at casting angle and 
-        # from Player's hands
-        var origin = position + Vector2(14, 0).rotated(cast_angle) + Vector2(0, 2)
-        cast_projectile.emit(Fireball, cast_angle, origin)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Spawn a fireball every 100ms if Fireball button is held</span>
+<span class="k">func</span><span class="w"> </span><span class="n">_on_fireball_interval_timer_timeout</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">CASTING</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># Signal that a fireball should be cast at casting angle and </span>
+<span class="w">        </span><span class="c1"># from Player&#39;s hands</span>
+<span class="w">        </span><span class="k">var</span><span class="w"> </span><span class="n">origin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">position</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">rotated</span><span class="p">(</span><span class="n">cast_angle</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">cast_projectile</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">Fireball</span><span class="p">,</span><span class="w"> </span><span class="n">cast_angle</span><span class="p">,</span><span class="w"> </span><span class="n">origin</span><span class="p">)</span>
+</code></pre></div>
+
 <p>So the <code>var origin</code> is calculated by applying 3 transformations:
 1. Create a 'point' at position x=14, y=0 and rotate it by the casting angle: <code>Vector2(14, 0).rotated(cast_angle)</code>
 2. Move it relative to Zelia's center (<code>position +</code>)
 3. Move it 2 pixels down <code>+ Vector(0, 2)</code></p>
 <p>Also, her hands do not match up as nicely with the fireballs as they did in the original game. Use these new angles to determine <code>casting_up</code> and <code>casting_down</code> in <code>get_casting_sprite</code> for better effect:</p>
-<pre><code class="language-gdscript">    var casting_up    = deg &gt; -160 and deg &lt; 0
-    var casting_down  = deg &gt; 30   and deg &lt; 160
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">casting_up</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">deg</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">-</span><span class="mi">160</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">deg</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">casting_down</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">deg</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">30</span><span class="w">   </span><span class="ow">and</span><span class="w"> </span><span class="n">deg</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">160</span>
+</code></pre></div>
+
 <h2 id="make-fireballs-collide-with-the-tilemap-not-with-the-player">Make fireballs collide with the <code>TileMap</code>, not with the <code>Player</code></h2>
 <p>At the moment fireballs still fly out the game window. We want then to collide with the terrain tiles, however. </p>
 <p>Let's look at the <a href="https://docs.godotengine.org/en/stable/getting_started/first_2d_game/03.coding_the_player.html#preparing-for-collisions">tutorial</a> once more and apply:</p>
@@ -345,18 +354,20 @@ func _on_fireball_interval_timer_timeout():
 <li>Leave defaults on and click <code>Connect</code></li>
 <li>To remove them we could use <code>queue_free()</code> again:</li>
 </ol>
-<pre><code class="language-gdscript">func _on_body_entered(body):
-    queue_free()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_body_entered</span><span class="p">(</span><span class="n">body</span><span class="p">):</span>
+<span class="w">    </span><span class="n">queue_free</span><span class="p">()</span>
+</code></pre></div>
+
 <p>That works, the fireball collides when it hits the <code>Tilemap</code>. However..</p>
 <p>..It will also disappear if it collides with the <code>Player</code>. </p>
 <h3 id="collision-layer-and-collision-mask"><code>Collision Layer</code> and <code>Collision Mask</code></h3>
 <p>To illustrate, make set its origin the <code>position</code>-property of the player again in <code>player.gd</code>:</p>
-<pre><code class="language-gdscript">        # comment out the next line with Ctrl+k
-#       var origin = position + Vector2(14, 0).rotated(cast_angle) + Vector2(0, 2)
-        # replace origin with position in next line
-        cast_projectile.emit(Fireball, cast_angle, position)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">        </span><span class="c1"># comment out the next line with Ctrl+k</span>
+<span class="c1">#       var origin = position + Vector2(14, 0).rotated(cast_angle) + Vector2(0, 2)</span>
+<span class="w">        </span><span class="c1"># replace origin with position in next line</span>
+<span class="w">        </span><span class="n">cast_projectile</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">Fireball</span><span class="p">,</span><span class="w"> </span><span class="n">cast_angle</span><span class="p">,</span><span class="w"> </span><span class="n">position</span><span class="p">)</span>
+</code></pre></div>
+
 <p>Depending on whether the fireballs are drawn over or behind the <code>Player</code> you will see either/or:
 - them pop in and out of existence
 - not at all</p>
@@ -382,9 +393,10 @@ func _on_fireball_interval_timer_timeout():
 <h4 id="test-again">Test again</h4>
 <p>Press <code>F5</code> to test if the fireballs <em>do</em> collide with the <code>Tilemap</code> and <em>do not</em> collide with the <code>Player</code>. </p>
 <p>Then change back the <code>player.gd</code> script:</p>
-<pre><code class="language-gdscript">        var origin = position + Vector2(14, 0).rotated(cast_angle) + Vector2(0, 2)
-        cast_projectile.emit(Fireball, cast_angle, origin)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">        </span><span class="k">var</span><span class="w"> </span><span class="n">origin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">position</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">rotated</span><span class="p">(</span><span class="n">cast_angle</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">cast_projectile</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">Fireball</span><span class="p">,</span><span class="w"> </span><span class="n">cast_angle</span><span class="p">,</span><span class="w"> </span><span class="n">origin</span><span class="p">)</span>
+</code></pre></div>
+
 <h3 id="add-some-smoothness-to-the-collided-fireballs">Add some smoothness to the collided fireballs</h3>
 <p>Right now the fireballs disappear very abrubtly because <code>queue_free()</code> is invoked immediately.</p>
 <p>We can smoothe this out a little by introducing a delay and slowing them down on impact:</p>
@@ -395,20 +407,22 @@ func _on_fireball_interval_timer_timeout():
 <li>Set the <code>Wait Time</code> to <code>0.5</code></li>
 <li>Change+Add this script to <code>fireball.gd</code>:</li>
 </ol>
-<pre><code class="language-gdscript">func _on_body_entered(body):
-    # start the new timer in stead of calling queue_free here
-    $DissipateTimer.start()
-    # slow it down to 1/10th the speed
-    velocity *= 0.1
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_body_entered</span><span class="p">(</span><span class="n">body</span><span class="p">):</span>
+<span class="w">    </span><span class="c1"># start the new timer in stead of calling queue_free here</span>
+<span class="w">    </span><span class="o">$</span><span class="n">DissipateTimer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="w">    </span><span class="c1"># slow it down to 1/10th the speed</span>
+<span class="w">    </span><span class="n">velocity</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mf">0.1</span>
+</code></pre></div>
+
 <ol start="6">
 <li>Click <code>DissipateTimer</code>-node</li>
 <li>Connect the <code>Node &gt; timeout()</code>-signal to the <code>Fireball</code></li>
 <li>Implement <code>_on_dissipate_timer_timeout()</code> like so:</li>
 </ol>
-<pre><code class="language-gdscript">func _on_dissipate_timer_timeout():
-    queue_free()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_dissipate_timer_timeout</span><span class="p">():</span>
+<span class="w">    </span><span class="n">queue_free</span><span class="p">()</span>
+</code></pre></div>
+
 <p>That's only a little better. We need an animation to make them fade into non-existence slowly.</p>
 <h2 id="generate-renditions-to-make-the-fireball-dissipate">Generate renditions to make the fireball dissipate</h2>
 <p>We could make this very ease on ourselves by drawing images manually in our <a href="https://www.gimp.org/">favourite image manipulation program</a>, but we'll do it the lazy way.</p>
@@ -433,135 +447,145 @@ func _on_fireball_interval_timer_timeout():
 <li>Close the <code>Project Settings</code>-dialog again.</li>
 <li>Enter this test script in the file <code>texture_renditions.gd</code>:</li>
 </ol>
-<pre><code class="language-gdscript">extends Node
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">Node</span>
 
-var singleton_test : String
+<span class="k">var</span><span class="w"> </span><span class="n">singleton_test</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">String</span>
 
-func _ready():
-    singleton_test = &quot;singleton_test&quot;
-    print(&quot;asserting this print is called only once&quot;)
-</code></pre>
+<span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="n">singleton_test</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;singleton_test&quot;</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;asserting this print is called only once&quot;</span><span class="p">)</span>
+</code></pre></div>
+
 <p>Run the project with <code>F5</code> and confirm in the console that yes indeed: </p>
-<pre><code>asserting this print is called only once
+<div class="codehilite"><pre><span></span><code>asserting this print is called only once
 --- Debugging process stopped ---
-</code></pre>
+</code></pre></div>
+
 <p>Also, test if <code>TextureRenditions.singleton_test</code> is indeed a globally accessible string in <code>fireball.gd</code>:</p>
-<pre><code class="language-gdscript">func _ready():
-    print(TextureRenditions.singleton_test)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="nb">print</span><span class="p">(</span><span class="n">TextureRenditions</span><span class="o">.</span><span class="n">singleton_test</span><span class="p">)</span>
+</code></pre></div>
+
 <p>Run the project again and confirm in the console after shooting some fireballs:</p>
-<pre><code>singleton_test
+<div class="codehilite"><pre><span></span><code>singleton_test
 singleton_test
 singleton_test
 singleton_test
 --- Debugging process stopped ---
-</code></pre>
+</code></pre></div>
+
 <h3 id="generate-the-dissipate-animation-with-image-and-imagetexture">Generate the dissipate animation with <code>Image</code> and <code>ImageTexture</code></h3>
 <p>So now we want to prepare the animation for the fireball in our <code>Autoload</code>-node called <code>TextureRenditions</code>. Open the <code>texture_renditions.gd</code> script again.</p>
 <ol>
 <li>Use <code>preload</code> to open the <code>fireball.png</code> texture and get an instance of its <code>Image</code>:</li>
 </ol>
-<pre><code class="language-gdscript">extends Node
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">Node</span>
 
-var fireball = preload(&quot;res://projectiles/fireball/fireball.png&quot;).get_image()
-</code></pre>
+<span class="k">var</span><span class="w"> </span><span class="n">fireball</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">preload</span><span class="p">(</span><span class="s2">&quot;res://projectiles/fireball/fireball.png&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_image</span><span class="p">()</span>
+</code></pre></div>
+
 <ol start="2">
 <li>Prepare a global array to hold the preprocess images:</li>
 </ol>
-<pre><code>var fireball_dissipate : Array = []
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">var</span><span class="w"> </span><span class="n">fireball_dissipate</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">Array</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+</code></pre></div>
+
 <ol start="3">
 <li>In the <code>_ready()</code> function add this line:</li>
 </ol>
-<pre><code class="language-gdscript">func _ready():
-    fireball_dissipate = get_dissipate_renditions(fireball)
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="n">fireball_dissipate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_dissipate_renditions</span><span class="p">(</span><span class="n">fireball</span><span class="p">)</span>
+</code></pre></div>
+
 <ol start="4">
 <li>And then write the function <code>get_dissipate_renditions(...)</code></li>
 </ol>
-<pre><code class="language-gdscript"># Test if we can make one gray fireball first
-func get_dissipate_renditions(src_rendition):
-    # Create a new Image instance with the same properties as the source image
-    var dst_rendition = Image.create(src_rendition.get_width(), src_rendition.get_height(), false, src_rendition.get_format())
-    # Loop through all the pixels
-    for x in range(src_rendition.get_width()):
-        for y in range(src_rendition.get_height()):
-            # Get the original color
-            var src_color = src_rendition.get_pixel(x, y)
-            # Set red, green and blue to the red of the source color
-            # and keep the source alpha transparency
-            dst_rendition.set_pixel(x, y, Color(src_color.r, src_color.r, src_color.r, src_color.a))
-    # return a list of one gray-scaled image rendition
-    # converted to an instace of ImageTexture
-    return [ImageTexture.create_from_image(dst_rendition)]
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Test if we can make one gray fireball first</span>
+<span class="k">func</span><span class="w"> </span><span class="n">get_dissipate_renditions</span><span class="p">(</span><span class="n">src_rendition</span><span class="p">):</span>
+<span class="w">    </span><span class="c1"># Create a new Image instance with the same properties as the source image</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">dst_rendition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Image</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_width</span><span class="p">(),</span><span class="w"> </span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_height</span><span class="p">(),</span><span class="w"> </span><span class="bp">false</span><span class="p">,</span><span class="w"> </span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_format</span><span class="p">())</span>
+<span class="w">    </span><span class="c1"># Loop through all the pixels</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">range</span><span class="p">(</span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_width</span><span class="p">()):</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">range</span><span class="p">(</span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_height</span><span class="p">()):</span>
+<span class="w">            </span><span class="c1"># Get the original color</span>
+<span class="w">            </span><span class="k">var</span><span class="w"> </span><span class="n">src_color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_pixel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span>
+<span class="w">            </span><span class="c1"># Set red, green and blue to the red of the source color</span>
+<span class="w">            </span><span class="c1"># and keep the source alpha transparency</span>
+<span class="w">            </span><span class="n">dst_rendition</span><span class="o">.</span><span class="n">set_pixel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="nb nb-Type">Color</span><span class="p">(</span><span class="n">src_color</span><span class="o">.</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">src_color</span><span class="o">.</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">src_color</span><span class="o">.</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">src_color</span><span class="o">.</span><span class="n">a</span><span class="p">))</span>
+<span class="w">    </span><span class="c1"># return a list of one gray-scaled image rendition</span>
+<span class="w">    </span><span class="c1"># converted to an instace of ImageTexture</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">[</span><span class="n">ImageTexture</span><span class="o">.</span><span class="n">create_from_image</span><span class="p">(</span><span class="n">dst_rendition</span><span class="p">)]</span>
+</code></pre></div>
+
 <ol start="5">
 <li>Now edit <code>fireball.gd</code>, edit <code>_ready()</code> like this:</li>
 </ol>
-<pre><code class="language-gdscript">func _ready():
-    # Start playing the &quot;default&quot; animation
-    $AnimatedSprite2D.play(&quot;default&quot;)
-    # The sprite_frames of $AnimatedSprite2D is a singleton, so after calling 
-    # add_animation one time, it exists for all other instances
-    if &quot;dissipate&quot; not in $AnimatedSprite2D.sprite_frames.get_animation_names():
-        # Add a new animation to the SpriteFrames instance of the $AnimatedSprite2D node
-        $AnimatedSprite2D.sprite_frames.add_animation(&quot;dissipate&quot;)
-        # Loop through all rendition images in the global singleton fireball_dissipate
-        for rendition in TextureRenditions.fireball_dissipate:
-            # Add them as a frame to 
-            $AnimatedSprite2D.sprite_frames.add_frame(&quot;dissipate&quot;, rendition)
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="c1"># Start playing the &quot;default&quot; animation</span>
+<span class="w">    </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">play</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="c1"># The sprite_frames of $AnimatedSprite2D is a singleton, so after calling </span>
+<span class="w">    </span><span class="c1"># add_animation one time, it exists for all other instances</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="s2">&quot;dissipate&quot;</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">sprite_frames</span><span class="o">.</span><span class="n">get_animation_names</span><span class="p">():</span>
+<span class="w">        </span><span class="c1"># Add a new animation to the SpriteFrames instance of the $AnimatedSprite2D node</span>
+<span class="w">        </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">sprite_frames</span><span class="o">.</span><span class="n">add_animation</span><span class="p">(</span><span class="s2">&quot;dissipate&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="c1"># Loop through all rendition images in the global singleton fireball_dissipate</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">rendition</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">TextureRenditions</span><span class="o">.</span><span class="n">fireball_dissipate</span><span class="p">:</span>
+<span class="w">            </span><span class="c1"># Add them as a frame to </span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">sprite_frames</span><span class="o">.</span><span class="n">add_frame</span><span class="p">(</span><span class="s2">&quot;dissipate&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rendition</span><span class="p">)</span>
+</code></pre></div>
 
-</code></pre>
 <ol start="6">
 <li>And change the animation on impact in <code>_on_body_entered</code>:</li>
 </ol>
-<pre><code class="language-gdscript">func _on_body_entered(body):
-    # play the dissipate animation we coded
-    $AnimatedSprite2D.play(&quot;dissipate&quot;)
-    # start the new timer in stead of calling queue_free here
-    $DissipateTimer.start()
-    # slow it down to 1/10th the speed
-    velocity *= 0.1
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_body_entered</span><span class="p">(</span><span class="n">body</span><span class="p">):</span>
+<span class="w">    </span><span class="c1"># play the dissipate animation we coded</span>
+<span class="w">    </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">play</span><span class="p">(</span><span class="s2">&quot;dissipate&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="c1"># start the new timer in stead of calling queue_free here</span>
+<span class="w">    </span><span class="o">$</span><span class="n">DissipateTimer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="w">    </span><span class="c1"># slow it down to 1/10th the speed</span>
+<span class="w">    </span><span class="n">velocity</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mf">0.1</span>
+</code></pre></div>
+
 <p>Test the project with <code>F5</code>. You should now see gray fireballs after collision:</p>
 <p><img alt="gray fireballs" src="../screenshots/gray-fireball.png" /></p>
 <h3 id="the-actual-rendition-script">The actual rendition script</h3>
 <p>Now that we established a simple list of one gray fireball rendition worked, let's finish up the rendition script in <code>texture_renditions.gd</code>:</p>
-<pre><code class="language-gdscript">func _ready():
-    fireball_dissipate = get_dissipate_renditions(fireball, 30, 1, 0.25)
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="n">fireball_dissipate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_dissipate_renditions</span><span class="p">(</span><span class="n">fireball</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.25</span><span class="p">)</span>
 
-# Return a list of dissipating image renditions as an ImageTexture-Array
-# - src_rendition is the original Image
-# - amount is the amount of times to repeat the rendition effect
-# - scatter is the chance of a pixel being rendered again in a given rendeition
-# - fade is the factor by which the alpha channel transparency should be reduced 
-# in each rendition
-func get_dissipate_renditions(src_rendition : Image, amount : int = 14, scatter : int = 1, fade : float = 0.5):
-    var renditions = []
-    for n in range(amount):
-        # Create a new Image instance with the same properties as the source image
-        var dst_rendition = Image.create(src_rendition.get_width(), src_rendition.get_height(), false, src_rendition.get_format())
-        # Loop through all the pixels
-        for x in range(src_rendition.get_width()):
-            for y in range(src_rendition.get_height()):
-                # Get the original color
-                var src_color = src_rendition.get_pixel(x, y)
-                # Copy the source pixel if the random int between 0 and scatter
-                # hits one
-                if randi_range(0, scatter) == 1:
-                    # Copy the pixel, reduce opacity by factor fade
-                    dst_rendition.set_pixel(x, y, Color(src_color.r, src_color.g, src_color.b, src_color.a * fade))
+<span class="c1"># Return a list of dissipating image renditions as an ImageTexture-Array</span>
+<span class="c1"># - src_rendition is the original Image</span>
+<span class="c1"># - amount is the amount of times to repeat the rendition effect</span>
+<span class="c1"># - scatter is the chance of a pixel being rendered again in a given rendeition</span>
+<span class="c1"># - fade is the factor by which the alpha channel transparency should be reduced </span>
+<span class="c1"># in each rendition</span>
+<span class="k">func</span><span class="w"> </span><span class="n">get_dissipate_renditions</span><span class="p">(</span><span class="n">src_rendition</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">Image</span><span class="p">,</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">int</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w"> </span><span class="n">scatter</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">int</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">fade</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">float</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">renditions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">range</span><span class="p">(</span><span class="n">amount</span><span class="p">):</span>
+<span class="w">        </span><span class="c1"># Create a new Image instance with the same properties as the source image</span>
+<span class="w">        </span><span class="k">var</span><span class="w"> </span><span class="n">dst_rendition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Image</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_width</span><span class="p">(),</span><span class="w"> </span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_height</span><span class="p">(),</span><span class="w"> </span><span class="bp">false</span><span class="p">,</span><span class="w"> </span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_format</span><span class="p">())</span>
+<span class="w">        </span><span class="c1"># Loop through all the pixels</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">range</span><span class="p">(</span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_width</span><span class="p">()):</span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nb">range</span><span class="p">(</span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_height</span><span class="p">()):</span>
+<span class="w">                </span><span class="c1"># Get the original color</span>
+<span class="w">                </span><span class="k">var</span><span class="w"> </span><span class="n">src_color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_pixel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span>
+<span class="w">                </span><span class="c1"># Copy the source pixel if the random int between 0 and scatter</span>
+<span class="w">                </span><span class="c1"># hits one</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="n">randi_range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">scatter</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span>
+<span class="w">                    </span><span class="c1"># Copy the pixel, reduce opacity by factor fade</span>
+<span class="w">                    </span><span class="n">dst_rendition</span><span class="o">.</span><span class="n">set_pixel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="nb nb-Type">Color</span><span class="p">(</span><span class="n">src_color</span><span class="o">.</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">src_color</span><span class="o">.</span><span class="n">g</span><span class="p">,</span><span class="w"> </span><span class="n">src_color</span><span class="o">.</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">src_color</span><span class="o">.</span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">fade</span><span class="p">))</span>
 
-        # append this rendition to result array
-        renditions.append(ImageTexture.create_from_image(dst_rendition))
-        # overwrite the src_rendition variable with a new empty image
-        src_rendition = Image.create(src_rendition.get_width(), src_rendition.get_height(), false, src_rendition.get_format())
-        # copy the current rendition into this variable entirely to be
-        # manipulated in the next iteration
-        src_rendition.copy_from(dst_rendition)
-    # return the list of amount renditions
-    return renditions
-</code></pre>
+<span class="w">        </span><span class="c1"># append this rendition to result array</span>
+<span class="w">        </span><span class="n">renditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ImageTexture</span><span class="o">.</span><span class="n">create_from_image</span><span class="p">(</span><span class="n">dst_rendition</span><span class="p">))</span>
+<span class="w">        </span><span class="c1"># overwrite the src_rendition variable with a new empty image</span>
+<span class="w">        </span><span class="n">src_rendition</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Image</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_width</span><span class="p">(),</span><span class="w"> </span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_height</span><span class="p">(),</span><span class="w"> </span><span class="bp">false</span><span class="p">,</span><span class="w"> </span><span class="n">src_rendition</span><span class="o">.</span><span class="n">get_format</span><span class="p">())</span>
+<span class="w">        </span><span class="c1"># copy the current rendition into this variable entirely to be</span>
+<span class="w">        </span><span class="c1"># manipulated in the next iteration</span>
+<span class="w">        </span><span class="n">src_rendition</span><span class="o">.</span><span class="n">copy_from</span><span class="p">(</span><span class="n">dst_rendition</span><span class="p">)</span>
+<span class="w">    </span><span class="c1"># return the list of amount renditions</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">renditions</span>
+</code></pre></div>
+
 <p>Upon testing with <code>F5</code>, we should now see something like this:</p>
 <p><img alt="dissipating fireball" src="../screenshots/dissipating-fireball.png" /></p>
 <p>Tastes may differ, but personally I enjoy the fact that the random scatter in our renditions makes the fireball dissipate a little differently every time we play the game.</p>

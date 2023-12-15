@@ -202,27 +202,30 @@
 <ol>
 <li>Add a movement state for casting:</li>
 </ol>
-<pre><code class="language-gdscript">enum MovementState { IDLE, RUNNING, AIRBORNE, CASTING }
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">enum</span><span class="w"> </span><span class="n">MovementState</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">IDLE</span><span class="p">,</span><span class="w"> </span><span class="n">RUNNING</span><span class="p">,</span><span class="w"> </span><span class="n">AIRBORNE</span><span class="p">,</span><span class="w"> </span><span class="n">CASTING</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
 <ol start="2">
 <li>Add a property for the direction of casting</li>
 </ol>
-<pre><code class="language-gdscript">@export var cast_angle : float
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">cast_angle</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">float</span>
+</code></pre></div>
+
 <ol start="3">
 <li>In the <code>_physics_process</code>  set <code>cast_angle</code> and <code>movement_state</code> right above the jump code</li>
 </ol>
-<pre><code class="language-gdscript">    if Input.is_action_pressed(&quot;Fireball button&quot;):
-        movement_state = MovementState.CASTING
-        # base the angle of casting on the position of the mouse
-        # relative to Zelia or on the L-stick
-        if Input.is_action_pressed(&quot;Left mouse button&quot;):
-            cast_angle = (get_global_mouse_position() - position).normalized().angle()
-        else:
-            cast_angle = Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)).normalized().angle()
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Fireball button&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">CASTING</span>
+<span class="w">        </span><span class="c1"># base the angle of casting on the position of the mouse</span>
+<span class="w">        </span><span class="c1"># relative to Zelia or on the L-stick</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Left mouse button&quot;</span><span class="p">):</span>
+<span class="w">            </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">get_global_mouse_position</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
+<span class="w">        </span><span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">(</span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_X</span><span class="p">),</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_Y</span><span class="p">))</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
 
-    # Handle Jump, only when on the floor
-</code></pre>
+<span class="w">    </span><span class="c1"># Handle Jump, only when on the floor</span>
+</code></pre></div>
+
 <ol start="4">
 <li>Test via remote debugging</li>
 </ol>
@@ -250,16 +253,17 @@
 </ol>
 <h3 id="flipping-the-player-left-and-right-by-aiming">Flipping the player left and right by aiming</h3>
 <p>Extend the code in the <code>if</code>-block we just created for setting the <code>cast_angle</code> to include setting the <code>orientation</code>-property correctly.</p>
-<pre><code class="language-gdscript">    if Input.is_action_pressed(&quot;Fireball button&quot;):
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Fireball button&quot;</span><span class="p">):</span>
 
-        ## ... movement_state and cast_angle are still set here
+<span class="w">        </span><span class="c1">## ... movement_state and cast_angle are still set here</span>
 
-        # base her orientation on the angle of casting as well
-        if cast_angle &gt; -(PI * 0.5) and cast_angle &lt; PI * 0.5:
-            orientation = Orientation.RIGHT
-        else:
-            orientation = Orientation.LEFT
-</code></pre>
+<span class="w">        </span><span class="c1"># base her orientation on the angle of casting as well</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">-</span><span class="p">(</span><span class="bp">PI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="bp">PI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">:</span>
+<span class="w">            </span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">RIGHT</span>
+<span class="w">        </span><span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">LEFT</span>
+</code></pre></div>
+
 <p>Test using <code>F5</code>: when clicking with the mouse left of her she should now flip to look left.</p>
 <h3 id="letting-zelia-stop-jumping-and-moving-on-the-x-axis-while-casting">Letting Zelia stop jumping and moving on the x-axis while casting</h3>
 <p>When she's casting she should not slide sideways.</p>
@@ -269,120 +273,126 @@
 <li>First move your entire <code>if Input.is_action_pressed("Fireball button")</code>-block all the way up to below <code>velocity.y += gravity * delta</code>.</li>
 <li>Change <code>if movement_state == MovementState.AIRBORNE</code> into <code>elif movement_state == MovementState.AIRBORNE</code></li>
 </ol>
-<pre><code class="language-gdscript">    if Input.is_action_pressed(&quot;Fireball button&quot;):
-        movement_state = MovementState.CASTING
-        # base the angle of casting on the position of the mouse
-        # relative to Zelia or on the L-stick
-        if Input.is_action_pressed(&quot;Left mouse button&quot;):
-            cast_angle = (get_global_mouse_position() - position).normalized().angle()
-        else:
-            cast_angle = Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)).normalized().angle()
-        # base her orientation on the angle of casting as well
-        if cast_angle &gt; -(PI * 0.5) and cast_angle &lt; PI * 0.5:
-            orientation = Orientation.RIGHT
-        else:
-            orientation = Orientation.LEFT
-    elif movement_state == MovementState.AIRBORNE:
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Fireball button&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">CASTING</span>
+<span class="w">        </span><span class="c1"># base the angle of casting on the position of the mouse</span>
+<span class="w">        </span><span class="c1"># relative to Zelia or on the L-stick</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Left mouse button&quot;</span><span class="p">):</span>
+<span class="w">            </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">get_global_mouse_position</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
+<span class="w">        </span><span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">(</span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_X</span><span class="p">),</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_Y</span><span class="p">))</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
+<span class="w">        </span><span class="c1"># base her orientation on the angle of casting as well</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">-</span><span class="p">(</span><span class="bp">PI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="bp">PI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">:</span>
+<span class="w">            </span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">RIGHT</span>
+<span class="w">        </span><span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">LEFT</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+</code></pre></div>
+
 <p>This stops her from sliding or moving around while in the air.</p>
 <h4 id="step-2-only-jump-when-not-casting-and-not-airborne">Step 2, only jump when not casting <em>and</em> not airborne</h4>
 <p>She can still jump while casting now, let's fix that.</p>
 <p>Indent the <code>if Input.is_action_just_pressed("Jump") and is_on_floor()</code> to make it part of the <code>else</code>-case matching not casting and not being airborne</p>
-<pre><code class="language-gdscript">    else:
-        # Else we are not airborne right now
-        if Input.is_action_pressed(&quot;Run right&quot;):
-            # so we run right when run right is pressed
-            orientation = Orientation.RIGHT
-            movement_state = MovementState.RUNNING
-            velocity.x = speed
-        elif Input.is_action_pressed(&quot;Run left&quot;):
-            # .. and left ...
-            orientation = Orientation.LEFT
-            movement_state = MovementState.RUNNING
-            velocity.x = -speed
-        else:
-            # and stand idle if no x-movement button is pressed
-            velocity.x = 0
-            movement_state = MovementState.IDLE  
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># Else we are not airborne right now</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Run right&quot;</span><span class="p">):</span>
+<span class="w">            </span><span class="c1"># so we run right when run right is pressed</span>
+<span class="w">            </span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">RIGHT</span>
+<span class="w">            </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">RUNNING</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">speed</span>
+<span class="w">        </span><span class="k">elif</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Run left&quot;</span><span class="p">):</span>
+<span class="w">            </span><span class="c1"># .. and left ...</span>
+<span class="w">            </span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">LEFT</span>
+<span class="w">            </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">RUNNING</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">speed</span>
+<span class="w">        </span><span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="c1"># and stand idle if no x-movement button is pressed</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">            </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">IDLE</span><span class="w">  </span>
 
-## This is new
-        # Handle Jump, only when on the floor
-        if Input.is_action_just_pressed(&quot;Jump&quot;):
-            $JumpSound.play()
-            movement_state = MovementState.AIRBORNE
-            velocity.y = jump_speed
-</code></pre>
+<span class="c1">## This is new</span>
+<span class="w">        </span><span class="c1"># Handle Jump, only when on the floor</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_just_pressed</span><span class="p">(</span><span class="s2">&quot;Jump&quot;</span><span class="p">):</span>
+<span class="w">            </span><span class="o">$</span><span class="n">JumpSound</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+<span class="w">            </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
+<span class="w">            </span><span class="n">velocity</span><span class="o">.</span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">jump_speed</span>
+</code></pre></div>
+
 <p>That stopped her from jumping while casting</p>
 <h4 id="step-3-separate-code-for-setting-initial-movement-state-from-code-updating-positions">Step 3, separate code for setting initial movement state from code updating positions.</h4>
 <p>This step will have no <em>functional</em> effect, but it will prepare us for our "readable code refactor" that comes next.</p>
 <p><strong>First</strong> create this new <code>if-block</code> just under <code>velocity.y += gravity * delta</code>:</p>
-<pre><code class="language-gdscript">    # Set initial movement state
-    if Input.is_action_pressed(&quot;Fireball button&quot;):
-        movement_state = MovementState.CASTING
-        # base the angle of casting on the position of the mouse
-        # relative to Zelia or on the L-stick
-        if Input.is_action_pressed(&quot;Left mouse button&quot;):
-            cast_angle = (get_global_mouse_position() - position).normalized().angle()
-        else:
-            cast_angle = Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)).normalized().angle()
-    elif is_on_floor():
-        movement_state = MovementState.IDLE
-    else:
-        movement_state = MovementState.AIRBORNE
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="c1"># Set initial movement state</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Fireball button&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">CASTING</span>
+<span class="w">        </span><span class="c1"># base the angle of casting on the position of the mouse</span>
+<span class="w">        </span><span class="c1"># relative to Zelia or on the L-stick</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Left mouse button&quot;</span><span class="p">):</span>
+<span class="w">            </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">get_global_mouse_position</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
+<span class="w">        </span><span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">(</span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_X</span><span class="p">),</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_Y</span><span class="p">))</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">is_on_floor</span><span class="p">():</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">IDLE</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
+</code></pre></div>
+
 <p><strong>Second</strong> Replace the old <code>if Input.is_action_pressed("Fireball button")</code>-block with this code:</p>
-<pre><code class="language-gdscript">    # Update movement state, velocity and orientation based on the combo of
-    # her current movement state and environmental factors
-    if movement_state == MovementState.CASTING:
-        # She cannot run or move on x-axis in the air while casting
-        velocity.x = 0
-        # base her orientation on the angle of casting as well
-        if cast_angle &gt; -(PI * 0.5) and cast_angle &lt; PI * 0.5:
-            orientation = Orientation.RIGHT
-        else:
-            orientation = Orientation.LEFT
-    elif movement_state == MovementState.AIRBORNE:
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="c1"># Update movement state, velocity and orientation based on the combo of</span>
+<span class="w">    </span><span class="c1"># her current movement state and environmental factors</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">CASTING</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># She cannot run or move on x-axis in the air while casting</span>
+<span class="w">        </span><span class="n">velocity</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="c1"># base her orientation on the angle of casting as well</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">-</span><span class="p">(</span><span class="bp">PI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="bp">PI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.5</span><span class="p">:</span>
+<span class="w">            </span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">RIGHT</span>
+<span class="w">        </span><span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="n">orientation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">LEFT</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+</code></pre></div>
+
 <p>Your script should now look like this:</p>
 <p><a href="https://github.com/Teaching-myself-Godot/godot-zelia/blob/letting-zelia-stop-x-on-cast/player/player.gd">player.gd  (tag = letting-zelia-stop-x-on-cast)</a></p>
 <h2 id="draw-the-correct-casting-sprites-based-on-cast-direction">Draw the correct casting sprites based on cast direction</h2>
 <p>Let's make a well-named function to choose the correct sprite name to draw:</p>
 <h3 id="func-get_casting_sprite"><code>func get_casting_sprite</code></h3>
-<pre><code class="language-gdscript">## Determine the casting sprite name based on decimal degrees
-func get_casting_sprite(deg) -&gt; String:
-    var casting_left  = (deg &gt; 120 and deg &lt; 180) or (deg &gt; -180 and deg &lt; -120)
-    var casting_right = deg &gt; -60  and deg &lt; 60
-    var casting_up    = deg &gt; -140 and deg &lt; -20
-    var casting_down  = deg &gt; 30   and deg &lt; 150
+<div class="codehilite"><pre><span></span><code><span class="c1">## Determine the casting sprite name based on decimal degrees</span>
+<span class="k">func</span><span class="w"> </span><span class="n">get_casting_sprite</span><span class="p">(</span><span class="n">deg</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nb nb-Type">String</span><span class="p">:</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">casting_left</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">deg</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">120</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">deg</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">180</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="p">(</span><span class="n">deg</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">-</span><span class="mi">180</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">deg</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">-</span><span class="mi">120</span><span class="p">)</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">casting_right</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">deg</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">-</span><span class="mi">60</span><span class="w">  </span><span class="ow">and</span><span class="w"> </span><span class="n">deg</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">60</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">casting_up</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">deg</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">-</span><span class="mi">140</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">deg</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="o">-</span><span class="mi">20</span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">casting_down</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">deg</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">30</span><span class="w">   </span><span class="ow">and</span><span class="w"> </span><span class="n">deg</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">150</span>
 
-    if casting_up and (casting_right or casting_left):
-        return &quot;casting_diag_up&quot;
-    elif casting_down and (casting_right or casting_left):
-        return &quot;casting_down&quot;
-    elif casting_up:
-        return &quot;casting_up&quot;
-    elif casting_down:
-        return &quot;casting_down&quot;
-    else:
-        return &quot;casting_forward&quot;
-</code></pre>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">casting_up</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="p">(</span><span class="n">casting_right</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">casting_left</span><span class="p">):</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s2">&quot;casting_diag_up&quot;</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">casting_down</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="p">(</span><span class="n">casting_right</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">casting_left</span><span class="p">):</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s2">&quot;casting_down&quot;</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">casting_up</span><span class="p">:</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s2">&quot;casting_up&quot;</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">casting_down</span><span class="p">:</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s2">&quot;casting_down&quot;</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s2">&quot;casting_forward&quot;</span>
+</code></pre></div>
+
 <p>As you can see, this function expects the cast_angle to be passed as <code>decimal degrees</code> in stead of <code>radians</code>.</p>
 <p>This makes the code a little more self-documenting, at the cost of some minimal performance.</p>
 <p>Now let's also add the case for <code>MovementState.CASTING</code> to our <code>match</code>-statement:</p>
-<pre><code class="language-gdscript">    # Determine sprite based on movement state
-    match (movement_state):
-        MovementState.RUNNING:
-            $AnimatedSprite2D.animation = &quot;running&quot;
-        # This was added
-        MovementState.AIRBORNE:
-            $AnimatedSprite2D.animation = &quot;jumping&quot;
-        MovementState.CASTING:
-            # when casting invoke get_casting_sprite to set the correct 
-            # animation name
-            $AnimatedSprite2D.animation = get_casting_sprite(rad_to_deg(cast_angle))
-        _: # MovementState.IDLE
-            $AnimatedSprite2D.animation = &quot;idle&quot;
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="c1"># Determine sprite based on movement state</span>
+<span class="w">    </span><span class="k">match</span><span class="w"> </span><span class="p">(</span><span class="n">movement_state</span><span class="p">):</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;running&quot;</span>
+<span class="w">        </span><span class="c1"># This was added</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;jumping&quot;</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">CASTING</span><span class="p">:</span>
+<span class="w">            </span><span class="c1"># when casting invoke get_casting_sprite to set the correct </span>
+<span class="w">            </span><span class="c1"># animation name</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_casting_sprite</span><span class="p">(</span><span class="n">rad_to_deg</span><span class="p">(</span><span class="n">cast_angle</span><span class="p">))</span>
+<span class="w">        </span><span class="n">_</span><span class="p">:</span><span class="w"> </span><span class="c1"># MovementState.IDLE</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;idle&quot;</span>
+</code></pre></div>
+
 <p>Note the <code>rad_to_deg</code> there.</p>
 <h2 id="extract-some-functions-for-less-messy-code">Extract some functions for less messy code</h2>
 <p>Now it's really time to fix <a href="../day-1/#technical-debt-2">Technical debt 2</a>, because the debt became deeper.</p>
@@ -404,73 +414,77 @@ func get_casting_sprite(deg) -&gt; String:
 <p>Let's rewrite the above <a href="#rearrange-the-code-in-_physics_process-a-little">code</a> again.</p>
 <p>We spot that <code>_physics_process</code> is now almost 100 lines long!</p>
 <p>Step <code>1</code> - code that needs comments:</p>
-<pre><code class="language-gdscript">    # Handle casting
-    if Input.is_action_pressed(&quot;Fireball button&quot;):
-        movement_state = MovementState.CASTING
-        # base the angle of casting on the position of the mouse
-        # relative to Zelia or on the L-stick
-        if Input.is_action_pressed(&quot;Left mouse button&quot;):
-            cast_angle = (get_global_mouse_position() - position).normalized().angle()
-        else:
-            cast_angle = Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)).normalized().angle()
-    elif is_on_floor():
-        movement_state = MovementState.IDLE
-    else:
-        movement_state = MovementState.AIRBORNE
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="c1"># Handle casting</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Fireball button&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">CASTING</span>
+<span class="w">        </span><span class="c1"># base the angle of casting on the position of the mouse</span>
+<span class="w">        </span><span class="c1"># relative to Zelia or on the L-stick</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Left mouse button&quot;</span><span class="p">):</span>
+<span class="w">            </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">get_global_mouse_position</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
+<span class="w">        </span><span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">(</span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_X</span><span class="p">),</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_Y</span><span class="p">))</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">is_on_floor</span><span class="p">():</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">IDLE</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
+</code></pre></div>
+
 <p>Is moved to a separate function named <code>set_movement_state</code>.</p>
-<pre><code class="language-gdscript"># Set initial movement state
-func set_movement_state():
-    if Input.is_action_pressed(&quot;Fireball button&quot;):
-        movement_state = MovementState.CASTING
-        # base the angle of casting on the position of the mouse
-        # relative to Zelia or on the L-stick
-        if Input.is_action_pressed(&quot;Left mouse button&quot;):
-            cast_angle = (get_global_mouse_position() - position).normalized().angle()
-        else:
-            cast_angle = Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)).normalized().angle()
-    elif is_on_floor():
-        movement_state = MovementState.IDLE
-    else:
-        movement_state = MovementState.AIRBORNE
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Set initial movement state</span>
+<span class="k">func</span><span class="w"> </span><span class="n">set_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Fireball button&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">CASTING</span>
+<span class="w">        </span><span class="c1"># base the angle of casting on the position of the mouse</span>
+<span class="w">        </span><span class="c1"># relative to Zelia or on the L-stick</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Left mouse button&quot;</span><span class="p">):</span>
+<span class="w">            </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">get_global_mouse_position</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
+<span class="w">        </span><span class="k">else</span><span class="p">:</span>
+<span class="w">            </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">(</span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_X</span><span class="p">),</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_Y</span><span class="p">))</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">is_on_floor</span><span class="p">():</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">IDLE</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
+</code></pre></div>
+
 <p>Step <code>1</code> can be applied again to this new function:</p>
-<pre><code class="language-gdscript"># base the angle of casting on the position of the mouse relative to Zelia
-func set_cast_angle():
-    if Input.is_action_pressed(&quot;Left mouse button&quot;):
-        cast_angle = (get_global_mouse_position() - position).normalized().angle()
-    else:
-        cast_angle = Vector2(Input.get_joy_axis(0, JOY_AXIS_LEFT_X), Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)).normalized().angle()
+<div class="codehilite"><pre><span></span><code><span class="c1"># base the angle of casting on the position of the mouse relative to Zelia</span>
+<span class="k">func</span><span class="w"> </span><span class="n">set_cast_angle</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Left mouse button&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">get_global_mouse_position</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">position</span><span class="p">)</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">(</span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_X</span><span class="p">),</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_Y</span><span class="p">))</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
 
-# Set initial movement state
-func set_movement_state():
-    if Input.is_action_pressed(&quot;Fireball button&quot;):
-        movement_state = MovementState.CASTING
-        set_cast_angle()
-    elif is_on_floor():
-        movement_state = MovementState.IDLE
-    else:
-        movement_state = MovementState.AIRBORNE
-</code></pre>
+<span class="c1"># Set initial movement state</span>
+<span class="k">func</span><span class="w"> </span><span class="n">set_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Fireball button&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">CASTING</span>
+<span class="w">        </span><span class="n">set_cast_angle</span><span class="p">()</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">is_on_floor</span><span class="p">():</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">IDLE</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
+</code></pre></div>
+
 <p>Now both step <code>2</code> and <code>3</code> still apply to this new function:</p>
-<pre><code class="language-gdscript"># Vector of L-stick
-func get_l_stick_axis_vec() -&gt; Vector2:
-    return Vector2(
-        Input.get_joy_axis(0, JOY_AXIS_LEFT_X), 
-        Input.get_joy_axis(0, JOY_AXIS_LEFT_Y)
-    )
+<div class="codehilite"><pre><span></span><code><span class="c1"># Vector of L-stick</span>
+<span class="k">func</span><span class="w"> </span><span class="n">get_l_stick_axis_vec</span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">:</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">(</span>
+<span class="w">        </span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_X</span><span class="p">),</span><span class="w"> </span>
+<span class="w">        </span><span class="n">Input</span><span class="o">.</span><span class="n">get_joy_axis</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">JOY_AXIS_LEFT_Y</span><span class="p">)</span>
+<span class="w">    </span><span class="p">)</span>
 
-# Vector from player to mouse position
-func get_mouse_vec_to_player() -&gt; Vector2:
-    return get_global_mouse_position() - position
+<span class="c1"># Vector from player to mouse position</span>
+<span class="k">func</span><span class="w"> </span><span class="n">get_mouse_vec_to_player</span><span class="p">()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="nb nb-Type">Vector2</span><span class="p">:</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">get_global_mouse_position</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">position</span>
 
-# base the angle of casting on the position of the mouse relative to Zelia
-func set_cast_angle():
-    if Input.is_action_pressed(&quot;Left mouse button&quot;):
-        cast_angle = get_mouse_vec_to_player().normalized().angle()
-    else:
-        cast_angle = get_l_stick_axis_vec().normalized().angle()
-</code></pre>
+<span class="c1"># base the angle of casting on the position of the mouse relative to Zelia</span>
+<span class="k">func</span><span class="w"> </span><span class="n">set_cast_angle</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Left mouse button&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_mouse_vec_to_player</span><span class="p">()</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">cast_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_l_stick_axis_vec</span><span class="p">()</span><span class="o">.</span><span class="n">normalized</span><span class="p">()</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span>
+</code></pre></div>
+
 <h4 id="rinse-and-repeat">Rinse and repeat!</h4>
 <p>Now we spot this elaborate comment: </p>
 <p><em>"Update movement state, velocity and orientation based on the combo of her current movement state and environmental factors"</em></p>
@@ -484,16 +498,17 @@ func set_cast_angle():
 7. Do the same for <code>handle_airborne()</code> under <code>elif movement_state == MovementState.AIRBORNE:</code>
 8. And make 2 functions to be called under <code>else:</code> - <code>handle_running()</code> and <code>handle_jumping()</code></p>
 <p>Your final func <code>handle_movement_state()</code> should now look like this.</p>
-<pre><code class="language-gdscript"># Main movement state handler entry point
-func handle_movement_state():
-    if movement_state == MovementState.CASTING:
-        handle_casting()
-    elif movement_state == MovementState.AIRBORNE:
-        handle_airborne()
-    else:
-        handle_running()
-        handle_jumping()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="c1"># Main movement state handler entry point</span>
+<span class="k">func</span><span class="w"> </span><span class="n">handle_movement_state</span><span class="p">():</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">CASTING</span><span class="p">:</span>
+<span class="w">        </span><span class="n">handle_casting</span><span class="p">()</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">        </span><span class="n">handle_airborne</span><span class="p">()</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">handle_running</span><span class="p">()</span>
+<span class="w">        </span><span class="n">handle_jumping</span><span class="p">()</span>
+</code></pre></div>
+
 <h4 id="just-2-more-funcs">Just 2 more funcs!</h4>
 <ol>
 <li>Create the function <code>set_current_sprite</code></li>
@@ -508,24 +523,25 @@ func handle_movement_state():
 </ol>
 <h4 id="all-tidied-up">All tidied up</h4>
 <p>Your <code>_physics_process</code> should now look like this:</p>
-<pre><code class="language-gdscript"># Changed _process to _physics_process
-func _physics_process(delta):
-    # Apply the gravity.
-    velocity.y += gravity * delta
+<div class="codehilite"><pre><span></span><code><span class="c1"># Changed _process to _physics_process</span>
+<span class="k">func</span><span class="w"> </span><span class="n">_physics_process</span><span class="p">(</span><span class="n">delta</span><span class="p">):</span>
+<span class="w">    </span><span class="c1"># Apply the gravity.</span>
+<span class="w">    </span><span class="n">velocity</span><span class="o">.</span><span class="n">y</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">gravity</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">delta</span>
 
-    # Set, and handle movement state 
-    set_movement_state()
-    handle_movement_state()
+<span class="w">    </span><span class="c1"># Set, and handle movement state </span>
+<span class="w">    </span><span class="n">set_movement_state</span><span class="p">()</span>
+<span class="w">    </span><span class="n">handle_movement_state</span><span class="p">()</span>
 
-    # Set the correct sprite based on movement state
-    set_current_sprite()
+<span class="w">    </span><span class="c1"># Set the correct sprite based on movement state</span>
+<span class="w">    </span><span class="n">set_current_sprite</span><span class="p">()</span>
 
-    # Determine sprite-flip based on orientation
-    flip_current_sprite()
+<span class="w">    </span><span class="c1"># Determine sprite-flip based on orientation</span>
+<span class="w">    </span><span class="n">flip_current_sprite</span><span class="p">()</span>
 
-    # Apply 2d physics engine's movement 
-    move_and_slide()
-</code></pre>
+<span class="w">    </span><span class="c1"># Apply 2d physics engine&#39;s movement </span>
+<span class="w">    </span><span class="n">move_and_slide</span><span class="p">()</span>
+</code></pre></div>
+
 <p>And everything should still work.</p>
 <p>Your entire <code>player.gd</code> script should look like this:</p>
 <p><a href="https://github.com/Teaching-myself-Godot/godot-zelia/blob/164027e6ed74a70c1222778ebcd8dffba24ec416/player/player.gd"><code>player.gd</code></a> - on github commit: <em>"use my own tutorial for day-3 part 1."</em></p>

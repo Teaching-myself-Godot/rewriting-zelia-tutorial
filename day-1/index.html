@@ -274,53 +274,54 @@ Here is her <a href="https://github.com/Teaching-myself-Godot/rewriting-zelia-tu
 <p>Finally, let's code some stuff, taking guidance  from <a href="https://docs.godotengine.org/en/stable/getting_started/first_2d_game/03.coding_the_player.html">the official guide</a>.</p>
 <p>Attach a script to the <code>Player</code>-node and save it in <code>res://player/player.gd</code></p>
 <p>So in the original game there were some movement states I would like to keep using to make our rewrite easier:</p>
-<pre><code class="language-python">from enum import Enum
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
-class Orientation(Enum):
-    LEFT = 1
-    RIGHT = 2
-    NONE = 3
-    UP = 4
-    DOWN = 5
+<span class="k">class</span> <span class="nc">Orientation</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">LEFT</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">RIGHT</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">NONE</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">UP</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">DOWN</span> <span class="o">=</span> <span class="mi">5</span>
 
-class MovementState(Enum):
-    IDLE = 1
-    RUNNING = 2
-    AIRBORNE = 3
-    JUMPING = 4
-    DYING = 5
-    CASTING = 6
-    FACING_FORWARD = 7
-    HOLDING_ITEM = 8
+<span class="k">class</span> <span class="nc">MovementState</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">IDLE</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">RUNNING</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">AIRBORNE</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">JUMPING</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">DYING</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">CASTING</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">FACING_FORWARD</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">HOLDING_ITEM</span> <span class="o">=</span> <span class="mi">8</span>
 
-class CastDirection(Enum):
-    DIAG_DOWN = 1
-    FORWARD = 2
-    DIAG_UP = 3
-    UP = 4
-    DOWN = 5
-</code></pre>
+<span class="k">class</span> <span class="nc">CastDirection</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">DIAG_DOWN</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">FORWARD</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">DIAG_UP</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">UP</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">DOWN</span> <span class="o">=</span> <span class="mi">5</span>
+</code></pre></div>
+
 <p>Let's <a href="https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_basics.html">read up on</a> how to port these python style <code>enums</code> to gdscript.</p>
 <p>That looks nice and clean, let's define some inside our <code>player.gd</code> script for now.</p>
 <p>Let's assign them to some properties in the <code>_ready()</code> func.</p>
-<pre><code class="language-gdscript">extends Area2D
+<div class="codehilite"><pre><span></span><code><span class="k">extends</span><span class="w"> </span><span class="n">Area2D</span>
 
-enum Orientation   { LEFT, RIGHT }
-enum MovementState { IDLE, RUNNING, AIRBORNE }
+<span class="k">enum</span><span class="w"> </span><span class="n">Orientation</span><span class="w">   </span><span class="p">{</span><span class="w"> </span><span class="n">LEFT</span><span class="p">,</span><span class="w"> </span><span class="n">RIGHT</span><span class="w"> </span><span class="p">}</span>
+<span class="k">enum</span><span class="w"> </span><span class="n">MovementState</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">IDLE</span><span class="p">,</span><span class="w"> </span><span class="n">RUNNING</span><span class="p">,</span><span class="w"> </span><span class="n">AIRBORNE</span><span class="w"> </span><span class="p">}</span>
 
-# We will want to debug these states, let's export them as well
-@export var movement_state : int
-@export var orientation    : int
+<span class="c1"># We will want to debug these states, let&#39;s export them as well</span>
+<span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">int</span>
+<span class="err">@</span><span class="k">export</span><span class="w"> </span><span class="k">var</span><span class="w"> </span><span class="n">orientation</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="nb nb-Type">int</span>
 
 
-func _ready():
-    movement_state = MovementState.IDLE
-    orientation    = Orientation.RIGHT
+<span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">IDLE</span>
+<span class="w">    </span><span class="n">orientation</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">RIGHT</span>
 
-func _process(delta):
-    pass
+<span class="k">func</span><span class="w"> </span><span class="n">_process</span><span class="p">(</span><span class="n">delta</span><span class="p">):</span>
+<span class="w">    </span><span class="k">pass</span>
+</code></pre></div>
 
-</code></pre>
 <h3 id="test-run">Test run</h3>
 <p>Run the current scene to test our property assignments. </p>
 <p>To debug exported properties while running, go to the node tree window and pick <code>Remote</code> in stead of <code>Local</code>:</p>
@@ -332,38 +333,41 @@ func _process(delta):
 <h2 id="implement-running-animations">Implement running animations</h2>
 <p>So let's now write some body for the <code>_process()</code> func.</p>
 <p>Let's first write tests for the <code>Run right</code> and <code>Run left</code> actions to set the movement</p>
-<pre><code class="language-gdscript">func _process(delta):
-    if Input.is_action_pressed(&quot;Run right&quot;):
-        orientation    = Orientation.RIGHT
-        movement_state = MovementState.RUNNING
-    elif Input.is_action_pressed(&quot;Run left&quot;):
-        orientation    = Orientation.LEFT
-        movement_state = MovementState.RUNNING
-    else:
-        movement_state = MovementState.IDLE
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_process</span><span class="p">(</span><span class="n">delta</span><span class="p">):</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Run right&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="n">orientation</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">RIGHT</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">RUNNING</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Run left&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="n">orientation</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">LEFT</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">RUNNING</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">IDLE</span>
+</code></pre></div>
+
 <p>To test out whether our state changes work we run the current scene and open the <code>Remote</code> inspector for player. (Remember: click the <code>root</code>-node first and then the <code>Player</code>-node).</p>
 <p>I noticed a slight delay in the inspector, but I'm guessing that's due to it being on a lower priority thread.</p>
 <h3 id="picking-the-right-animations-based-on-states">Picking the right animations based on states</h3>
 <p>Let's reread <a href="https://docs.godotengine.org/en/stable/getting_started/first_2d_game/03.coding_the_player.html#choosing-animations">the guide</a> on changing the animations.</p>
 <p>Add the following code at the bottom of the <code>_process</code> func:</p>
-<pre><code class="language-gdscript">    match (movement_state):
-        MovementState.RUNNING:
-            $AnimatedSprite2D.animation = &quot;running&quot;
-        _: # MovementState.IDLE
-            $AnimatedSprite2D.animation = &quot;idle&quot;
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="k">match</span><span class="w"> </span><span class="p">(</span><span class="n">movement_state</span><span class="p">):</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;running&quot;</span>
+<span class="w">        </span><span class="n">_</span><span class="p">:</span><span class="w"> </span><span class="c1"># MovementState.IDLE</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;idle&quot;</span>
 
-    if orientation == Orientation.LEFT:
-        $AnimatedSprite2D.flip_h = true
-    else:
-        $AnimatedSprite2D.flip_h = false
-</code></pre>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">orientation</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">LEFT</span><span class="p">:</span>
+<span class="w">        </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">flip_h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">true</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">flip_h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">false</span>
+</code></pre></div>
+
 <p>And make sure our <code>AnimatedSprite2D</code> node starts playing in func <code>_ready</code>.</p>
-<pre><code class="language-gdscript">func _ready():
-    movement_state = MovementState.IDLE
-    orientation    = Orientation.RIGHT
-    $AnimatedSprite2D.play()
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_ready</span><span class="p">():</span>
+<span class="w">    </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">IDLE</span>
+<span class="w">    </span><span class="n">orientation</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">RIGHT</span>
+<span class="w">    </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+</code></pre></div>
+
 <p>Test the current scene and if all is well our little Zelia is up and running! (pun intended)</p>
 <h2 id="implementing-the-jump">Implementing the jump</h2>
 <p>Ok so now we want her to jump!</p>
@@ -384,38 +388,39 @@ func _process(delta):
 <p><img alt="mock air time timer props" src="../screenshots/mock-airtimer-props.png" /></p>
 <h3 id="starting-the-mockairtimer-when-the-jump-button-was-pressed">Starting the MockAirTimer when the jump button was pressed</h3>
 <p>Change the <code>_process</code> func to match this snippet; changes and additions are under the comments.</p>
-<pre><code class="language-gdscript">func _process(delta):
-    # If user wants to jump, start the MockAirTimer and change the movement state to airborne
-    if Input.is_action_just_pressed(&quot;Jump&quot;) and movement_state != MovementState.AIRBORNE:
-        $MockAirTimer.start()
-        movement_state = MovementState.AIRBORNE
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_process</span><span class="p">(</span><span class="n">delta</span><span class="p">):</span>
+<span class="w">    </span><span class="c1"># If user wants to jump, start the MockAirTimer and change the movement state to airborne</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_just_pressed</span><span class="p">(</span><span class="s2">&quot;Jump&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">        </span><span class="o">$</span><span class="n">MockAirTimer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
 
-    if Input.is_action_pressed(&quot;Run right&quot;):
-        orientation    = Orientation.RIGHT
-        # Only change movement state to running if not airborne
-        movement_state = MovementState.RUNNING if movement_state != MovementState.AIRBORNE else MovementState.AIRBORNE
-    elif Input.is_action_pressed(&quot;Run left&quot;):
-        orientation    = Orientation.LEFT
-        # Only change movement state to running if not airborne
-        movement_state = MovementState.RUNNING if movement_state != MovementState.AIRBORNE else MovementState.AIRBORNE
-    else:
-        # Only change movement state to idle if not airborne
-        movement_state = MovementState.IDLE    if movement_state != MovementState.AIRBORNE else MovementState.AIRBORNE
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Run right&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="n">orientation</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">RIGHT</span>
+<span class="w">        </span><span class="c1"># Only change movement state to running if not airborne</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">RUNNING</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
+<span class="w">    </span><span class="k">elif</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_pressed</span><span class="p">(</span><span class="s2">&quot;Run left&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="n">orientation</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">LEFT</span>
+<span class="w">        </span><span class="c1"># Only change movement state to running if not airborne</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">RUNNING</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="c1"># Only change movement state to idle if not airborne</span>
+<span class="w">        </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">IDLE</span><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span>
 
-    match (movement_state):
-        MovementState.RUNNING:
-            $AnimatedSprite2D.animation = &quot;running&quot;
-        # This was added
-        MovementState.AIRBORNE:
-            $AnimatedSprite2D.animation = &quot;jumping&quot;
-        _: # MovementState.IDLE
-            $AnimatedSprite2D.animation = &quot;idle&quot;
+<span class="w">    </span><span class="k">match</span><span class="w"> </span><span class="p">(</span><span class="n">movement_state</span><span class="p">):</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;running&quot;</span>
+<span class="w">        </span><span class="c1"># This was added</span>
+<span class="w">        </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;jumping&quot;</span>
+<span class="w">        </span><span class="n">_</span><span class="p">:</span><span class="w"> </span><span class="c1"># MovementState.IDLE</span>
+<span class="w">            </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">animation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;idle&quot;</span>
 
-    if orientation == Orientation.LEFT:
-        $AnimatedSprite2D.flip_h = true
-    else:
-        $AnimatedSprite2D.flip_h = false
-</code></pre>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">orientation</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Orientation</span><span class="o">.</span><span class="n">LEFT</span><span class="p">:</span>
+<span class="w">        </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">flip_h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">true</span>
+<span class="w">    </span><span class="k">else</span><span class="p">:</span>
+<span class="w">        </span><span class="o">$</span><span class="n">AnimatedSprite2D</span><span class="o">.</span><span class="n">flip_h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">false</span>
+</code></pre></div>
+
 <h3 id="listening-to-the-mockairtimer-timeout">Listening to the MockAirTimer timeout</h3>
 <p>If we let her jump now she will remain airborne forever. Let's not forget to add a listener to the <code>MockAirTimer</code>.</p>
 <p>Select the <code>MockAirTimer</code>-node in the node tree view and open the <code>Node</code> tab next to the <code>Inspector</code> tab.</p>
@@ -424,9 +429,10 @@ func _process(delta):
 <p>Leave all the defaults in place and click <code>Connect</code></p>
 <h3 id="handle-the-timeout">Handle the timeout</h3>
 <p>We now end up with the listener func <code>_on_mock_air_timer_timeout</code> to implement like this:</p>
-<pre><code class="language-gdscript">func _on_mock_air_timer_timeout():
-    movement_state = MovementState.IDLE
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="k">func</span><span class="w"> </span><span class="n">_on_mock_air_timer_timeout</span><span class="p">():</span>
+<span class="w">    </span><span class="n">movement_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">IDLE</span>
+</code></pre></div>
+
 <p>Run the player scene to test out the jump. </p>
 <h3 id="tweaking-the-timings">Tweaking the timings</h3>
 <p>Personally I think one second of air time is a little to long, so let's change it to  <code>0.7s</code> - not too long as to seem unnatural, yet long enough for her to change direction in the air.</p>
@@ -434,9 +440,10 @@ func _process(delta):
 <p>Before we round up let's also add in the jump sound. Create a new child node for <code>Player</code> of type <code>AudioStreamPlayer</code> and call it <code>JumpSound</code>.</p>
 <p>Open up the <code>Inspector</code> and next to <code>Stream</code> use <code>Quick load</code> and pick <code>jump-sound.wav</code> from our resources dir.</p>
 <p>Then add this new line of code in <code>_process</code>:</p>
-<pre><code class="language-gdscript">    if Input.is_action_just_pressed(&quot;Jump&quot;) and movement_state != MovementState.AIRBORNE:
-        $JumpSound.play() # the new line
-</code></pre>
+<div class="codehilite"><pre><span></span><code><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">Input</span><span class="o">.</span><span class="n">is_action_just_pressed</span><span class="p">(</span><span class="s2">&quot;Jump&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="n">movement_state</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">MovementState</span><span class="o">.</span><span class="n">AIRBORNE</span><span class="p">:</span>
+<span class="w">        </span><span class="o">$</span><span class="n">JumpSound</span><span class="o">.</span><span class="n">play</span><span class="p">()</span><span class="w"> </span><span class="c1"># the new line</span>
+</code></pre></div>
+
 <h2 id="technical-debt-2">Technical debt 2</h2>
 <p>The <a href="https://github.com/Teaching-myself-Godot/godot-zelia/blob/6d300048f64f709ae48f67c5de0fc57542551f6e/player/player.gd">code is starting to look a little messy</a> already, so we might want refactor at this point.</p>
 <p>No worries, we'll revisit this code often.</p>
