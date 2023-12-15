@@ -491,7 +491,7 @@ The next step is not to allow that strange bit of negative `hp`!
 
 All it takes is doing stuff we already did with the fireball: [autoloaded texture renditions](day-4.md#generate-renditions-to-make-the-fireball-dissipate)
 
-1. Open `res://texture_renditions.gd`
+1. Open `res://cracked_renditions.gd`
 2. Add the properties `slime` and `slime_dissipate`
 
 ```gdscript
@@ -1469,7 +1469,7 @@ func get_cracked_renditions(source_id: int, src_image : Image):
 
 	print("Assert single invocation for get_cracked_renditions:" + str(source_id))
 
-	# copy the source image into the rendition map
+	# copy the source image into the rendition map as the 1st rendition in the list
 	cracked_rendition_map[source_id] = [ImageTexture.create_from_image(src_image)]
 
 	# for each alpha mask we preloaded into the crack_masks array ...
@@ -1481,6 +1481,57 @@ func get_cracked_renditions(source_id: int, src_image : Image):
 	# of course return the dictionary
 	return cracked_rendition_map[source_id]
 ```
+
+7. Now we must adapt our code in `res://tiles/breakable_tile.gd` to generate the renditions:
+
+```gdscript
+# add a property to store the renditions in
+var cracked_renditions  : Array
+
+func _ready():
+	# create the renditions, or get the stored renditions using the texture's RID as key
+	cracked_renditions = TextureRenditions.get_cracked_renditions(texture.get_rid().get_id(), texture.get_image())
+	# Set the currrent texture to the first rendition (a copy of the original)
+	$Sprite2D.set_texture(cracked_renditions[0])
+	# The rest remains the same
+	$Sprite2D.region_rect = Rect2(texture_pos.x, texture_pos.y, 15, 15)
+	$CollisionPolygon2D.polygon = collisigon
+```
+
+8. And adapt it to _use_ the renditions:
+
+```gdscript
+var cracked_renditions  : Array
+# Add a property to store the start_hp in (in order to calculate how much is left)
+var start_hp            : float
+
+func _ready():
+	# and set it to the initial value of hp 
+	start_hp = hp
+	cracked_renditions = TextureRenditions.get_cracked_renditions(texture.get_rid().get_id(), texture.get_image())
+	# ... keep the rest
+
+func take_damage(dmg : float):
+	hp -= dmg
+	if hp <= 0:
+		queue_free()
+	
+	# calculate the percentage of damage done
+	var perc = hp / start_hp
+
+	# set the cracked rendition accordingly 
+	if perc > .9:
+		$Sprite2D.set_texture(cracked_renditions[0])
+	elif perc > .8:
+		$Sprite2D.set_texture(cracked_renditions[1])
+	elif perc > .6:
+		$Sprite2D.set_texture(cracked_renditions[2])
+	elif perc > .3:
+		$Sprite2D.set_texture(cracked_renditions[3])
+	else:
+		$Sprite2D.set_texture(cracked_renditions[4])
+```
+
 
 ## Allow those breakable tiles to fall down
 
