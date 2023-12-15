@@ -1408,7 +1408,79 @@ This time we will use a set of `.png` files as an alpha mask. You can download t
 
 1. Extract `cracked-renditions.zip` in `res://surface_maps`
 2. Open `res://texture_rendition.gd`
+3. Preload the files as an image resource like this:
 
+```gdscript
+var crack_mask_0 = preload("res://surface_maps/crack-mask-0.png").get_image()
+var crack_mask_1 = preload("res://surface_maps/crack-mask-1.png").get_image()
+var crack_mask_2 = preload("res://surface_maps/crack-mask-2.png").get_image()
+var crack_mask_3 = preload("res://surface_maps/crack-mask-3.png").get_image()
+```
+
+4. And prepare these 2 data objects to be used in our rendition code:
+
+```gdscript
+var crack_masks = [crack_mask_0, crack_mask_1, crack_mask_2, crack_mask_3]
+var cracked_rendition_map : Dictionary = {}
+```
+
+5. The first function we'll write is a reusable function `get_alpha_mask_rendition`, which takes 2 arguments
+	- `src_image : Image`, the image we want to make partly transparent using an alpha mask
+	- `alpha_map : Image`, the image we will use to 'draw transparency' on the source image, as it were
+
+```gdscript
+func get_alpha_mask_rendition(src_image : Image, alpha_map : Image):
+
+	# create a destination image with the same properties as the source image
+	var dst_rendition = Image.create(src_image.get_width(), src_image.get_height(), false, src_image.get_format())
+
+	# loop through all the pixels in the source image
+	for x in range(src_image.get_width()):
+		for y in range(src_image.get_height()):
+
+			# Get the original color
+			var src_color = src_image.get_pixel(x, y)
+
+			# Get the color representing the amount of transparency to draw
+			var alpha_color = alpha_map.get_pixel(x, y)
+
+			# Calculate how much transparency this should be, by inverting
+			# the alpha-amount of the mask's color
+			var dest_alpha = 1.0 - alpha_color.a if 1.0 - alpha_color.a > 0.0 else 0.0
+
+			# draw a pixel to the destination image based on the source pixel
+			# and set the alpha to the lowest of these 2 alpha values:
+			#  1. dest_alpha
+			#  2. the alpha of the source pixel
+			dst_rendition.set_pixel(x, y, Color(src_color.r, src_color.g, src_color.b, min(src_color.a, dest_alpha)))
+
+	# return the destination image as an ImageTexture object
+	return ImageTexture.create_from_image(dst_rendition)
+```
+
+6. Let's then write a function `get_cracked_renditions` which takes 2 arguments
+	- `source_id : int`, a key for our dictionary to make sure the rendition is generated only once in code (singleton pattern)
+	- `src_image : Image` the image we want to generate cracked renditions for
+
+```gdscript
+func get_cracked_renditions(source_id: int, src_image : Image):
+	if source_id in cracked_rendition_map:
+		return cracked_rendition_map[source_id]
+
+	print("Assert single invocation for get_cracked_renditions:" + str(source_id))
+
+	# copy the source image into the rendition map
+	cracked_rendition_map[source_id] = [ImageTexture.create_from_image(src_image)]
+
+	# for each alpha mask we preloaded into the crack_masks array ...
+	for crack_mask in crack_masks:
+		# ... make a rendition with get_alpha_mask_rendition and add it to
+		# the dictionary using source_id as key
+		cracked_rendition_map[source_id].append(get_alpha_mask_rendition(src_image, crack_mask))
+
+	# of course return the dictionary
+	return cracked_rendition_map[source_id]
+```
 
 ## Allow those breakable tiles to fall down
 
