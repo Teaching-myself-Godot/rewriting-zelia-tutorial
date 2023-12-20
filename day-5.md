@@ -1,4 +1,4 @@
-# Day 5 - Slimes, Breaking tiles, Falling Tiles, Scenery Tiles and Shaders
+# Day 5 - Slimes, Breaking tiles, Scenery Tiles with Shaders
 
 A long title for a long episode!
 
@@ -7,10 +7,8 @@ A long title for a long episode!
 1. [Make a bouncing Slime monster](#make-a-bouncing-slime-monster)
 2. [Add the tree-trunk terrain](#add-the-tree-trunk-terrain)
 3. [Make tiles Zelia can break](#make-tiles-zelia-can-break)
-4. [Allow those breakable tiles to fall down](#allow-those-breakable-tiles-to-fall-down)
-5. [Technical Debt 6](#technical-debt-6)
+4. [Technical Debt 6](#technical-debt-6)
 5. [Reuse tiles as background scenery](#reuse-tiles-as-background-scenery)
-
 
 
 ## Make a bouncing Slime monster
@@ -1533,13 +1531,6 @@ func take_damage(dmg : float):
 ```
 
 
-## Allow those breakable tiles to fall down
-
-Rigid -> Static -> Rigid -> Character -> Area -> Static -> Rigid -> ooooh...
-
-Spoiler: it was [StaticBody2D](https://docs.godotengine.org/en/stable/classes/class_staticbody2d.html#class-staticbody2d) I wanted all along.
-
-
 ## Technical debt 6
 
 While following the [my first 3D game](https://docs.godotengine.org/en/stable/getting_started/first_3d_game) tutorial I was reminded of Godot's group tagging feature in part [06. on squashing monsters](https://docs.godotengine.org/en/stable/getting_started/first_3d_game/06.jump_and_squash.html#squashing-monsters):
@@ -1555,3 +1546,18 @@ The [original Zelia game](https://renevanderark.itch.io/zelia-mystery-mage-and-a
 
 Although we could probably do this without any complexity, let's use this oppurtunity to explore 2D fragment shaders.
 
+We'll use the simplest of shaders imaginable to create a subtle blue hue and some transparency, for the "_distant_" effect:
+
+![the distant effect](./screenshots/the-distant-effect.png)
+
+The steps to achieve this are:
+
+1. [Create a new SceneryTerrains node in the Game scene](#create-a-new-sceneryterrains-node-in-the-game-scene)
+2. [Add a 2D A fragment shader to change the color of the tiles](#add-a-2d-a-fragment-shader-to-change-the-color-of-the-tiles)
+3. [Adapt the game background color](#adapt-the-game-background-color)
+
+### Create a new SceneryTerrains node in the Game scene
+
+### Add a 2D A fragment shader to change the color of the tiles
+
+### Adapt the game background color

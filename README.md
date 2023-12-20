@@ -6,7 +6,7 @@
 - [Day 2 - Adding some tiles and some physics](day-2.md)
 - [Day 3 - Casting Sprites](day-3.md)
 - [Day 4 - Casting Fireballs](day-4.md)
-- [Day 5 - Slimes, Breaking tiles, Falling Tiles, Scenery Tiles and Shaders](day-5.md)
+- [Day 5 - Slimes, Breaking tiles, Scenery Tiles with Shaders](day-5.md)
 
 ## Browse topics
 
@@ -15,7 +15,7 @@
 - [Autotiles in godot 4.1.1](day-2.md#addings-tiles-in-a-tilemap)
 - [Refactoring big functions](day-3.md#extract-some-functions-for-less-messy-code)
 - [Basic platformer 2D physics](day-2.md#adapting-her-script-to-characterbody2d)
-- [2D shaders](day-5.md#reuse-tiles-as-background-scenery)
+- [2D as](day-5.md#reuse-tiles-as-background-scenery)
 - [Interactive TileMap Recipes](day-5.md#make-tiles-zelia-can-break)
 
 
@@ -54,7 +54,7 @@ I will be documenting my work in numbered days, some days we'll get a lot done. 
 - [Day 2 - Adding some tiles and some physics](day-2.md)
 - [Day 3 - Casting Sprites](day-3.md)
 - [Day 4 - Casting Fireballs](day-4.md)
-- [Day 5 - Slimes, Breaking tiles, Falling Tiles, Scenery Tiles and Shaders](day-5.md)
+- [Day 5 - Slimes, Breaking tiles, Scenery Tiles with Shaders](day-5.md)
 
 ## Things I read up on
 
